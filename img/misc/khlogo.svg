@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:cc="http://creativecommons.org/ns#"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:svg="http://www.w3.org/2000/svg"
+	xmlns="http://www.w3.org/2000/svg"
+	id="khlogo"
+	version="1.1"
+	width="750"
+	height="710"
+	viewBox="175 135 400 400"
+	xml:space="preserve">
+	<defs>
+        <radialGradient id = "gradient-box" cx = "50%" cy = "50%" r = "50%">
+            <stop stop-color = "hsl(212,60%,70%)" offset = "0%"/>
+            <stop stop-color = "hsl(212,60%,42%)" offset = "85%"/>
+            <stop stop-color = "hsl(212,60%,38%)" offset = "100%"/>
+        </radialGradient>	
+		<filter id="box-drop-shadow">
+			<feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+			<feOffset dx="2" dy="-2" result="offsetblur"/>
+			<feFlood flood-opacity="0.3" flood-color="rgb(0,0,0)"/>
+			<feComposite in2="offsetblur" operator="in"/>
+			<feMerge>
+			<feMergeNode/>
+			<feMergeNode in="SourceGraphic"/>
+			</feMerge>
+		</filter>	
+		<filter id="logo-glow" x="-20%" y="-20%" width="140%" height="140%">
+			<feColorMatrix type="matrix" values=
+				"0 0 0 0 0
+				 0 0 0 0 0 
+				 0 0 0 0 0 
+				 0 0 0 1 0"/>
+			<feGaussianBlur stdDeviation="7" in="SourceAlpha" result="coloredBlur"/>
+			<feMerge>
+			<feMergeNode in="coloredBlur"/>
+			<feMergeNode in="SourceGraphic"/>
+			</feMerge>
+		</filter>
+		<filter id="logo-glow2" width="1.5" height="1.5" x="-.25" y="-.25">
+			<feGaussianBlur id="feGaussianBlur5384" in="SourceAlpha" stdDeviation="12" result="blur"/>
+			<feColorMatrix id="feColorMatrix5386" result="bluralpha" type="matrix" values=
+				"-1  0  0 0 0
+				  0 -1  0 0 0
+				  0  0 -1 0 0
+				  0  0  0 0.8 0 "/>
+			<feOffset id="feOffset5388" in="bluralpha" dx="0.000000" dy="0.000000" result="offsetBlur"/>
+			<feMerge id="feMerge5390">
+				<feMergeNode id="feMergeNode5392" in="offsetBlur"/>
+				<feMergeNode id="feMergeNode5394" in="SourceGraphic"/>
+			</feMerge>
+		</filter>		
+	</defs>
+	<g 
+		id="logo-group"
+		transform="matrix(1.25,0,0,-1.25,0,1052.5)">
+		<path
+			id="box-back"
+			style="filter:url(#box-drop-shadow);fill:#0d1823;fill-opacity:1;fill-rule:evenodd;stroke:none"
+			d="m 159.24,677.1204 c 0,17.04 13.8,30.84 30.72,30.84 l 215.04,0 c 17.04,0 30.84,-13.8 30.84,-30.84 l 0,-215.04 c 0,-16.92 -13.8,-30.72 -30.84,-30.72 l -215.04,0 c -16.92,0 -30.72,13.8 -30.72,30.72"
+		/>
+		<path			
+			id="box-front"
+			style="fill:url(#gradient-box);fill-opacity:1;fill-rule:evenodd;stroke:none"
+			d="m 165.72,675.4404 c 0,14.4 11.64,26.04 25.92,26.04 l 211.8,0 c 14.28,0 25.92,-11.64 25.92,-26.04 l 0,-211.68 c 0,-14.4 -11.64,-26.04 -25.92,-26.04 l -211.8,0 c -14.28,0 -25.92,11.64 -25.92,26.04"
+		/>
+		<g
+			id="kh-group"
+			style=""
+			>
+			<path
+				id="kh-path"
+				style="filter:url(#logo-glow);fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
+				d="M 306.46875 250 L 266.28125 424.90625 L 299.71875 424.90625 L 311.28125 374.65625 L 321.15625 373.15625 L 333.15625 424.90625 L 367.375 424.90625 L 367.375 424.875 L 397.5 424.875 L 416.71875 340.875 C 416.71875 340.875 432.91875 325.75 440.71875 325.75 C 449.41875 325.75 450.75 330.98125 450.75 340.28125 C 450.75 346.13125 447.75 359.79375 446.25 366.09375 L 432.75 424.875 L 466.21875 424.875 L 480.15625 363.53125 C 481.95625 356.03125 485.40625 340.88125 485.40625 332.03125 C 485.40625 312.53125 477.76875 296.9375 454.96875 296.9375 C 438.46875 296.9375 423.75 311.625 423.75 311.625 L 437.71875 250 L 404.25 250 L 392.71875 299.9375 L 357.625 299.9375 L 325.96875 345.25 L 317.40625 347.0625 L 339.90625 250 L 306.46875 250 z M 391.96875 303.28125 L 365.5625 417.75 L 350.875 360.09375 L 391.96875 303.28125 z "
+				transform="matrix(0.8,0,0,-0.8,0,842)"
+				/>
+		</g>
+	</g>
+</svg>
