@@ -1,0 +1,1730 @@
+<!-- init section -->
+	<head>
+			<title>Using the Component Object Model (COM)</title>
+	</head>
+
+	<body bgcolor="#ffffff" text="#000000" alink="#ff0000" vlink="#002080" link="#0f00ff">
+	<font face="VERDANA, ARIAL, HELVETICA">
+	<center>
+	<table>
+
+
+
+
+
+<!-- title section -->
+
+
+	<table border=0 cellspacing=0 cellpadding=0 width=600>
+	<font face="Arial, Helvetica" size=1>
+		<tr>
+			<td width=150><a href=/><img src=../art/top-root.gif alt="root" width=150 height=25 border=0 vspace=0></a><br></td>
+
+			<td width=150><a href=../../index.html><img src=../art/top-back.gif alt="previous" width=150 height=25 border=0 vspace=0></a><br></td>
+
+			<td width=150><a href=../index.html><img src=../art/top-index.gif alt="index" width=150 height=25 border=0 vspace=0></a><br></td>
+
+			<td width=150><a href=mailto:koch3@uni-weimar.de><img src=../art/top-mail.gif alt="mail" width=150 height=25 border=0 vspace=0></a><br></td>
+
+		</table>
+
+<!-- page section -->
+	<table border=0 cellspacing=0 cellpadding=0 width=600>
+		<tr>
+			<td bgcolor=#ffffff text=#000000 width=600 valign=top align=left>
+			<font face="Verdana,Arial, Helvetica" size=2>
+			<br>
+			<hr size=1>
+			<br>
+Author: Lar Mader
+
+<br>June 1996
+
+<h1 align=center>Using the Component Object Model (COM)</h1>
+
+
+
+<h2>Contents </h2>
+
+
+
+<h3>1. Overview of OLE and COM </h3>
+
+
+
+<ol>
+
+<li>What is OLE and COM </li>
+
+
+
+<li>Advantages of COM DLLs over traditional DLLs </li>
+
+
+
+<li>Advantages over C++ </li>
+
+
+
+<li>Aggregation </li>
+
+
+
+<li>Understanding COM design </li>
+
+</ol>
+
+
+
+<h3>2. Programming COM </h3>
+
+
+
+<ol>
+
+<li>GUIDs </li>
+
+
+
+<li>IUnknown </li>
+
+
+
+<li>The Rules of Reference Counting </li>
+
+
+
+<li>IClassFactory </li>
+
+</ol>
+
+
+
+<h3>3. In process servers </h3>
+
+
+
+<ol>
+
+<li>Exporting the DllGetClassObject() and DllCanUnloadNow() functions </li>
+
+
+
+<li>The ClassFactory's CreateInstance method </li>
+
+
+
+<li>The Client application </li>
+
+
+
+<li>The entire source code for a COM server DLL </li>
+
+
+
+<li>The entire source code for the client program </li>
+
+
+
+<li>Registering the COM Server </li>
+
+</ol>
+
+
+
+<p>
+
+<hr size=1 width="100%" ></p>
+
+
+
+<h3>1. Overview of OLE</h3>
+
+
+
+<p><b>A. What is OLE and COM</b></p>
+
+
+
+<p>Prior to OLE1, managing compound documents usually involved cutting
+
+and pasting object data to and from the clipboard, between the document
+
+and the apps used to create these objects. This was cumbersome and there
+
+were many limitations. </p>
+
+
+
+<p>OLE1 was a technology based on DDE that was developed to support linking
+
+and embedding objects (hence the name Object Linking and Embedding) created
+
+in one application, called a server, into a document in another application,
+
+called a container. The application functioning as a container was typically
+
+responsible for owning the data associated with the object, and could sometimes
+
+display the object. But when it came time to edit the object, a simple
+
+double click would take care of loading the server application and sending
+
+the data to the server. Now the user could see, edit, and manipulate the
+
+object in the application that created it. When the user was done editing,
+
+closing the server app would cause the object data to be sent back to the
+
+container app. </p>
+
+
+
+<p>The objects stored in a compound document can be thought of as a type
+
+of software component, however there are many types of software components
+
+that applications would like to be able to share. Creating software components
+
+is one of the most effective methods of code reuse. In trying to solve
+
+some of the limitations of OLE1 and expand its capabilities, Microsoft
+
+developed a powerful general purpose object sharing technology called COM,
+
+the Component Object Model. COM is the model used to program OLE2. OLE2
+
+is now referred to as simply OLE (it doesn't need a version number, as
+
+you will see), and it no longer stands for Object Linking and Embedding,
+
+because it has become more general purpose. </p>
+
+
+
+<p>With COM, the programmer gains access to a set of interfaces exposed
+
+by the object. An interface is simply a group functions, usually related.
+
+When programming OLE, one might create a COM object server that provides
+
+an object with some functionality for use by other applications. In this
+
+scenario, the programmer creating the object defines the object and codes
+
+all of the interfaces to be exposed. In other scenarios, you may be adding
+
+OLE object container or server functionality to your app, and in this scenario,
+
+you must provide implementations for abstract interfaces that are already
+
+declared by some other COM objects. </p>
+
+
+
+<p>COM objects can live in many different locations. They are called &quot;in
+
+process servers&quot; when they live in DLLs. COM objects in DLLs are the
+
+most efficient in terms of call overhead since DLLs are loaded into the
+
+process space of the application using them, and thus there is no interprocess
+
+communication. They are called &quot;local servers&quot; when they live
+
+in separate EXEs, in which case one application is talking across process
+
+boundaries to reach the COM object that is off in another EXE. The process
+
+of talking across process boundaries in OLE is called marshaling, and always
+
+involves at least a little more overhead than simply talking to a DLL Now,
+
+with Windows NT 4.0 (in beta 2 at this time) COM objects can also live
+
+on a separate machine that is connected by a network. This technology is
+
+being called DCOM, or Distributed COM. Once you have implemented a COM
+
+object as a local server, it is trivial to make it capable of living out
+
+on the network. </p>
+
+
+
+<p><b>B. Advantages of COM DLLs over traditional DLLs</b> </p>
+
+
+
+<p>DLLs are a great a way to share code in Windows. Unfortunately, the
+
+traditional ways that DLLs are used make many things more difficult than
+
+they should be. </p>
+
+
+
+<p>One big problem is what is known as the versioning problem. Suppose
+
+you have a DLL that provides a standard service, and you need to add to
+
+it a host of new functions to extend the service or implement a new complimentary
+
+service. </p>
+
+
+
+<p>So now the question is, how do you provide the new service, that is,
+
+these new functions? You could provide a new DLL with a different name,
+
+but this isn't really ideal since each additional DLL an app uses adds
+
+a fixed amount of overhead in load time and memory requirements, in addition
+
+to any overhead related to the added function itself. If the new DLL has
+
+the same name as the old DLL, how does an app know which DLL it is linking
+
+to? Does the new app have the added functionality or not? True, your DLL
+
+could have a version-info resource, but then it gets a little tricky keeping
+
+straight which functions belong to which version, especially if you added
+
+a lot of functions. Or you can link to the DLL with LoadLibrary and check
+
+the returns from GetProcAddress, but again this gets a little tedious if
+
+you have a lot of new functions. </p>
+
+
+
+<p>Additionally, you get problems based on the fact that different vendors
+
+providing this DLL may install it in different places. You then end up
+
+with multiple copies of the DLL on the hard drive, and possibly multiple
+
+versions, with the additional problem that apps may start loading the wrong
+
+version. This in effect requires that users of the DLL check its versioning
+
+in some way. </p>
+
+
+
+<p>Its important to realize that these problems are not insurmountable.
+
+We have been dealing with versioning DLLs for over 6 years and surviving.
+
+But the solutions are clumsy, and prone to error. </p>
+
+
+
+<p>COM provides an elegant solution to all of these problems. COM is an
+
+object oriented system. The functions that you access in a COM object are
+
+exposed via what we call interfaces. An interface is identical to the C++
+
+concept of a vtable pointer. After initializing COM and loading your object
+
+server, one of the most fundamental things you do as a client of a COM
+
+object is ask for an interface pointer. You can obtain an interface pointer
+
+by calling a standard method QueryInterface(). The interface pointer that
+
+you get is a pointer to a vtable that contains the addresses of a set of
+
+functions in the DLL. </p>
+
+
+
+<p>This helps to solve the versioning problem in several ways. First of
+
+all, when a service provider adds a new set of functions to the DLL, they
+
+can all be encapsulated completely in a new interface (i.e vtable). A client
+
+of the DLL doesn't need to know what version of the DLL it is using. It
+
+simply calls QueryInterface() to determine if the new functionality is
+
+present. If it is, a pointer is returned to a vtable, that contains the
+
+addresses of ALL the new functions. This means that clients that are aware
+
+of the new DLL version can gracefully check for the presence of the new
+
+functionality by calling QueryInterface(), and the new functions are neatly
+
+encapsulated in a vtable. No need to worry about trying to keep track which
+
+functions are new. </p>
+
+
+
+<p>Additionally, managing COM DLL versions on the hard drive is easier.
+
+The COM client doesn't even know the name of the DLL. Instead, the COM
+
+client references the COM objects in the DLL via a GUID, or a Globally
+
+Unique Identifier. GUIDS are 16 byte numbers generated by an algorithm
+
+that guarantees them to be unique in time and space (more on this later).
+
+When the client wants a COM object, it refers to the GUID, and the system
+
+goes about loading the COM DLL for you. It does this by looking up the
+
+GUID in the registry to find the path and name of the DLL to load. </p>
+
+
+
+<p>This is nice, because it means that the user of the DLL never needs
+
+to worry about whether it's installed in the path, if it has the right
+
+file name, if the DLL name changes with newer version, etc. </p>
+
+
+
+<p><b>C. Advantages over C++</b> </p>
+
+
+
+<p>Libraries of code that are statically linked suffer from the following
+
+problems: </p>
+
+
+
+<ol>
+
+<li>Wasteful of disk space and memory space, since the same library may
+
+get linked into many different modules.</li>
+
+
+
+<li>The implementation of the objects in the library are permanently attached
+
+to the module that linked them. Thus updates or fixes to the library can't
+
+be delivered without recompiling the module. </li>
+
+</ol>
+
+
+
+<p>Since dynamically linkable objects don't suffer these problems, they
+
+are very well suited for use as software components. However exporting
+
+C++ classes from a DLL is somewhat problematic. The main issues are:</p>
+
+
+
+<ol>
+
+<li>Users of your object must use a C++ compiler </li>
+
+
+
+<li>Except that even among C++ compilers, name mangling varies </li>
+
+
+
+<li>Layout of objects is different across compilers for C++ classes using
+
+virtual base classes, RTTI, and exception handling </li>
+
+</ol>
+
+
+
+<p>COM allows you to create polymorphic objects which are exported from
+
+a DLL or EXE that can be used by virtually any language. It is based on
+
+the concept of the standard vtable layout. All C++ compilers, and most
+
+object oriented languages such as Delphi support this vtable format natively.
+
+Other languages aren't left out in the cold either. In straight C, it's
+
+a little more fuss because you have to fill in a structure with function
+
+addresses, but it still works fine. Because interfaces are identified by
+
+GUIDS, name linkage is also not an issue. </p>
+
+
+
+<p><b>D. Aggregation </b></p>
+
+
+
+<p>Aggregation is what happens to a person having a bad day. But seriously,
+
+COM doesn't support true inheritance, in terms of how C++ defines it. It
+
+does however support a similar object oriented principle known as aggregation,
+
+which is a technique in which an object can contain other objects, and
+
+expose the interfaces of the contained object as it chooses. </p>
+
+
+
+<p><b>E Understanding COM design</b> </p>
+
+
+
+<p>In trying to understand COM, it is useful to explain the design decisions
+
+in terms of the following goal: Figure out a clean way to move a simplified
+
+C++ like class into a DLL (or EXE) and have it be useable by any language.
+
+</p>
+
+
+
+<p>We have a couple requirements. </p>
+
+
+
+<ol>
+
+<li>The vtable(s) will be the only access to the class (i.e the interface(s)).
+
+This is because its easy to ensure that the vtable is the first entry in
+
+the object. Also, members are invoked via a function pointer only. This
+
+is nice because we don't want any external linkage to actual members. For
+
+this reason we don't allow exporting static member functions. We don't
+
+allow exporting data because the layout in the object makes things more
+
+complicated cross language. Thus the interface to a class is specified
+
+as an abstract base class. This is appropriate since the compiler can't
+
+fill in the vtable entries anyway, and it causes the compiler to enforce
+
+the rule that the client can't try to construct one of these objects by
+
+calling new. </li>
+
+
+
+<li>Construction and destruction of the object must be kept inside the
+
+COM object. Since we have abstract base classes, the client doesn't even
+
+know the size of the object. This is also a requirement if we are going
+
+to be compiler neutral. </li>
+
+
+
+<li>We need a way to identify our COM objects, and make sure that our identifier
+
+is unique (doesn't match someone else's COM object on the same system).
+
+This is the motivation for GUIDS. </li>
+
+</ol>
+
+
+
+<p>These requirements motivate many of the design decisions in COM.
+
+</p>
+
+<hr size=1 width="100%" >
+
+
+
+<h3>2. Programming COM </h3>
+
+
+
+<p><b>A. GUIDS</b> </p>
+
+
+
+<p>GUIDS, or Globally Unique Identifiers, are fundamental to COM. GUIDS
+
+are simply 16 byte numbers, but their value lies in the fact that the algorithm
+
+used to generate them guarantees them to be unique. </p>
+
+
+
+<p>The point of the GUID, is that it represents a way to name all of your
+
+classes and interfaces, and be guaranteed that they will be uniquely named.
+
+This is important since there will be many, many COM objects living on
+
+a system in a sort of global namespace, and therefore a way to keep names
+
+from conflicting is mandatory. </p>
+
+
+
+<p>GUIDS can be obtained in one of several ways. You can use the GUIDGEN
+
+utility provided with the WIN32 SDK and most Compilers including Borland
+
+C++. Or you can call Microsoft and they can allocate some GUIDS for you.
+
+There is also an API in COM that you can call to get a new GUID at runtime.
+
+</p>
+
+
+
+<p><b>B. IUnknown</b> </p>
+
+
+
+<p>All objects derive from the IUnknown interface. It is an abstract base
+
+class that defines the three fundamental methods that all COM objects must
+
+have: </p>
+
+
+
+<ol>
+
+<li>QueryInterface </li>
+
+
+
+<li>AddRef </li>
+
+
+
+<li>Release</li>
+
+</ol>
+
+
+
+<p>In C++ parlance, this is an abstract base class that looks like this:</p>
+
+
+
+<pre>class FAR IUnknown {
+
+  public:
+
+    virtual HRESULT STDMETHODCALLTYPE QueryInterface( IID FAR&amp; riid,
+
+                                                      LPVOID FAR* ppvObj) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE AddRef(void) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE Release(void) = 0;
+
+};
+
+</pre>
+
+
+
+<p>Therefore, these three functions must be implemented by all COM all
+
+objects. </p>
+
+
+
+<p>QueryInterface is used to return an interface pointer to the Client
+
+program. In C++ we do this by simply assigning the &quot;this&quot; pointer
+
+to the second parameter of the QueryInterface function. The first parameter
+
+is the GUID of the interface being requested. </p>
+
+
+
+<p>This first parameter is present because it is possible for a class to
+
+support more that one interface. This in effect means that the class has
+
+two or more vtables. One way to achieve this in C++ is to have a class
+
+that multiply inherits two different classes. In this case, to return a
+
+pointer to one of the interfaces, you simply assign a cast of the &quot;this&quot;
+
+pointer as the class type that is being Queried. </p>
+
+
+
+<p>AddRef and Release are complimentary functions and manage what is known
+
+as reference counting. This is an important and sometimes tricky aspect
+
+of COM. Reference counting is used to control when a COM object should
+
+be destroyed. A COM object doesn't go away until its reference count reaches
+
+zero. A call to AddRef bumps the reference count of the object by one,
+
+and a call to release decrements the reference count by one. The Release
+
+function is in charge of destroying the object when it decrements the reference
+
+count to zero. </p>
+
+
+
+<p><b>C. The Rules of Reference Counting</b> </p>
+
+
+
+<p>In order to properly control the lifetime of a COM object you must follow
+
+the standard rules of reference counting. This means knowing when you must
+
+call AddRef on your object, and when you must call Release. If you don't
+
+follow the rules, your object may never get cleaned up, or worse, get destroyed
+
+before it was supposed to be, causing run-time problems. </p>
+
+
+
+<p>The general rule is that whenever a user makes a copy of an interface
+
+pointer, the user should call AddRef, and then call Release when done using
+
+it. Additionally, when passing pointers to and from functions, the following
+
+three possible situations needs to be handled: </p>
+
+
+
+<ol>
+
+<li>Interface pointer passed in to a function -- In this situation, there
+
+is no need for anyone to call AddRef or Release, unless someone makes a
+
+copy of the pointer that will last outside the scope of the function, in
+
+which case, the general rule above applies. </li>
+
+
+
+<li>Interface pointer returned from a function -- In this case, the called
+
+function must call AddRef on the pointer before returning it, and the caller
+
+must call Release when it done with it. </li>
+
+
+
+<li>Interface pointer passed into a function changes and is returned --
+
+If the interface pointer doesn't change, nothing needs to be done. If a
+
+new interface is substituted for the one passed in, the called function
+
+must Release the old interface pointer and AddRef the new one. </li>
+
+</ol>
+
+
+
+<p><b>D. IClassFactory</b> </p>
+
+
+
+<p>IClassFactory is the interface used to construct your objects. It is
+
+a descendant of IUnknown, and would look like this: </p>
+
+
+
+<pre>class FAR IClassFactory : public IUnknown {
+
+  public:
+
+    // inherited IUnknown methods
+
+    virtual HRESULT STDMETHODCALLTYPE QueryInterface( IID FAR&amp; riid,
+
+                                                      LPVOID FAR* ppvObj) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE AddRef(void) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE Release(void) = 0;
+
+    // These are the two new methods of IClassFactory
+
+    virtual HRESULT STDMETHODCALLTYPE CreateInstance( LPUNKNOWN pUnkOuter,
+
+                                                      IID FAR&amp; riid,
+
+                                                      LPVOID FAR* ppvObject) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE LockServer(BOOL fLock) = 0;
+
+};
+
+</pre>
+
+
+
+<p>All COM objects must provide an actual instance of a ClassFactory, so
+
+that clients of the COM object can call the CreateInstance method of the
+
+ClassFactory to create the COM objects supported. The LockServer method
+
+is used when you need to ensure that the COM server doesn't get unloaded.
+
+</p>
+
+
+
+<p>
+
+<hr size=1 width="100%" ></p>
+
+
+
+<h3>3. In process servers </h3>
+
+
+
+<p>Lets now take a look at how to implement a very simple COM server and
+
+client. We will develop a trivial COM server and client application. The
+
+COM server will provide a COM object with one interface that supports a
+
+method for returning a random number. The client application will initialize
+
+COM, load our COM object server, get the interface pointer, and start getting
+
+random numbers using the method of the interface. </p>
+
+
+
+<p><b>A. Exporting the DllGetClassObject() and DllCanUnloadNow() functions</b>
+
+</p>
+
+
+
+<p>A COM DLL must export two functions. The DllGetClassObject() function
+
+is used to get the interface pointer to the ClassFactory. </p>
+
+
+
+<pre>STDAPI _export DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID FAR * ppv)
+
+</pre>
+
+
+
+<p>The first parameter is the Class ID (GUID) of the object for which you
+
+want a ClassFactory. This means that you will get back a pointer to a ClassFactory
+
+that can create objects of the type specified by the rclsid. The second
+
+parameter is the interface of the ClassFactory requested. This should always
+
+be IID_IClassFactory. The only other interface it would be valid to ask
+
+for would be IID_IUnknown.</p>
+
+
+
+<p>The client application will load the DLL by calling either CoGetClassObject()
+
+or CoCreateInstance(), and pass in the Class ID of the object it needs.
+
+The system then looks up the Class ID in the registry, loads the appropriate
+
+DLL, and calls the DllGetClassObject() function in the DLL for you, to
+
+return the ClassFactory to the Client. Here is a what our simple COM server's
+
+DllGetClassObject must look like. </p>
+
+
+
+<pre>// Global variable
+
+// This is the instance of our class factory (its declared
+
+// in the header file). This must be instantiated at DLL
+
+// load time so that the DLLGetClassObject() function
+
+// can return a pointer to it
+
+static RandClassFactory rcFactory;
+
+
+
+STDAPI _export DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID FAR * ppv)
+
+{
+
+    *ppv = NULL;
+
+    if( rclsid != CLSID_Rand)
+
+    {
+
+        return(ResultFromScode(E_FAIL));
+
+    }
+
+
+
+    if ( (riid != IID_IUnknown) &amp;&amp; (riid != IID_IClassFactory) )
+
+    {
+
+        return(ResultFromScode(E_NOINTERFACE));
+
+    }
+
+
+
+    *ppv = &amp;rcFactory;
+
+    rcFactory.AddRef();
+
+
+
+    return(NOERROR);
+
+}
+
+</pre>
+
+
+
+<p>The DllCanUnloadNow() is used by the system to determine if it can unload
+
+the DLL. It basically just returns true if it can and false if not, and
+
+is prototyped like this: </p>
+
+
+
+<pre>STDAPI _export DllCanUnloadNow(void)
+
+{
+
+    if ( (NumRandObjects == 0) &amp;&amp; (rcFactory.refCount == 0) )
+
+    {
+
+        return(ResultFromScode(S_OK));
+
+    }
+
+
+
+    return(ResultFromScode(S_FALSE));
+
+}
+
+</pre>
+
+
+
+<p><b>B. The ClassFactory's CreateInstance method</b> </p>
+
+
+
+<p>After the client has loaded the COM DLL and received the pointer to
+
+the appropriate ClassFactory, it can now call the ClassFactory's CreateInstance
+
+method to create the object. CreateInstance looks like this: </p>
+
+
+
+<pre>// Creates the object requested, and returns the interface requested
+
+STDMETHODIMP RandClassFactory::CreateInstance ( THIS_ LPUNKNOWN pUnkOuter,
+
+                                                REFIID riid,
+
+                                                LPVOID FAR* ppvObject)
+
+{
+
+    // the first parameter is a pointer an object that is aggregating
+
+    // our object. We don't support this in our example.
+
+    if ( pUnkOuter !=NULL )
+
+    {
+
+        return( ResultFromScode( CLASS_E_NOAGGREGATION ) );
+
+    }
+
+
+
+    LPRand pRand = new RandObj;
+
+    if ( pRand == NULL )
+
+    {
+
+        return( ResultFromScode(E_OUTOFMEMORY));
+
+    }
+
+
+
+    // if the requested interface is not supported, we must
+
+    // delete the object
+
+    HRESULT hErr = pRand-&gt;QueryInterface( riid, ppvObject);
+
+    if ( FAILED(GetScode(hErr)) )
+
+    {
+
+        delete pRand;
+
+        return hErr;
+
+    }
+
+
+
+    return(NOERROR);
+
+}
+
+</pre>
+
+
+
+<p><b>C. The Client application</b> </p>
+
+
+
+<p>The sequence of steps the client will use to get to the COM object are
+
+as follows: </p>
+
+
+
+<ol>
+
+<li>Initialize the COM system by calling the COM function CoInitialize().
+
+</li>
+
+
+
+<li>Load the DLL server by calling CoGetClassObject(), and passing the
+
+ClassId of the COM object that we want. This returns a pointer to the ClassFactory
+
+for the object requested. </li>
+
+
+
+<li>Using the pointer to the ClassFactory returned, we then call the CreateInstance
+
+member function of the ClassFactory to create our object and return an
+
+interface pointer to it. We then have a working interface pointer, with
+
+which to start using the COM Object. If the COM object supports additional
+
+interfaces, we can call that COM object's QueryInterface method to return
+
+any other interfaces. </li>
+
+</ol>
+
+
+
+<p>Since this is such a common sequence of events, COM provides a function
+
+called CoCreateInstance that rolls the above steps two and three into just
+
+one step. So, instead of calling CoGetClassObject followed by CreateInstance,
+
+you can simply call CoCreateInstance. </p>
+
+
+
+<p><b>D. The entire source code for a COM server DLL</b> </p>
+
+
+
+<p>This should be compiled as Win32 DLL, and you must link with the OLE2W32.LIB
+
+inport library. </p>
+
+
+
+<pre>#include &lt;windows.h&gt;
+
+#include &lt;objbase.h&gt;
+
+#include &lt;initguid.h&gt;
+
+#include &lt;scode.h&gt;
+
+
+
+#include &lt;stdlib.h&gt;
+
+#include &lt;time.h&gt;
+
+
+
+#pragma hdrstop
+
+
+
+#include &quot;test.h&quot;
+
+
+
+static ULONG NumRandObjects = 0;
+
+
+
+class RandObj : public IRand
+
+{
+
+    ULONG refCount;
+
+  public:
+
+
+
+    RandObj();
+
+    ~RandObj();
+
+
+
+    STDMETHOD(QueryInterface)( THIS_ REFIID riid, LPVOID FAR* ppvObj );
+
+    STDMETHOD_(ULONG, AddRef) ( THIS );
+
+    STDMETHOD_(ULONG, Release) ( THIS );
+
+
+
+    STDMETHOD_(ULONG, GetRand) (THIS_ ULONG Range);
+
+};
+
+
+
+RandObj::RandObj()
+
+{
+
+    refCount = 0;
+
+    NumRandObjects++;
+
+
+
+    randomize();
+
+}
+
+
+
+RandObj::~RandObj()
+
+{
+
+    NumRandObjects--;
+
+}
+
+
+
+STDMETHODIMP RandObj::QueryInterface( THIS_ REFIID riid, LPVOID FAR * ppvObj )
+
+{
+
+    if ( (riid == IID_IUnknown) || (riid == IID_IRand) )
+
+    {
+
+        *ppvObj = this;
+
+        AddRef();
+
+        return(NOERROR);
+
+    }
+
+    *ppvObj = NULL;
+
+    return ResultFromScode(E_NOINTERFACE);
+
+}
+
+
+
+STDMETHODIMP_(ULONG) RandObj::AddRef()
+
+{
+
+    return(++refCount);
+
+}
+
+
+
+STDMETHODIMP_(ULONG) RandObj::Release()
+
+{
+
+    if ( --refCount == 0 )
+
+    {
+
+        delete this;
+
+        return(0);
+
+    }
+
+
+
+    return(refCount);
+
+}
+
+
+
+STDMETHODIMP_(ULONG) RandObj::GetRand(THIS_ ULONG Range)
+
+{
+
+    if ( Range &gt; RAND_MAX ) Range = RAND_MAX;
+
+
+
+    return (rand() % Range);
+
+}
+
+
+
+
+
+class RandClassFactory : public IClassFactory {
+
+  public:
+
+    ULONG refCount;
+
+
+
+    RandClassFactory() { refCount = 0; };
+
+
+
+    STDMETHOD(QueryInterface)( THIS_ REFIID riid, LPVOID FAR* ppvObj );
+
+    STDMETHOD_(ULONG, AddRef) ( THIS );
+
+    STDMETHOD_(ULONG, Release) ( THIS );
+
+
+
+    STDMETHOD(CreateInstance) (THIS_ LPUNKNOWN pUnkOuter, REFIID riid,
+
+                               LPVOID FAR* ppvObject);
+
+    STDMETHOD(LockServer) (THIS_ BOOL fLock);
+
+};
+
+
+
+static RandClassFactory rcFactory;
+
+
+
+STDMETHODIMP RandClassFactory::QueryInterface( THIS_ REFIID riid,
+
+                                               LPVOID FAR* ppvObj )
+
+{
+
+    if ( (riid == IID_IUnknown) || (riid == IID_IClassFactory) )
+
+    {
+
+        *ppvObj = this;
+
+        AddRef();
+
+        return(NOERROR);
+
+    }
+
+    *ppvObj = NULL;
+
+    return ResultFromScode(E_NOINTERFACE);
+
+}
+
+
+
+STDMETHODIMP_(ULONG) RandClassFactory::AddRef ( THIS )
+
+{
+
+    return(++refCount);
+
+}
+
+
+
+STDMETHODIMP_(ULONG) RandClassFactory::Release ( THIS )
+
+{
+
+    if ( --refCount == 0 )
+
+    {
+
+        delete this;
+
+        return(0);
+
+    }
+
+
+
+    return(refCount);
+
+}
+
+
+
+
+
+STDMETHODIMP RandClassFactory::CreateInstance (THIS_ LPUNKNOWN pUnkOuter,
+
+                                           REFIID riid, LPVOID FAR* ppvObject)
+
+{
+
+    if ( pUnkOuter !=NULL )
+
+    {
+
+        return( ResultFromScode( CLASS_E_NOAGGREGATION ) );
+
+    }
+
+    LPRand pRand = new RandObj;
+
+    if ( pRand == NULL )
+
+    {
+
+        return( ResultFromScode(E_OUTOFMEMORY));
+
+    }
+
+    HRESULT hErr = pRand-&gt;QueryInterface( riid, ppvObject);
+
+    if ( FAILED(GetScode(hErr)) )
+
+    {
+
+        delete pRand;
+
+        return hErr;
+
+    }
+
+    return(NOERROR);
+
+}
+
+
+
+STDMETHODIMP RandClassFactory::LockServer (THIS_ BOOL fLock)
+
+{
+
+    if (fLock)
+
+    {
+
+        NumRandObjects++;
+
+    } else {
+
+        NumRandObjects--;
+
+    }
+
+
+
+    return(NOERROR);
+
+}
+
+
+
+STDAPI _export DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID FAR * ppv)
+
+{
+
+    *ppv = NULL;
+
+
+
+    if( rclsid != CLSID_Rand)
+
+    {
+
+        return(ResultFromScode(E_FAIL));
+
+    }
+
+
+
+    if ( (riid != IID_IUnknown) &amp;&amp; (riid != IID_IClassFactory) )
+
+    {
+
+        return(ResultFromScode(E_NOINTERFACE));
+
+    }
+
+
+
+    *ppv = &amp;rcFactory;
+
+    rcFactory.AddRef();
+
+
+
+    return(NOERROR);
+
+}
+
+
+
+STDAPI _export DllCanUnloadNow(void)
+
+{
+
+    if ( (NumRandObjects == 0) &amp;&amp; (rcFactory.refCount == 0) )
+
+    {
+
+        return(ResultFromScode(S_OK));
+
+    }
+
+    return(ResultFromScode(S_FALSE));
+
+}
+
+</pre>
+
+
+
+<p><b>E. The entire source code for the client program</b> </p>
+
+
+
+<p>This should be compiled as a Win32 Console mode app, and you must link
+
+with the OLE2W32.LIB inport library. </p>
+
+
+
+<pre>#include &lt;iostream.h&gt;
+
+#include &lt;ole2ver.h&gt;
+
+#include &lt;objbase.h&gt;
+
+#include &lt;initguid.h&gt;
+
+#include &lt;scode.h&gt;
+
+
+
+#pragma hdrstop
+
+
+
+#include &quot;test.h&quot;
+
+
+
+// function to initialize the COM system.
+
+// Every COM client must do this
+
+bool InitCOM()
+
+{
+
+    DWORD coVersion = CoBuildVersion();
+
+    if ( (HIWORD(coVersion) != rmm) || (LOWORD(coVersion) &lt; rup) )
+
+    {
+
+        cout &lt;&lt; &quot;Bad version of COM.\n&quot;;
+
+        return(false);
+
+    }
+
+
+
+    HRESULT hErr = CoInitialize( NULL );
+
+    if ( FAILED(GetScode(hErr)) )
+
+    {
+
+        cout &lt;&lt; &quot;COM initialization failed.\n&quot;;
+
+        return(false);
+
+    }
+
+    return(true);
+
+}
+
+
+
+void UnInitCOM()
+
+{
+
+    CoUninitialize();
+
+}
+
+
+
+void main()
+
+{
+
+    HRESULT         hErr;
+
+    LPRand          pRand;
+
+
+
+    if (!InitCOM()) return;
+
+
+
+    // the third parameter is telling COM that we are loading an
+
+    // inprocess server (DLL) as opposed to a Local Server (EXE)
+
+    hErr = CoCreateInstance( CLSID_Rand,
+
+                             NULL,
+
+                             CLSCTX_INPROC_SERVER,
+
+                             IID_IRand,
+
+                            (LPVOID FAR *) &amp;pRand);
+
+
+
+    if ( FAILED(GetScode(hErr)) )
+
+    {
+
+        cout &lt;&lt; &quot;Failed!\n&quot;;
+
+    } else {
+
+        cout &lt;&lt; &quot;Succeeded!\n&quot;;
+
+        if ( pRand != NULL )
+
+        {
+
+            cout &lt;&lt; pRand-&gt;GetRand(100) &lt;&lt; endl;
+
+            cout &lt;&lt; pRand-&gt;GetRand(100) &lt;&lt; endl;
+
+            cout &lt;&lt; pRand-&gt;GetRand(100) &lt;&lt; endl;
+
+            pRand-&gt;Release();
+
+        }
+
+    }
+
+    UnInitCOM();
+
+}
+
+</pre>
+
+
+
+<p>Here is TEST.H: </p>
+
+
+
+<pre>#ifndef __comtest__
+
+#define __comtest__
+
+
+
+#undef  INTERFACE
+
+#define INTERFACE IRand
+
+
+
+DECLARE_INTERFACE_(IRand,IUnknown)
+
+{
+
+    STDMETHOD(QueryInterface) ( THIS_ REFIID riid, LPVOID FAR * ppvObj ) PURE;
+
+    STDMETHOD_(ULONG, AddRef) ( THIS ) PURE;
+
+    STDMETHOD_(ULONG, Release) ( THIS ) PURE;
+
+    STDMETHOD_(ULONG, GetRand) ( THIS_ ULONG Range ) PURE;
+
+};
+
+
+
+typedef IRand FAR * LPRand;
+
+
+
+// {DDF7D820-8355-11CF-B357-444553540000}
+
+// {93406CA0-8357-11CF-B357-444553540000}
+
+
+
+DEFINE_GUID(CLSID_Rand, 0xDDF7D820, 0x8355, 0x11CF, 0xB3, 0x57, 0x44, 0x45, 0x53, 0x54, 0x00, 0x00);
+
+DEFINE_GUID(IID_IRand,  0x93406CA0, 0x8357, 0x11CF, 0xB3, 0x57, 0x44, 0x45, 0x53, 0x54, 0x00, 0x00);
+
+
+
+#endif
+
+</pre>
+
+
+
+<p><b>F. Registering the COM Server</b> </p>
+
+
+
+<p>You must add entries to the registry so that the system can look up
+
+your COM server and load it. Create a text file that contains the following
+
+tect exactly. The file must start with the word REGEDIT. </p>
+
+
+
+<pre>REGEDIT
+
+
+
+HKEY_CLASSES_ROOT\RandObj = Random Number Object
+
+
+
+HKEY_CLASSES_ROOT\RandObj\CLSID = {DDF7D820-8355-11CF-B357-444553540000}
+
+HKEY_CLASSES_ROOT\CLSID\{DDF7D820-8355-11CF-B357-444553540000} = Random Number Object
+
+HKEY_CLASSES_ROOT\CLSID\{DDF7D820-8355-11CF-B357-444553540000}\InprocServer32=e:\LarDev\COM\comtest.dll
+
+</pre>
+
+
+
+<p>You can then import these definitions into the registry by running the
+
+REGEDIT.EXE program and choosing the &quot;Registry|Import Registry File&quot;
+
+menu option. </p>
+
+		</tr>
+	</table>
+			
+<!-- misc section -->
+	<map name="logo">
+	</map>
+
+<!-- author section -->
+	<table width=600>
+		<tr><td>
+		<hr size=1 width=600>
+        <center>
+        <font size=2>
+        Copyright &copy 1997 by Karsten Koch.
+        </font>
+        </center>
+		</td></tr>
+	</table>
+
+<!-- end section -->
+
+	</table>
+
+	</center>
+	</body>
+
+
+

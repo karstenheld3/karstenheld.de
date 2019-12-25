@@ -1,0 +1,33 @@
+
+import "oaidl.idl";
+
+[
+  object,dual,pointer_default(unique),
+  uuid(9CEDE610-0116-11D1-86CA-E9A742759030)
+]
+interface IProcessor : IDispatch
+{
+  HRESULT AddNode([in] double X,[in] double Y);
+  HRESULT GetResult([in] long Name,[out,retval] double * Result);
+};
+
+[
+  uuid(9CEDE610-0116-11D1-86CA-E9A742759031),
+  version(1.0)
+]
+library Processor
+{
+  [
+    uuid(9CEDE610-0116-11D1-86CA-E9A742759032)
+  ]
+  coclass Processor
+  {
+    [default] interface IProcessor;
+  };
+};
+
+
+
+
+
+

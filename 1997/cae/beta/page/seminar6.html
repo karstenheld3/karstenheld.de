@@ -1,0 +1,328 @@
+<!-- init section -->
+
+	<head>
+		<title>Lehrveranstaltung zu Windows NT, MFC, COM, Active X: Seminar 6</title>
+	</head>
+	<body bgcolor="#ffffff" text="#000000" alink="#ff0000" vlink="#002080" link="#0f00ff">
+	<font face="VERDANA, ARIAL, HELVETICA">
+	<center>
+	<table>
+
+
+
+<!-- title section -->
+
+	<table border=0 cellspacing=0 cellpadding=0 width=600>
+	<font face="Arial, Helvetica" size=1>
+		<tr>
+			<td width=150><a href=/~bauinf><img src=../art/top-root.gif alt="root" width=150 height=25 border=0 vspace=0></a><br></td>
+			<td width=150><a href=/~bauinf/lehre/lehre.html><img src=../art/top-back.gif alt="previous" width=150 height=25 border=0 vspace=0></a><br></td>
+			<td width=150><a href=../index.html><img src=../art/top-index.gif alt="index" width=150 height=25 border=0 vspace=0></a><br></td>
+		</tr>
+	</table>
+
+
+<!-- page section -->
+
+	<table border=0 cellspacing=0 cellpadding=0 width=600>
+		<tr>
+			<td bgcolor=#ffffff text=#000000 width=600 valign=top align=left>
+			<font face="Verdana,Arial, Helvetica" size=2>
+			<br>
+			<hr size=1>
+			<br><h1><b>Seminar 6</i></b></h1>
+			<hr size=1>
+			<br><h2><b>Die Active Template Library (ATL)</i></b></h2>
+			<blockquote>
+			Im 6. Seminar wird die Implementierung einer COM-Klasse zur Berechnung von Querschnittswerten fortgesetzt. Das im 5. Seminar definierte Interface (interface.idl) wird kompiliert und vollständig in das Projekt eingebunden. Dafür kommt der im Developer Studio enthaltene MIDL-Kompiler zum Einsatz. Es wird eine Typenbibiliothek (Type Library) des erstellt und als Ressource hinzugefügt.
+			</blockquote>
+			<br><h3><b>Zur Active Template Library</i></b></h4>
+			<blockquote>
+			Die ATL ist eine Bibliothek zur Erstellung von COM-Objekten (COM-fähigen Servern), die als Steuerelemente visuell genutzt werden können oder "ohne Benutzeroberfläche" vorliegen. In Visual C++ sind zwei Assistenten zur ATL vorhanden: Der ATL COM Wizard dient der Entwicklung minimaler Komponenten, die sich zudem selbst registrieren können. Mit Hilfe des ATL Object Wizards können Objekte in vorhandene ATL-Projekte eingefügt werden.<br>
+			Bei unserem Beispiel handelt es sich um einen Inproc-Server, der ohne Visualisierung implementiert werden soll. Die ATL dient hier lediglich der Implementierung von COM-Funktionen.
+			<p>
+			</blockquote>
+			<br><h3><b>Automation und COM-Interfaces</i></b></h4>
+			<blockquote>
+			In COM-Interfaces werden verschiedene Funktionen (Funktions-prototypen) zusammengefaßt und exportiert, d.h. für andere Programme zugänglich gemacht. Eine Applikation enthält &uuml;blicherweise mehrere Interfaces, in denen jeweils zusammengehörige Funktionen enhalten sind. Diese Interfaces werden als Klassen im Server implementiert. Da der Implementierungsaufwand für kleinere Server und auch für Clients enorm hoch ist, gibt es eine weitere Möglichkeit, Funktionalität für andere Programme zugänglich zu machen: Die Automation-Schnittstelle (auch OLE Automation, ActiveX-Automation genannt) ermöglicht ein relativ einfaches Exportieren von Funktionen. Hier werden alle Funktionen über ein Automation-Interface (IDispatch) aufgerufen. Soll eine Klasse Automation-fähig sein, muss sie lediglich eine Implementierung des IDispatch-Interfaces enthalten und die zu exportierenden Funktionen müssen diesem Interface bekannt sein.
+			<p>
+			Durch die ATL werden verschiedene Makros zur Implementierung des IDispatch-Interfaces angeboten, die in unserem Beispiel Verwendung finden.
+			</blockquote>
+			<br><h3><b>Aufbau der ATL</i></b></h4>
+			<blockquote>
+			TODO: Hilfe nicht im LW F:, kann nix über den Aufbau rauskriegen...
+			</blockquote>
+			<br><h3><b>Implementierung mit der ATL</i></b></h4>
+			<ol>
+				<li>Starten Sie die Visual C++ Entwicklungsumgebung und laden Sie das Projekt "D:\Seminar6\processor.dsw" (auf Index-Seite herunterladen und entpacken).
+				<li>Fügen Sie die Dateien "interface.c" und "interface.h" dem Projekt hinzu. Diese Dateien enthalten die Deklaration des COM-Interfaces und die Definition der Indentifikatoren des Interfaces, der COM-Klasse und der Typenbibliothek.
+				<p>
+				<img src=art/sem5_msds1.gif>
+				<p>
+				<li>Legen Sie ein neues Ressourcen-Script mit dem Namen "ressource.rc" an (Datei-Neu).
+				<p>
+				<img src=art/sem6_msds1.gif>
+				<p>
+				<li>Schalten Sie den Arbeitsbereich in den Ressourcenübersicht-Modus. Doppelklicken Sie im Arbeitsbereich auf "processor Ressourcen", sodaß im rechten Fenster (Editor) processor.rc angezeigt wird. Selektieren Sie "processor.rc" und wählen Sie im Ansicht-Menü "Ressourcen-Includes...". Geben Sie unter dem Textfeld "Kompilier-Zeit-Direktiven:"  <font color=#ff0000>1 TYPELIB "interface.tlb"</font> ein (Bestätigen mit OK).
+				<p>
+				<img src=art/sem6_msds2.gif>
+				<p>
+				<ul>
+					<li>Damit ist nun die Typenbibliothek in das Ressourcenscript eingebunden. Dies ist nötig, um der ATL die Interfacedefiniton zur Verfügung zu stellen, wodurch die Implementierung eines Automation-Interfaces möglich wird.
+				</ul>
+				<p>
+				<li>Fügen Sie nun in die Datei "processor.h" den <font color=#ff0000>rot</font> markierten Text ein.
+			<p>
+				<table border=1><tr><td bgcolor=#000000>
+				<font color=#ffffff size=2>
+				processor.h
+				</font><tr><td>
+				<pre>
+#ifndef __processor__
+#define __processor__
+
+/////////////////////////////////////////////////////////////////////////////
+// class Point2D
+
+class Point2D : public CObject
+{
+  public:
+  double _X;
+  double _Y;
+};
+
+/////////////////////////////////////////////////////////////////////////////
+// class Processor
+
+class Processor<font color=#ff0000>: 
+  public IDispatchImpl&lt;IProcessor,& IID_IProcessor,& LIBID_Processor&gt; ,
+  public CComObjectRoot , public CComCoClass&lt;Processor,& CLSID_Processor&gt;</font>
+{
+ <font color=#ff0000> BEGIN_COM_MAP(Processor)
+    COM_INTERFACE_ENTRY(IDispatch)
+    COM_INTERFACE_ENTRY(IProcessor)
+  END_COM_MAP()
+
+  DECLARE_NOT_AGGREGATABLE(Processor)
+
+  DECLARE_REGISTRY(Processor,"Processor.Object","Processor.Object",
+                   IDS_PROCESSOR_DESCRIPTION,THREADFLAGS_APARTMENT)
+
+  // Processor members</font>
+  private:
+  CObList _Geometry; 
+  double _Xs,_Ys,_A,_Sx,_Sy,_Ix,_Iy,_Ixy;
+
+  public:
+  Processor();
+  void Process();
+
+  <font color=#ff0000>// IProcessor members</font>
+  public:
+  HRESULT __stdcall AddNode(double X,double Y);
+  HRESULT __stdcall GetResult(long Name,double * Result);
+};
+
+#endif
+				</pre>
+				</table>
+				<p>
+				<ul>
+					<li>Durch Vererbung erhält die Klasse "Processor" COM-Funktionen, die die Bereitstellung der Funktionen und Interfaces gewährleisten.
+					<li>Die Einträge der "COM_MAP" sind für die Macros der ATL von Bedeutung.
+					<li>Über den Eintrag "DECLARE_REGISTRY" wird festgelegt, unter welchem Namen das Automation-Objekt registriert wird (wichtig für Aufrufe aus VBA).
+				</ul>
+				<p>
+				<li>Fügen Sie auch in "processor.cpp" den <font color=#ff0000>rot</font> markierten Text ein (auszugsweise Darstellung).
+			<p>
+				<table border=1><tr><td bgcolor=#000000>
+				<font color=#ffffff size=2>
+				processor.cpp
+				</font><tr><td>
+				<pre>
+#include &lt;afxwin.h&gt;
+<font color=#ff0000>#include &lt;afxdisp.h&gt;
+#include &lt;atlbase.h&gt;
+
+class AtlGlobalModule : public CComModule
+{
+  public:
+  LONG Lock() { AfxOleLockApp(); return 0; }
+  LONG Unlock() { AfxOleUnlockApp(); return 0; }
+};
+
+AtlGlobalModule _Module;
+
+#include &lt;atlcom.h&gt;
+#include &lt;atlimpl.cpp&gt;
+#include "interface.h"
+#include "resource.h"</font>
+#include "processor.h"
+
+/////////////////////////////////////////////////////////////////////////////
+// class Processor
+
+Processor::Processor()
+{
+  _Geometry.RemoveAll();
+}
+
+void Processor::Process()
+{
+  _A = 0.0;
+  _Sx = 0.0;
+  _Sy = 0.0;
+  _Ix = 0.0;
+  _Iy = 0.0;
+  _Ixy = 0.0;
+
+  Point2D * Point;
+  double X,Y,X1,Y1;
+
+  POSITION Position = _Geometry.GetHeadPosition();
+  
+  if (Position != NULL)
+  {
+    Point = (Point2D *) _Geometry.GetNext(Position);
+    if (Point != NULL)
+    {
+      X1 = Point->_X - _Xs;
+      Y1 = Point->_Y - _Ys;
+    }
+  }
+
+  while (Position != NULL)
+  {
+    Point = (Point2D *) _Geometry.GetNext(Position);
+    if (Point != NULL)
+    {
+      X = Point->_X - _Xs;
+      Y = Point->_Y - _Ys;
+      
+      double A = (X1 * Y) - (X * Y1);
+      double B = X1 + X;
+      double C = Y1 + Y;
+      double D = ((X1 * Y) + (X * Y1)) / 2;
+      
+      _A += A / 2;
+      _Sx += (A * C) / 6;
+      _Sy += (A * B) / 6;
+      _Ix += (A * ((C * C) - (Y1 * Y))) / 12;
+      _Iy += (A * ((B * B) - (X1 * X))) / 12;
+      _Ixy += (A * ((B * C) - D)) / 12;
+      
+      X1 = X;
+      Y1 = Y;
+    }
+  }
+}
+
+HRESULT Processor::AddNode(double X,double Y)
+{
+  Point2D * Point = new Point2D;
+  Point->_X = X;
+  Point->_Y = Y;
+  _Geometry.AddTail(Point);
+  return S_OK;
+}
+
+HRESULT Processor::GetResult(long Name,double * Result)
+{
+  ....
+  return S_OK;
+}
+<font color=#ff0000>
+/////////////////////////////////////////////////////////////////////////////
+// global atl managment for inproc servers
+
+BEGIN_OBJECT_MAP(processor)
+  OBJECT_ENTRY(CLSID_Processor,Processor)
+END_OBJECT_MAP()
+
+extern "C" BOOL WINAPI DllMain(HINSTANCE Instance,DWORD Reason,void *)
+{
+  if (Reason == DLL_PROCESS_ATTACH)
+  {
+    _Module.Init(processor,Instance);
+	  DisableThreadLibraryCalls(Instance);
+  }
+  if (Reason == DLL_PROCESS_DETACH)
+  {  
+    _Module.Term();
+  }
+
+  return TRUE;
+}
+ 
+STDAPI DllGetClassObject(REFCLSID rclsid,REFIID riid,void ** ppv)
+{
+  return _Module.GetClassObject(rclsid, riid, ppv);
+}
+
+STDAPI DllCanUnloadNow()
+{
+  return (_Module.GetLockCount()==0) ? S_OK : S_FALSE;
+}
+
+STDAPI DllRegisterServer()
+{
+  return _Module.RegisterServer(TRUE);
+}
+
+STDAPI DllUnregisterServer()
+{
+  _Module.UnregisterServer();
+	return S_OK;
+}</font>
+				</pre>
+				</table>
+				<p>
+				<ul>
+					<li>Im oberen Teil werden verschiedene Header-Dateien eingebunden, die für die Implementierung der COM-Funktionen nötig sind (ATL usw.).
+					<li>Die Klasse "AtlGlobalModule" stellt die COM-Klasse des Prozessors dar. In ihr werden die "Lock"- und "Unlock"-Aufrufe an die Funktionen der Klasse "CComModule" weitergeleitet. Über Funktionen der Instanz von AtlGlobalModule "_Module" werden die Aufrufe "DllGetClassObject", "DllCanUnloadNow", "DllRegisterServer" und "DllUnRegisterServer" ebenfalls an Funktionen der Klasse "CComModule" weitergeleitet.
+					<li>Auf die nähere Erläuterung der Implementierung soll nicht weiter eingegangen werden.
+				</ul>
+			<p>
+			<li>Als letztes soll eine Datei mit dem Namen "processor.def" erstellt werden, in der definiert ist, welche Funktionen des InProcess-Servers exportiert werden sollen. Wählen Sie Datei-Neu, "Textdatei" und geben Sie folgenden Text ein:
+			<p>
+				<table border=1><tr><td bgcolor=#000000>
+				<font color=#ffffff size=2>
+				processor.def
+				</font><tr><td>
+				<pre>
+EXPORTS
+DllGetClassObject private
+DllCanUnloadNow private
+DllRegisterServer private
+DllUnregisterServer private
+				</pre>
+				</table>
+				<p>
+			<li>Speichern Sie die Datei unter "processor.def" und fügen Sie sie anschließend dem Projekt hinzu.
+			<p>
+			<img src=art/sem5_msds1.gif>
+			<p>
+			<li>Kompilieren Sie als letztes die Datei "seminar.cpp". Ist der Kompilier- und Bindevorgang erfolgreich abgeschlossen, so ist der Prozessor-Server nun voll COM- und Automation-fähig.
+			<p>
+			</ol>
+		</tr>
+	</table>
+
+
+<!-- author section -->
+	<!-- author: Karsten Koch 1997-->
+	<table width=600>
+		<tr><td>
+		<hr size=1 width=600>
+        	<center>
+        	<font size=2>
+        Lehrstuhl f&uuml;r Informatik im Bauwesen, BUW
+	        </font>
+	        </center>
+		</td></tr>
+	</table>
+
+<!-- end section -->
+	</table>
+	</center>
+	</body>

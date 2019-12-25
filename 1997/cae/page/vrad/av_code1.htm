@@ -1,0 +1,497 @@
+<HTML>
+<HEAD>
+
+<META NAME="GENERATOR" CONTENT="Internet Assistant for Microsoft Word 2.0z">
+<TITLE>Untitled</TITLE>
+</HEAD>
+<P>
+datei:<A HREF="dfgvr711.doc">"dfgvr711.doc"</A><BR>
+<P><P><P>
+<B><FONT SIZE=1 FACE="Times New Roman">header source files - project
+voxDesign 0</FONT></B><FONT SIZE=1 FACE="Times New Roman"><BR>a choise
+of</FONT>
+<P>
+<FONT SIZE=1 FACE="Times New Roman">
+//**************************************************************//<BR>
+//* CopyLeft (C) 1995 by js(v)d               *//<BR>          
+//* see the file COPYING                         *//<BR>                    
+//**************************************************************//<BR>
+<BR>                                                             
+//* <B>module:   global.h</B>                               *//<BR>
+//*project:  VoxelDesign         *//<BR>                
+//* authors:ag, jsd, hr                *//<BR>               
+//* compiler: cc           gcc 2.6.3       cc, gcc 2.6.3          *//<BR>
+//* system:  irix 5.2     linux 1.2.1     hp-ux 9.03             *//<BR>
+//**************************************************************//<BR>
+                                                             
+//* 95/05/07  -  initial version                     *// <BR>
+//*                                                     (jsd) *//<BR>
+//**************************************************************/<BR><P>
+ #ifndef
+ __GLOBAL_H_#define __GLOBAL_H_<BR><BR>
+ #include &lt;stdio.h&gt;<BR>
+ #include&lt;stdlib.h&gt;<BR>
+ #include &lt;math.h&gt;<BR>
+ #include &lt;gl/gl.h&gt;
+ <BR>#include&lt;gl/device.h&gt;<BR>
+ #include &lt;gl/get.h&gt;<BR>
+ #include &quot;polhemus.h&quot;<BR>
+ #include&quot;version.h&quot;<BR><BR>
+ #ifdef __cplusplus<BR>
+ extern &quot;C&quot;
+ {<BR>
+ #endif <BR>
+ <BR><BR>/*defines */<BR><BR>
+ #if __GNUC_MINOR__ &gt;= 6<BR>
+ #define BOOL bool<BR>#else<BR>#define BOOL int<BR>
+ #endif<BR><BR>
+ #ifndef TRUE<BR>
+ #define TRUE 1<BR>
+ #endif<BR>
+ #ifndef FALSE<BR>
+ #define FALSE 0<BR>
+ #endif<BR><BR>
+ 
+ #ifndef M_EPSILON<BR>
+ #define M_EPSILON 0.001<BR>
+ #endif<BR><P>
+ /* const */<BR><BR>
+ 
+ #ifdef VOXELMAIN<BR>
+ const Matrix Identity =
+{  {1, 0, 0, 0},  {0, 1, 0, 0},  {0, 0, 1, 0},  {0, 0, 0, 1}}; <BR>
+#else extern const Matrix Identity;<BR>
+#endif<BR><BR>
+<BR>/* typedefs */<BR>
+<BR>typedef enum vx_RetCode
+{  <BR>VX_ERR = 0,  <BR>VX_OK = 1<BR>} vx_RetCode;<BR><BR>
+typedef enum vx_InterfaceMode { <BR> VX_CLICK = 0, <BR> VX_TURN = 1<BR>} vx_InterfaceMode;<BR><BR>
+typedef enum vx_VideoMode {<BR>  VX_PAL = 1,<BR>  VX_NTSC = 2<BR>} vx_VideoMode;<BR><BR>
+typedef enum vx_DrawMode {<BR>  VX_MAKE_VOXEL = 0,<BR> VX_KILL_VOXEL = 1, <BR> VX_SEL_PANEL = 2,<BR> 
+VX_EXIT_VOXEL = 3, <BR> VX_NO_MODE = 4<BR>} vx_DrawMode;<BR><BR>
+typedef enum vx_LightMode
+{ <BR> VX_LIGHT1 = 1, <BR> VX_LIGHT2 = 2<BR>} vx_LightMode;<BR><BR>
+typedef enum vx_Material
+{ <BR>VX_DEFAULT_MAT = 0, <BR> VX_MATERIAL1 = 1,  <BR>VX_MATERIAL2 = 2<BR>} vx_Material;<BR><BR>
+typedef
+enum vx_Colors {<BR>  VX_RED = 1, <BR> VX_GREEN = 2,<BR>  VX_BLUE = 3, <BR> VX_WHITE
+= 4, <BR> VX_BLACK = 5,<BR>  VX_YELLOW = 6, <BR> VX_BROWN = 7,  <BR>VX_ORANGE
+= 8,<BR>  VX_RND_COLOR = 9<BR>} vx_Colors;<BR><BR>
+
+#define NUM_DRAW_MODES (VX_NO_MODE)<BR><BR>
+typedef
+struct _vx_Coord {<BR>  double X; <BR> double Y; <BR> double Z;<BR>} vx_Coord;<BR><BR>
+typedef
+struct _vx_Voxel { <BR> vx_Coord      Position; <BR> unsigned long Color;
+ unsigned long DisplayListEntry;<BR>} vx_Voxel;<BR>
+ <BR>typedef struct _vx_Frame
+{ <BR> vx_Voxel          Frame[32];<BR>  <BR>int               count; <BR> struct
+_vx_Frame *next;<BR>  struct _vx_Frame *prev;<BR>} vx_Frame;<BR><BR>
+typedef struct
+_vx_Space { <BR> vx_Frame  *FrameRoot; <BR> vx_Frame **FrameList; <BR> int
+      *BitField;<BR>} vx_Space;<BR><BR>
+      typedef struct _vx_InitRec { <BR> long initialMonitor;<BR>  plh_InitRec       plhConfig;<BR>  int
+              plhNumStations;<BR>  double            FOV;<BR>  int   
+           screenX;  <BR>int               screenY;<BR>  double      
+     voxelSize1;<BR>  double            voxelSize2; <BR> double      
+     roomMetric[3];<BR> <BR> long              roomVoxel[3];<BR> <BR> char   
+         *inputFile; <BR> char             *outputFile; <BR> char    
+        *logFile; <BR> char             *tmpFile; <BR> vx_InterfaceMode
+ Interface;<BR>} vx_InitRec;<BR><BR>
+ typedef struct _vx_ModeRec { <BR> plh_DataRec
+  *plhStation; <BR> vx_VideoMode   Video; <BR> vx_DrawMode    State; 
+<BR>vx_LightMode   Light; <BR> vx_Material    Material;<BR>  vx_Colors   
+  Color; <BR> vx_Space       Space; <BR> unsigned long  Pointer[NUM_DRAW_MODES];<BR>
+<BR> unsigned long  Room; <BR> unsigned long  CoordSys;  <BR>unsigned long
+ Panel; <BR> unsigned long  RefVoxel; <BR> unsigned long  RefPointer;
+<BR> FILE         *logFile;<BR>}vx_ModeRec;<BR><BR>
+
+#ifdef __STDC__<BR><BR>
+vx_RetCode
+    vx_Print (FILE *, const char *, ...);<BR><BR>
+    vx_RetCode     vx_Warning
+(int, FILE *, const char *, ...);<BR><BR>
+vx_RetCode     vx_Error (int,
+FILE *, const char *, ...);<BR><BR><BR>
+
+void           vx_Usage (char *, const
+vx_InitRec *, const vx_ModeRec *);<BR>
+vx_RetCode     vx_ParseConfigFile
+(char *, vx_InitRec *, vx_ModeRec *);
+<BR>vx_RetCode     vx_ParseCmdLine
+(int, char **, vx_InitRec *, vx_ModeRec *);<BR>vx_RetCode     vx_Init
+(plh_ModeRec *, vx_InitRec *, vx_ModeRec *);<BR>vx_RetCode     vx_Exit
+(const plh_ModeRec *, const vx_InitRec *, const vx_ModeRec *);<BR>vx_RetCode
+    vx_Loop (const plh_ModeRec *, const vx_InitRec *, vx_ModeRec
+*);<BR>vx_RetCode     vx_SetupSpace (const vx_InitRec *, vx_ModeRec
+*);<BR>vx_RetCode     vx_SetVoxelAt (const vx_InitRec *, vx_ModeRec
+*, long);<BR>vx_RetCode     vx_DelVoxelAt (const vx_InitRec *, vx_ModeRec
+*);<BR>vx_RetCode     vx_HandlePanel (const vx_InitRec *, vx_ModeRec
+*);<BR>vx_RetCode     vx_ShowPanel (const vx_ModeRec *);<BR>vx_RetCode
+    vx_ReadConfig (FILE *, const vx_InitRec *, vx_ModeRec *);<BR>vx_RetCode
+    vx_Load (const vx_InitRec *, vx_ModeRec *);<BR>vx_RetCode    
+vx_Save (const vx_InitRec *, const vx_ModeRec *);<BR>vx_RetCode  
+  vx_LoadBackup (const vx_InitRec *, vx_ModeRec *);<BR>vx_RetCode
+    vx_SaveBackup (const vx_InitRec *, const vx_ModeRec *);<BR><BR>
+    
+    unsigned
+long  vx_getColor (const vx_InitRec *, const vx_ModeRec *);<BR>float
+        *vx_getLightModel (const vx_InitRec *, const vx_ModeRec
+*);<BR>float         *vx_getLight (const vx_InitRec *, const vx_ModeRec
+*);<BR>float         *vx_getMaterial (const vx_InitRec *, const vx_ModeRec
+*);<BR>vx_RetCode     vx_MakeRefVoxel (const vx_InitRec *, vx_ModeRec
+*);<BR>vx_RetCode     vx_MakeCoordSys (const vx_InitRec *, vx_ModeRec
+*);<BR>vx_RetCode     vx_MakePointer (const vx_InitRec *, vx_ModeRec
+*);<BR>vx_RetCode     vx_MakeRoom (const vx_InitRec *, vx_ModeRec
+*);<BR>vx_RetCode     vx_MakePanel (const vx_InitRec *, vx_ModeRec
+*);<BR>vx_RetCode     vx_InterfaceDoubleClick (const plh_ModeRec *,
+const vx_InitRec *, vx_ModeRec *);<BR>vx_RetCode     vx_InterfaceTurnAround
+(const plh_ModeRec *, const vx_InitRec *, vx_ModeRec *);<BR><BR>
+/*<BR>
+vx_RetCode
+    vx_InitSharks (void);<BR>vx_RetCode     vx_UpdateSharks (void);<BR>*/<BR><BR>
+    
+    #else<BR><BR>
+    
+ vx_RetCode     vx_Print ();<BR>vx_RetCode     vx_Warning ();<BR>vx_RetCode
+    vx_Error ();<BR><BR>
+    
+    void           vx_Usage ();<BR>vx_RetCode     vx_ParseConfigFile
+();<BR>vx_RetCode     vx_ParseCmdLine ();<BR>vx_RetCode     vx_Init ();<BR>vx_RetCode
+    vx_Exit ();<BR>vx_RetCode     vx_Loop ();<BR>vx_RetCode     vx_SetupSpace
+();<BR>vx_RetCode     vx_SetVoxelAt ();<BR>vx_RetCode     vx_DelVoxelAt
+();<BR>vx_RetCode     vx_HandlePanel ();<BR>vx_RetCode     vx_ShowPanel
+();<BR>vx_RetCode     vx_ReadConfig ();<BR>vx_RetCode     vx_Load ();<BR>vx_RetCode
+    vx_Save ();<BR>vx_RetCode     vx_LoadBackup ();<BR>vx_RetCode    
+vx_SaveBackup ();<BR><BR>
+
+unsigned long  vx_getColor ();<BR>float         *vx_getLightModel
+();<BR>float         *vx_getLight ();<BR>float         *vx_getMaterial
+();<BR><BR>
+vx_RetCode     vx_MakeRefVoxel ();<BR>vx_RetCode     vx_MakeCoordSys
+();<BR>vx_RetCode     vx_MakePointer ();<BR>vx_RetCode     vx_MakeRoom
+();<BR>vx_RetCode     vx_MakePanel ();<BR>vx_RetCode     vx_InterfaceDoubleClick
+();<BR>vx_RetCode     vx_InterfaceTurnAround ();<BR><BR>
+
+/*<BR><BR>
+vx_RetCode     vx_InitSharks
+();<BR>vx_RetCode     vx_UpdateSharks ();<BR>*/<BR><BR>
+#endif<BR><BR>
+
+#ifdef __cplusplus<BR>}#endif<BR><BR>
+
+#endif
+/* #ifndef __GLOBAL_H_ */<BR><BR>
+/**************************************************************/<BR>
+/* end of file global.h                                    
+     */
+/**************************************************************/<BR>
+*/ CopyLeft (C) 1995 by js(v)d                             
+     */<BR>/* see the file COPYING                          
+               */<BR>
+/**************************************************************/<BR>/*
+                                                             
+*/<BR>/* <B>module:   event.c</B>                                
+            */<BR>/* project:  VoxDesign                         
+               */<BR>/* authors:  ag, jsd, hr                    
+	       */<BR>/*                                     
+	       */<BR>/* compiler: cc           gcc 2.6.3
+      cc, gcc 2.6.3          */<BR>/* system:   irix 5.2     linux
+1.2.1     hp-ux 9.03             */<BR>/*                        
+*/<BR>/**************************************************************/<BR>/*
+                                                             
+							     */<BR>/* 95/05/07  -  initial version                            
+							     */<BR>/*                                                    
+    (jsd) */<BR>/*                                               
+    */<BR>/* 95/05/18  -  getting the viewing right; see
+vx_LookAt()       */<BR>/*                                       
+           (jsd &amp;&amp; mm) */<BR>/*                          
+	   */<BR>/**************************************************************/<BR><BR>
+	   
+#include&quot;global.h&quot;<BR><BR>
+#ifdef DEBUG2<BR><BR>
+/*<BR>**     Function name : void
+vx_TargetCross (const plh_DataRec *ptr,            const plh_DataRec
+*hmd)<BR>**<BR>**     Description : something like a target cross visualizing
+the                      line of hear and the line of d(pl)ump
+w/ its                      values along the lines; for debbuging
+only<BR>**     Input :<BR>**     Output :<BR>*/<BR><BR>
+
+void vx_TargetCross (const
+plh_DataRec *ptr, const plh_DataRec *hmd){ <BR> double tmpPos1[3];<BR>
+ double tmpPos2[3];<BR>  char   buf[64];<BR><BR>
+ 
+ tmpPos1[0] = tmpPos1[1]
+= tmpPos1[2] = 0.0;  <BR><BR>
+pushmatrix ();<BR>    translate (hmd-&gt;Position[0]
++ (hmd-&gt;LineOfSight[0] * 5.0),  <BR>            hmd-&gt;Position[1]
++ (hmd-&gt;LineOfSight[1] * 5.0),<BR>              hmd-&gt;Position[2]
++ (hmd-&gt;LineOfSight[2] * 5.0));<BR>    linewidth (2);<BR>  <BR>
+
+tmpPos2[0]
+= hmd-&gt;LineOfHear[0] / 2.0; <BR>   tmpPos2[1] = hmd-&gt;LineOfHear[1]
+/ 2.0; <BR>   tmpPos2[2] = hmd-&gt;LineOfHear[2] / 2.0;  <BR>  cpack (0xFFFFFFFF);<BR>
+   bgnline ();<BR>      v3d (tmpPos1);<BR>      v3d (tmpPos2);<BR>    endline
+();<BR>  <BR>
+
+tmpPos2[0] -= hmd-&gt;LineOfHear[0];<BR>    tmpPos2[1]
+-= hmd-&gt;LineOfHear[1];<BR>    tmpPos2[2] -= hmd-&gt;LineOfHear[2];<BR>
+   cpack (0xFF0000FF);<BR>    bgnline ();<BR>      v3d (tmpPos1);<BR>    
+ v3d (tmpPos2);<BR>    endline ();<BR>    sprintf (buf, &quot;H:[%+3.3f
+%+3.3f %+3.3f]&quot;,   <BR>         hmd-&gt;LineOfHear[0], <BR>     
+     hmd-&gt;LineOfHear[1],     <BR>       hmd-&gt;LineOfHear[2]);<BR>
+   cmov (tmpPos2[0], tmpPos2[1], tmpPos2[2]);<BR>    charstr (buf);<BR><BR>
+   
+   
+       tmpPos2[0] = hmd-&gt;LineOfDump[0] / 2.0; <BR>   tmpPos2[1]
+= hmd-&gt;LineOfDump[1] / 2.0; <BR>   tmpPos2[2] = hmd-&gt;LineOfDump[2]
+/ 2.0;   <BR> cpack (0xFF0000FF);<BR>    bgnline ();<BR>      v3d (tmpPos1);<BR>
+     v3d (tmpPos2);<BR>    endline ();<BR>  <BR>
+     
+     tmpPos2[0] -= hmd-&gt;LineOfDump[0];<BR>
+   tmpPos2[1] -= hmd-&gt;LineOfDump[1];<BR>    tmpPos2[2] -= hmd-&gt;LineOfDump[2];<BR>
+   cpack (0xFFFFFFFF);<BR>    bgnline ();<BR>      v3d (tmpPos1);<BR>    
+ v3d (tmpPos2);<BR>    endline ();<BR>    sprintf (buf, &quot;D:[%+3.3f
+%+3.3f %+3.3f]&quot;, <BR>           hmd-&gt;LineOfDump[0],      
+     hmd-&gt;LineOfDump[1], <BR>           hmd-&gt;LineOfDump[2]);<BR>
+   cmov (tmpPos2[0], tmpPos2[1], tmpPos2[2]);<BR>    charstr (buf);<BR><BR>
+   
+linewidth (1);<BR>      popmatrix ();<BR>}<BR><BR>
+
+#endif /* #ifdef DEBUG2
+       */<BR><BR>
+
+/*<BR>**     Function name : vx_RetCode vx_LookAt (double eyex,
+            double eyey, <BR>            double eyez, <BR>           
+double centerx, <BR>            double centery,         <BR>    double
+centerz,       <BR>      double upx,       <BR>     double upy,     
+       double upz)<BR>**<BR>**     Description : shamelessly adapted (copied!)
+from glu.c located in                      the MESA project by
+brian paul. thanx. the idea came                      to mm and
+me at a terrible session looking for a way                   
+  to get the right viewing  at any position and at any       
+              angle, suddenly we realised theat we to set the
+                     view-up vector explicitly. (jsd)<BR><BR>
+**     Input
+:<BR>**     Output :*/<BR><BR>
+
+vx_RetCode vx_LookAt (double eyex, double eyey,
+double eyez,             double centerx, double centery, double
+centerz,             double upx, double upy, double upz)<BR>
+{  float
+m[4][4];<BR>  float x[3], y[3], z[3];<BR>  float mag; <BR><BR>
+z[0] = (float)
+(eyex - centerx);<BR>  z[1] = (float) (eyey - centery);<BR>z[2] = (float)
+(eyez - centerz);<BR>  <BR>
+
+mag = sqrtf ((z[0] * z[0]) + (z[1] * z[1])
++ (z[2] * z[2]));<BR>  if (mag) { <BR>   z[0] /= mag;   <BR> z[1] /= mag;<BR>
+   z[2] /= mag; <BR> } <BR><BR>
+   
+   y[0] = (float) upx; <BR> y[1] = (float) upy;<BR>
+ y[2] = (float) upz; <BR><BR>
+ 
+ x[0] =  (y[1] * z[2]) - (y[2] * z[1]);<BR> 
+x[1] = -(y[0] * z[2]) + (y[2] * z[0]);<BR>  x[2] =  (y[0] * z[1])
+- (y[1] * z[0]);<BR> <BR>
+y[0] =  (z[1] * x[2]) - (z[2] * x[1]);<BR>  y[1]
+= -(z[0] * x[2]) + (z[2] * x[0]);<BR>  y[2] =  (z[0] * x[1]) - (z[1]
+* x[0]);<BR>  <BR>
+
+mag = sqrtf ((x[0] * x[0]) + (x[1] * x[1]) + (x[2]
+* x[2]));<BR>  if (mag) { <BR>   x[0] /= mag;<BR>    x[1] /= mag;  <BR>  x[2]
+/= mag; <BR> } <BR><BR>
+
+mag = sqrtf ((y[0] * y[0]) + (y[1] * y[1]) + (y[2]
+* y[2]));<BR>  if (mag) { <BR>   y[0] /= mag; <BR>   y[1] /= mag; <BR>   y[2]
+/= mag; <BR> } <BR><BR>
+
+m[0][0] = x[0];<BR>  m[1][0] = x[1];<BR>  m[2][0] = x[2];<BR>
+ m[3][0] = 0.0; <BR><BR>
+ 
+m[0][1] = y[0];<BR>  m[1][1] = y[1];<BR>  m[2][1] =
+y[2];<BR>  m[3][1] = 0.0;   <BR><BR>
+
+m[0][2] = z[0];<BR>  m[1][2] = z[1];<BR>  m[2][2]
+= z[2];<BR>  m[3][2] = 0.0;  <BR><BR>
+
+m[0][3] = 0.0;  m[1][3] = 0.0;  m[2][3]
+= 0.0; <BR> m[3][3] = 1.0; <BR><BR>
+
+multmatrix (m);<BR><BR>
+translate (-eyex, -eyey,
+-eyez);<BR> <BR>
+
+return VX_OK;<BR>}<BR><BR>
+
+/***     Function name : vx_RetCode vx_DrawPointer
+(const plh_DataRec *ptr,          const vx_ModeRec *mode)****
+    Description :<BR>**     Input :<BR>**     Output :<BR>*/<BR><BR>
+    
+vx_RetCode vx_DrawPointer
+(const vx_InitRec *init, vx_ModeRec *mode)<BR>
+{ <BR> const  plh_DataRec
+*ptr = &amp;(mode-&gt;plhStation[0]);<BR>  static float        pos1[3];<BR>
+ static float        pos2[3];<BR>   <BR>
+ pos1[0] = 0.0; <BR> pos1[1] = 0.0;<BR>
+ pos1[2] = 0.0; <BR> pos2[0] = ptr-&gt;LineOfDump[0] * 10.0; <BR> pos2[1]
+= ptr-&gt;LineOfDump[1] * 10.0; <BR> pos2[2] = ptr-&gt;LineOfDump[2]
+* 10.0; <BR><BR>
+
+pushmatrix ();<BR>    translate (ptr-&gt;Position[0], ptr-&gt;Position[1],
+ptr-&gt;Position[2]);<BR>    cpack (0xFF884088);<BR>    callobj (mode-&gt;Pointer[mode-&gt;State]);<BR>
+       cpack (vx_getColor (init, mode));<BR>  
+       
+linewidth (5);<BR>
+   bgnline ();<BR>      v3f (pos1);<BR>      v3f (pos2);<BR>    endline ();<BR>
+   linewidth (1);<BR>  popmatrix ();<BR>  <BR>
+   
+   return VX_OK;<BR>}<BR><BR>
+   
+   /***     Function
+name : vx_RetCode vx_Loop (const plh_ModeRec *plh,           const
+vx_InitRec *init,           vx_ModeRec *mode)<BR>****     Description
+:<BR>**     Input :<BR>**     Output :<BR>*/<BR><BR>
+
+vx_RetCode vx_Loop (const plh_ModeRec
+*plh, const vx_InitRec *init,           vx_ModeRec *mode)<BR>{ <BR> vx_RetCode
+(*InterfaceFunc)(const plh_ModeRec *, const vx_InitRec *, vx_ModeRec
+*) = NULL; <BR> register     loop; <BR> short        val; <BR> plh_DataRec
+*ptr = &amp;(mode-&gt;plhStation[0]);<BR>  plh_DataRec *hmd = &amp;(mode-&gt;plhStation[1]);<BR>
+ vx_Frame    *localFrame = mode-&gt;Space.FrameRoot; <BR><BR>
+ 
+ switch
+(init-&gt;Interface) { <BR> case VX_CLICK:  <BR>  InterfaceFunc = &amp;(vx_InterfaceDoubleClick);<BR>
+   break; <BR> case VX_TURN: <BR>   InterfaceFunc = &amp;(vx_InterfaceTurnAround);<BR>
+   break; <BR> default: <BR>   InterfaceFunc = &amp;(vx_InterfaceTurnAround);<BR>
+   break; <BR> } <BR><BR>
+   
+while (1) {    <BR><BR>    /* handle the keys to handle
+(?) */  <BR>  if (qtest ()) <BR>     switch (qread (&amp;val)) {  <BR>   
+case ESCKEY:   <BR>    return VX_OK;    <BR>   break   <BR>   default: <BR>  
+   break;   <BR>   }    <BR><BR>
+/* clear for 4D series (color, zbuffer)
+*/ <BR>   czclear (0, 0x7fffff);<BR>    <BR>
+
+/* get tracker data from all
+stations */ <BR>   plh_Read (init-&gt;plhNumStations, mode-&gt;plhStation,
+plh);<BR>   <BR>
+
+/* set a default matrix state */ <BR>   loadmatrix (Identity);<BR><BR>
+
+       pushmatrix ();<BR>       <BR>   /* call the interface routine */<BR>
+     (void) InterfaceFunc (plh, init, mode);<BR>  <BR>        if (VX_EXIT_VOXEL
+== mode-&gt;State)      <BR> return VX_OK;  <BR><BR>          /* this gives
+a ``discrete'' ptr movement into the space */  <BR>    ptr-&gt;Position[0]
+= init-&gt;voxelSize1 *     <BR>  trunc ((ptr-&gt;Position[0] / init-&gt;voxelSize1)
++ 0.5);<BR>      ptr-&gt;Position[1] = init-&gt;voxelSize1 *    <BR> 
+ trunc ((ptr-&gt;Position[1] / init-&gt;voxelSize1) + 0.5);<BR>  
+   ptr-&gt;Position[2] = init-&gt;voxelSize1 *  <BR>     trunc ((ptr-&gt;Position[2]
+/ init-&gt;voxelSize1) + 0.5);<BR>      <BR>
+
+/* this gives a ``discrete''
+hmd movement into the space */<BR>/*      hmd-&gt;Position[0] = init-&gt;voxelSize1
+*  <BR>    trunc ((hmd-&gt;Position[0] / init-&gt;voxelSize1) + 0.5);<BR>
+     hmd-&gt;Position[1] = init-&gt;voxelSize1 *    <BR>  trunc ((hmd-&gt;Position[1]
+/ init-&gt;voxelSize1) + 0.5);<BR>      hmd-&gt;Position[2] = init-&gt;voxelSize1
+*   <BR>   trunc ((hmd-&gt;Position[2] / init-&gt;voxelSize1) + 0.5);<BR>*/<BR><BR>
+
+/* it's tho one used in OpenGL :-) */   <BR>   vx_LookAt
+(hmd-&gt;Position[0],  <BR>      hmd-&gt;Position[1],  <BR>          
+   hmd-&gt;Position[2],         <BR>       hmd-&gt;Position[0] + hmd-&gt;LineOfSight[0],<BR>
+               hmd-&gt;Position[1] + hmd-&gt;LineOfSight[1], <BR>
+              hmd-&gt;Position[2] + hmd-&gt;LineOfSight[2],  <BR>
+             -hmd-&gt;LineOfDump[0],            <BR>    -hmd-&gt;LineOfDump[1],
+          <BR>     -hmd-&gt;LineOfDump[2]);<BR><BR>
+	  
+#ifdef DEBUG2 <BR>  
+  /* for debugging purpose; shows a cross with the LOS and LOH
+       cosines */  <BR>    vx_TargetCross (ptr, hmd);<BR>#endif  <BR><BR>
+       
+       /*
+draw the actual pointer */    <BR>  vx_DrawPointer (init, mode);<BR> 
+          /* draw the vockschelch */      localFrame = mode-&gt;Space.FrameRoot;<BR><BR>
+           while (NULL != localFrame) {<BR>        for (loop = 0;
+loop &lt; localFrame-&gt;count; loop++)      <BR>    callobj (localFrame-&gt;Frame[loop].DisplayListEntry);<BR><BR>
+
+localFrame = localFrame-&gt;next;     <BR> }    <BR><BR>
+
+   if (VX_SEL_PANEL == mode-&gt;State)   <BR>    vx_ShowPanel (mode);<BR><BR>
+   
+#ifdef
+DEBUG   <BR>   callobj (mode-&gt;CoordSys);<BR>#endif    <BR><BR>
+
+callobj
+(mode-&gt;Room);<BR>      /* vx_UpdateSharks (); */ <BR><BR>         popmatrix();<BR> <BR>
+
+/* swap the buffers, assumin' we're in doublebuffer
+mode */  <BR>  swapbuffers ();<BR>  } <BR><BR>
+
+return VX_OK;<BR>}<BR><BR>
+
+/**************************************************************/<BR>
+/* <B>end of file event.c</B>                              
+*/<BR>/*                                             
+*/<BR>
+/**************************************************************/<BR>
+/**************************************************************/<BR>
+/*
+*/<BR>/* CopyLeft (C) 1995 by js(v)d                             
+							     */<BR>/*                                                    
+							     */<BR>/* see the file COPYING                          
+							     */<BR>/*                                          
+							     */<BR>
+/**************************************************************/<BR>/*
+                                                             
+*/<B>/* module:   version.h</B>                              
+*/<BR>/* project:  VoxelDesign                      
+*/<BR>/* authors:  ag, jsd, hr                 
+*/<BR>/*                                  
+*/<BR>/* compiler: cc           gcc 2.6.3
+      cc, gcc 2.6.3          */<BR>/* system:   irix 5.2     linux
+1.2.1     hp-ux 9.03             */<BR>/*                        
+*/<BR>/**************************************************************/<BR>/*
+                                                             
+							     */<BR>/* 95/05/30  -  initial version                     
+							     */<BR>/*                                       
+                 (jsd)        */<BR>/*                           
+		 */<BR>/**************************************************************/<BR><BR>
+		 
+#ifndef__VERSION_H_<BR>#define __VERSION_H_<BR><BR>
+#ifdef __cplusplus<BR>extern &quot;C&quot;
+{<BR>#endif<BR><BR>
+
+#ifdef VOXELMAIN<BR><BR>
+const char *vx_file_id_string = &quot;VoxDesign0&quot;;<BR>const
+char *vx_version_major_string = &quot;0&quot;;<BR>const char *vx_version_minor_string
+= &quot;02&quot;;<BR>const char *vx_version_name_string = &quot;VoxDesign&quot;;<BR>const
+char *vx_version_graphics_string = &quot;Iris GL&quot;;<BR><BR>
+
+#ifdef
+DEBUG<BR>const char *vx_version_compile_string = &quot;DEBUG VERSION
+from (&quot;__DATE__&quot;)&quot;;<BR>#else<BR>const char *vx_version_compile_string
+= &quot;PRODUCT VERSION from (&quot;__DATE__&quot;)&quot;;<BR>#endif
+/* #ifdef DEBUG */<BR><BR>
+
+const char *vx_version_author_string = &quot;[ag
+&amp;&amp; hr &amp;&amp; jsd] (thanx to mm)&quot;;<BR><BR>#else<BR><BR>
+
+extern
+const char *vx_file_id_string;<BR>extern const char *vx_version_major_string;<BR>extern
+const char *vx_version_minor_string;<BR>extern const char *vx_version_name_string;<BR>extern
+const char *vx_version_compile_string;<BR>extern const char *vx_version_graphics_string;<BR>extern
+const char *vx_version_author_string;<BR><BR>
+
+#endif /* #ifdef VOXELMAIN
+*/<BR><BR>
+
+#ifdef __cplusplus<BR>}#endif<BR><BR>#endif /* #ifndef __VERSION_H_ */<BR><BR>
+/**************************************************************/<BR>/*
+                                                             
+							     */<BR>/* end of file version.h                             
+							     */<BR>/*                                        
+							     */<BR>/**************************************************************/</FONT>
+<P>
+<A HREF="dfgvr71a.htm">"Zur&uuml;ck"</A><P>
+</BODY>
+</HTML>

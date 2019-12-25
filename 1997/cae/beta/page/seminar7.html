@@ -1,0 +1,171 @@
+<!-- init section -->
+
+	<head>
+		<title>Lehrveranstaltung zu Windows NT, MFC, COM, Active X: Seminar 7</title>
+	</head>
+	<body bgcolor="#ffffff" text="#000000" alink="#ff0000" vlink="#002080" link="#0f00ff">
+	<font face="VERDANA, ARIAL, HELVETICA">
+	<center>
+	<table>
+
+
+
+<!-- title section -->
+
+	<table border=0 cellspacing=0 cellpadding=0 width=600>
+	<font face="Arial, Helvetica" size=1>
+		<tr>
+			<td width=150><a href=/~bauinf><img src=../art/top-root.gif alt="root" width=150 height=25 border=0 vspace=0></a><br></td>
+			<td width=150><a href=/~bauinf/lehre/lehre.html><img src=../art/top-back.gif alt="previous" width=150 height=25 border=0 vspace=0></a><br></td>
+			<td width=150><a href=../index.html><img src=../art/top-index.gif alt="index" width=150 height=25 border=0 vspace=0></a><br></td>
+		</tr>
+	</table>
+
+
+<!-- page section -->
+
+	<table border=0 cellspacing=0 cellpadding=0 width=600>
+		<tr>
+			<td bgcolor=#ffffff text=#000000 width=600 valign=top align=left>
+			<font face="Verdana,Arial, Helvetica" size=2>
+			<br>
+			<hr size=1>
+			<br><h1><b>Seminar 7</i></b></h1>
+			<hr size=1>
+			<br><h2><b>ActiveX Automation</i></b></h2>
+			<blockquote>
+			In diesem Seminar werden die ActiveX Automation Technologie, die im 6. Seminar in einem Server implementiert wurde, behandelt und Kenntnisse über deren Benutzung vermittelt. Anschießend wird ein Beispiel für die Benutzung des implementierten Servers aus Mirosoft Excel vorgestellt.
+			</blockquote>
+			<br><h3><b>Die System-Registry</i></b></h4>
+			<blockquote>
+			Durch die Registrierung von Servern, COM-Klassen, Interfaces  und Typenbibliotheken werden Informationen, die für eine Zusammenarbeit benötigt werden, in einer zentralen Datenbank verwaltet und für alle Programme (z.B. Clients) zugänglich gemacht.
+			<p>
+			Die Einträge der Registrierung (Registry) sind hierarchisch, d.h. baumartig strukturiert. Es gibt genaue Festlegungen, nach denen jeder Eintrag stattzufinden hat. Die Registrierung untergliedert sich in vier Teilbäume mit Schlüsseln die jeweils Datenbanken für einzelne Benutzer und Computer enthalten. Der Aufbau der Registrierung ist vergleichbar mit einem Dateisystem, wobei die Schlüssel den Verzeichnissen und die Werteinträge den Dateien entsprechen.
+			<p>
+			Die Registrierung von Servern kann auf unterschiedlichen Wegen erfolgen:
+			<ol>
+				<li>selbstständige Registrierung des Servers beim erstmaligen Starten (Server ist EXE)
+				<li>Registrierung mit .REG-Datei
+				<li>Registrierung über REGSVR32.EXE
+			</ol>
+			Die Registrierung mit einer .REG-Datei kann natürlich nur erfolgen, wenn diese auch vorhanden ist. Im Falle unseres Beispiels (processor.dll) kommt die 3. Variante zum Einsatz.
+			</blockquote>
+			<br><h3><b>Funktionsaufrufe über Visual Basic for Applications (VBA)</i></b></h4>
+			<blockquote>
+			Die Programmiersprache Visual Basic ist unter dem Namen VBA in etlichen Applikationen als Automationswerkzeug integriert. Um den Server "processor.dll" aus z.B. Excel benutzen zu können, muß dieser zuerst registriert werden.
+			</blockquote>
+			<ol>
+				<li>Starten Sie die MS-DOS-Eingabeaufforderung. Wechseln Sie in das Verzeichnis, in welchem sich der kompilierte Server (processor.dll) befindet. Geben Sie <font color=#ff0000>REGSVR32 processor.dll [ENTER]</font> ein. Die Aktion sollte folgende Meldungen auslösen:
+				<p>
+				<img src=art/sem7_register1.gif>
+				<p>
+				<li>Starten Sie nun den Registrierungseditor (Doppelclick auf Symbol <img src=art/sem7_icon1.gif> oder Startleiste | Programme | Zubehör | Systemprogramme | Registrierungseditor wählen oder Startleiste | Ausführen... "regedit [ENTER]")
+				<li>Wechseln Sie in das Verzeichnis "\HKEY_CLASSES_ROOT\" (Doppelclick oder "+"). Der Prozessor ist unter "Processor.Object" mit seinem Namen "Cross Section Processor" und seinem Identifikator (CLSID) eingetragen.
+				<p>
+				<img src=art/sem7_register2.gif>
+				<p>
+				<li>Wechseln Sie nun in das Verzeichnis "HKEY_CLASSES_ROOT\CLSID\". Auch hier ist der Prozessor unter "{9CEDE610-0116-11D1-86CA-E9A742759032}" eingetragen.
+				<p>
+				<img src=art/sem7_register3.gif>
+				<p>
+				<li>Starten Sie Microsoft Excel (Doppelklick auf Symbol <img src=art/sem7_icon2.gif> oder Startleiste | Programme | MS Office usw.)
+				<li>Wechseln Sie in Visual Basic for Applications ([ALT]+[F11]) und wählen starten Sie den Objektkatalog (Werzeugkasten oder Menü Ansicht | Objektkatalog oder F2).
+				<p>
+				<img src=art/sem7_vba1.gif>
+				<p>
+				<li>. Wählen Sie nun im Menü Extras | Verweise. Schalten Sie den Processor aktiv und bestätigen Sie mit [ENTER] oder "OK".
+				<p>
+				<img src=art/sem7_vba2.gif>
+				<p>
+				<li>Wählen Sie nun im Objektkatalog den "Porcessor" Eintrag an. Die Elemente des Processors werden nun rechts angezeigt.
+				<p>
+				<img src=art/sem7_vba3.gif><p>
+				<p>
+				<ul>
+					<li>Der Objektkatalog zeigt je nach Einstellung alle Klassen, Module und Aufzählungen (Enum's) an die im aktuellen VBA-Projekt benutzt werden können. Er informiert über Attribute, Funktionen und andere Member der Klassen und zeigt die jeweiligen Namen und Datentypen der Parameter an. Des weiteren kann man erfahren, ob verschiedene Datentypen von Funktionsparametern von VBA unterstützt werden oder nicht.
+					<li>Die hier gezeigten Funktionen werden vom Automation-Objekt "Processor" unterstützt. Wichtig für die Anwendung der Berechnung sind lediglich die Funtionen<br>
+					<ul>
+						<li>Sub <b>AddNode</b>(X As Double, Y As Double)<br>
+							(fügt 2D-Punkt zur Polylinie hinzu)
+						<li>Function <b>GetResult</b>(Name As Long) As Double<br>
+							(gibt gewünschten Querschnittswert zurück)
+					</ul>
+					<li>Da "AddNode" keinen Wert zurückgibt, ist diese Funktion hier als (Visual Basic) Sub ausgewiesen.
+				</ul>
+				<li>Wechseln Sie nun wieder in die Excel-Normalansicht ([ALT]+[F4] oder Menü Ansicht | Microsoft Excel) und gestalten Sie die aktuelle Mappe so, daß es dem abgebildeten entspricht.
+				<p>
+				<img src=art/sem7_excel1.gif><p>
+				<p>
+				<li>Fügen Sie nun ein neues VBA-Modul ein indem Sie in die VBA-Umgebung wechseln ([ALT]+[F11]) im Menü Einfügen | Modul wählen.
+				<p>
+				<img src=art/sem7_vba4.gif><p>
+				<p>
+				<li>Erstellen Sie nun folgenden Quelltext:
+			<p>
+				<table border=1><tr><td bgcolor=#000000>
+				<font color=#ffffff size=2>
+				Excel: Modul1
+				</font><tr><td>
+				<pre>
+Sub StartProcessor()
+
+  Dim Processor As Object
+  
+  Set Processor = CreateObject("Processor.Object")
+  
+  For N = 0 To Cells(1, 2) - 1
+    Processor.AddNode Cells(3, 2 + N), Cells(4, 2 + N)
+  Next N
+  
+  Cells(6, 2) = Processor.GetResult(0)
+  Cells(7, 2) = Processor.GetResult(1)
+  Cells(8, 2) = Processor.GetResult(2)
+  Cells(9, 2) = Processor.GetResult(3)
+  Cells(10, 2) = Processor.GetResult(4)
+  Cells(11, 2) = Processor.GetResult(5)
+  Cells(12, 2) = Processor.GetResult(6)
+  Cells(13, 2) = Processor.GetResult(7)
+  
+  Set Processor = Nothing
+
+End Sub
+				</pre>
+				</table>
+				<p>
+				<ul>
+					<li>Dies ist ein VBA-Unterprogramm (Sub) mit dem Namen "StartProcessor", das die Querschnittswerte eines Polygonzuges mit Hilfe des "Processor" Objektes berechnet und ausgibt.
+					<li>Der Polygonzug wird in den Zeilen 3 und 4 (ab Spalte B) eingegeben.
+					<li>Die Querschnittswerte werden in den Zellen B6 bis B13 ausgegeben.
+				</ul>
+				<p>
+				<li>Wechseln Sie in die Excel-Umgebung und aktivieren sie den Werkzeugkasten "Formular" (Mauszeiger in Bereich der Werkzeugkästen ziehen, rechte Maustaste betätigen, "Formular" aktivieren.
+				<li>Erzeugen Sie eine neue Schaltfläche und weisen sie dieser das Makro (Unterprogramm, Sub) "StartProcessor" zu.				<p>
+				<p>
+				<img src=art/sem7_excel2.gif><p>
+				<li>Benennen Sie anschließend die Schaltfläche mit "START".
+				<li>Geben sie den abgebildeten Polygonzug ein und betätigen Sie die "START" Schaltfläche. Das Ergebnis müsste der Abbildung entsprechen.
+				<p>
+				<img src=art/sem7_excel3.gif><p>
+				<p>
+			</ol>			
+		</tr>
+	</table>
+
+
+<!-- author section -->
+	<!-- author: Karsten Koch 1997-->
+	<table width=600>
+		<tr><td>
+		<hr size=1 width=600>
+        	<center>
+        	<font size=2>
+        Lehrstuhl f&uuml;r Informatik im Bauwesen, BUW
+	        </font>
+	        </center>
+		</td></tr>
+	</table>
+
+<!-- end section -->
+	</table>
+	</center>
+	</body>

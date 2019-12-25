@@ -1,0 +1,3479 @@
+<HTML><HEAD><TITLE>DXF Group Codes</TITLE></HEAD><BODY>
+<a name="TOP"></a>
+<A NAME="XREF_84895"></A><A NAME="ID_404514"></A><A NAME="DXF_Group_Codes"></A><center><H1>DXF Group Codes</H1></center>
+
+<hr><center><font size=2><tt>
+. <a href="dxf_toc.htm">CONTENTS</a> . | . <b>DXF GROUP CODES</b> . | . <a href="al_u04_d.htm">DRAWING INTERCHANGE FILE FORMATS</a> . </tt></font></center>
+<hr>
+<table><tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td><i>The following DXF information can also be found in appendix C of the Release 13 AutoCAD Customization Guide. </i></td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr></table><p>
+
+<A NAME="XREF_17991"></A>This chapter describes the DXF group codes found in DXF files and encountered by AutoLISP, ADS, and ARX applications. The first section provides general information about DXF group codes. It lists the group codes in numerical order and organizes them by object type. (For descriptions of the AutoLISP functions that use group codes, see chapter 9, "Selection Set, Object, and Symbol Table Functions," in the Release 13 <I>AutoCAD Customization Guide</I>.) The remaining sections list and describe the group codes in the order that they are found in DXF files. <P>
+<hr size=1><U><I>Topics in this chapter:</I></U><BR>
+<ul>
+<li><a href="#General_DXF_Conventions">General DXF Conventions</a></li>
+<li><a href="#HEADER_Section">HEADER Section</a></li>
+<li><a href="#CLASSES_Section">CLASSES Section</a></li>
+<li><a href="#TABLES_Section">TABLES Section</a></li>
+<li><a href="#BLOCKS_Section">BLOCKS Section</a></li>
+<li><a href="#ENTITIES_Section">ENTITIES Section</a></li>
+<li><a href="#OBJECTS_Section">OBJECTS Section</a></li>
+<li><a href="#Advanced_DXF_Issues">Advanced DXF Issues</a></li>
+</ul>
+
+<a name="General_DXF_Conventions"></a><hr><P>
+<A NAME="ID_385189"></A><a href="#TOP"><H2>General DXF Conventions</H2></a><P>
+The DXF format is a tagged data representation of all the information contained in an AutoCAD drawing file of a specific version. <I>Tagged data </I>means that each data element in the file is preceded by an integer number that is called a <I>group code</I>. A group code's value indicates what type of data element follows. It also indicates the meaning of a data element for a given object (or record) type. Virtually all user-specified information in a drawing file can be represented in DXF format. The DXF format is essentially the same when used with applications (AutoLISP, ADS, and ARX). However, there are a few minor differences for some data groups. <P>
+For specific information about the format of DXF files, see appendix D, <A HREF="al_u04_d.htm#XREF_50195">"Drawing Interchange File Formats."</A><P>
+The group codes shown in this section can apply to DXF files, applications (AutoLISP, ADS, or ARX), or both. When the description of a code is different for applications and DXF files (or only applies to one or the other), the description is preceeded by the following indicators:<P>
+<DL COMPACT>
+<DT><B>APP</B><DD> Application-specific description
+<DT><B>DXF</B><DD> DXF file-specific description
+</DL>
+If the description is common to both DXF files and applications, no indicator is provided. Otherwise, the appropriate indicator is present.<P>
+
+<hr size=1><U><I>Topics in this section:</I></U><BR>
+<ul>
+<li><a href="#Group_Code_Ranges">Group Code Ranges</a><br>
+<li><a href="#Group_Codes_in_Numerical_Order">Group Codes in Numerical Order</a><br>
+<li><a href="#Object_and_Entity_Codes">Object and Entity Codes</a><br>
+</ul>
+
+<A NAME="ID_417868"></A><a name="Group_Code_Ranges"></a><H3>Group Code Ranges</H3><P>
+Group codes define the type of the associated value as an integer, a floating-point number, or a string, according to the following table of group code ranges. <P>
+<I>Group code ranges <BR></I>
+<TABLE BORDER=1><TR VALIGN=TOP><TD><B>Code range</B></TD>
+<TD><B>Group value type</B></TD></TR>
+<TR VALIGN=TOP><TD>0 - 9</TD>
+<TD>String (255 characters maximum; less for Unicode strings)</TD></TR>
+<TR VALIGN=TOP><TD>10  - 59</TD>
+<TD>Double precision 3D point</TD></TR>
+<TR VALIGN=TOP><TD>60 - 79</TD>
+<TD>16-bit integer value</TD></TR>
+<TR VALIGN=TOP><TD>90-99</TD>
+<TD>32-bit integer value</TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>String (255 characters maximum; less for Unicode strings)</TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>String (255 characters maximum; less for Unicode strings)</TD></TR>
+<TR VALIGN=TOP><TD>105</TD>
+<TD>String representing hexidecimal (hex) handle value</TD></TR>
+<TR VALIGN=TOP><TD>140 - 147</TD>
+<TD>Double precision scalar floating-point value</TD></TR>
+<TR VALIGN=TOP><TD>170 - 175</TD>
+<TD>16-bit integer value</TD></TR>
+<TR VALIGN=TOP><TD>280 - 289</TD>
+<TD>8-bit integer value</TD></TR>
+<TR VALIGN=TOP><TD>300 - 309</TD>
+<TD>Arbitrary text string</TD></TR>
+<TR VALIGN=TOP><TD>310-319</TD>
+<TD>String representing hex value of binary chunk</TD></TR>
+<TR VALIGN=TOP><TD>320-329</TD>
+<TD>String representing hex handle value</TD></TR>
+<TR VALIGN=TOP><TD>330-369</TD>
+<TD>String representing hex object IDs</TD></TR>
+<TR VALIGN=TOP><TD>999</TD>
+<TD>Comment (string)</TD></TR>
+<TR VALIGN=TOP><TD>1000 - 1009</TD>
+<TD>String (255 characters maximum; less for Unicode strings)</TD></TR>
+<TR VALIGN=TOP><TD>1010-1059</TD>
+<TD>Floating-point value</TD></TR>
+<TR VALIGN=TOP><TD>1060 - 1069</TD>
+<TD>16-bit integer value</TD></TR>
+<TR VALIGN=TOP><TD>1071 </TD>
+<TD>32-bit integer value</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_400200"></A><A NAME="ID_419667"></A><a name="Group_Codes_in_Numerical_Order"></a><H3>Group Codes in Numerical Order</H3><P>
+The following table gives the group code or group code range accompanied by an explanation of the group code value. In the table, "fixed" indicates that this group code always has the same purpose. The purpose of group codes that aren't fixed can vary depending on the context.<P>
+<I>Entity group codes by number<BR></I>
+<TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group code</B></TD>
+<TD><B>Description </B></TD></TR>
+<TR VALIGN=TOP><TD>-5</TD>
+<TD>APP: persistent reactor chain</TD></TR>
+<TR VALIGN=TOP><TD>-4</TD>
+<TD>APP: conditional operator (used <I>only</I> with <TT><B>ssget</B></TT> and <TT><B>ads_ssget()</B></TT>)</TD></TR>
+<TR VALIGN=TOP><TD>-3</TD>
+<TD>APP: extended data (XDATA) sentinel (fixed)</TD></TR>
+<TR VALIGN=TOP><TD>-2</TD>
+<TD>APP: entity name reference (fixed)</TD></TR>
+<TR VALIGN=TOP><TD>-1</TD>
+<TD>APP: entity name. This changes each time a drawing is opened. It is never saved. (fixed)</TD></TR>
+<TR VALIGN=TOP><TD>0</TD>
+<TD>Text string indicating the entity type (fixed)</TD></TR>
+<TR VALIGN=TOP><TD>1</TD>
+<TD>Primary text value for an entity</TD></TR>
+<TR VALIGN=TOP><TD>2</TD>
+<TD>Name (attribute tag, block name, and so on)</TD></TR>
+<TR VALIGN=TOP><TD>3-4</TD>
+<TD>Other textual or name values</TD></TR>
+<TR VALIGN=TOP><TD>5</TD>
+<TD>Entity handle. Text string of up to 16 hexadecimal digits (fixed)</TD></TR>
+<TR VALIGN=TOP><TD>6</TD>
+<TD>Linetype name (fixed)</TD></TR>
+<TR VALIGN=TOP><TD>7</TD>
+<TD>Text style name (fixed)</TD></TR>
+<TR VALIGN=TOP><TD>8</TD>
+<TD>Layer name (fixed)</TD></TR>
+<TR VALIGN=TOP><TD>9</TD>
+<TD>DXF: variable name identifier (used only in HEADER section of the DXF file).</TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>Primary point. This is the start point of a line or text entity, center of a circle, and so on. <BR>
+DXF: <I>X</I> value of the primary point (followed by <I>Y</I> and <I>Z</I> value codes 20 and 30)<BR>
+APP: 3D point (list of three reals)</TD></TR>
+<TR VALIGN=TOP><TD>11-18</TD>
+<TD>Other points. <BR>
+DXF: <I>X</I> value of other points (followed by <I>Y</I> value codes 21-28 and <I>Z</I> value codes 31-38)<BR>
+APP: 3D point (list of three reals)</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of the primary point </TD></TR>
+<TR VALIGN=TOP><TD>21-28, 31-37</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of other points </TD></TR>
+<TR VALIGN=TOP><TD>38</TD>
+<TD>DXF: entity's elevation if nonzero. Exists only in output from versions prior to AutoCAD Release 11.</TD></TR>
+<TR VALIGN=TOP><TD>39</TD>
+<TD>Entity's thickness if nonzero (fixed)</TD></TR>
+<TR VALIGN=TOP><TD>40-48</TD>
+<TD>Floating-point values (text height, scale factors, and so on)</TD></TR>
+<TR VALIGN=TOP><TD>48</TD>
+<TD>Linetype scale. Floating-point scalar value. Default value is defined for all entity types.</TD></TR>
+<TR VALIGN=TOP><TD>49</TD>
+<TD>Repeated floating-point value. Multiple 49 groups may appear in one entity for variable-length tables (such as the dash lengths in the LTYPE table). A 7<I>x</I> group always appears <I>before</I> the first 49 group to specify the table length.</TD></TR>
+<TR VALIGN=TOP><TD>50-58</TD>
+<TD>Angles (output in degrees to DXF files and radians through AutoLISP, ADS, and ARX applications). </TD></TR>
+<TR VALIGN=TOP><TD>60</TD>
+<TD>Entity visibility. Integer value. Absence or 0 indicates visibility; 1 indicates invisibility. </TD></TR>
+<TR VALIGN=TOP><TD>62</TD>
+<TD>Color number (fixed)</TD></TR>
+<TR VALIGN=TOP><TD>66</TD>
+<TD>"Entities follow" flag (fixed)</TD></TR>
+<TR VALIGN=TOP><TD>67</TD>
+<TD>Space--that is, model or paper space (fixed)</TD></TR>
+<TR VALIGN=TOP><TD>68</TD>
+<TD>APP: identifies whether viewport is on but fully off screen; is not active or is off.</TD></TR>
+<TR VALIGN=TOP><TD>69</TD>
+<TD>APP: viewport identification number.</TD></TR>
+<TR VALIGN=TOP><TD>70-78</TD>
+<TD>Integer values, such as repeat counts, flag bits, or modes</TD></TR>
+<TR VALIGN=TOP><TD>90-99</TD>
+<TD>32-bit integer values</TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass data marker (with derived class name as a string). Required for all objects and entity classes that are derived from another concrete class to segregate data defined by different classes in the inheritance chain for the same object.<BR>
+This is in addition to the requirement for DXF names for each distinct concrete class derived from ARX (see <A HREF="#XREF_11832">"Subclass Markers"</A>).</TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>Control string, followed by "{&ltarbitrary name&gt" or "}". Similar to the xdata 1002 group code, except that when the string begins with "{", it can be followed by an arbitrary string whose interpretation is up to the application. The only other allowable control string is "}" as a group terminator. As noted before, AutoCAD does not interpret these strings except during drawing audit operations; they are for application use.</TD></TR>
+<TR VALIGN=TOP><TD>105</TD>
+<TD>DIMVAR symbol table entry object handle</TD></TR>
+<TR VALIGN=TOP><TD>210</TD>
+<TD>Extrusion direction (fixed). <BR>
+DXF: <I>X</I> value of extrusion direction<BR>
+APP: 3D extrusion direction vector</TD></TR>
+<TR VALIGN=TOP><TD></TD>
+<TD></TD></TR>
+<TR VALIGN=TOP><TD></TD>
+<TD></TD></TR>
+<TR VALIGN=TOP><TD></TD>
+<TD></TD></TR>
+<TR VALIGN=TOP><TD></TD>
+<TD></TD></TR>
+<TR VALIGN=TOP><TD></TD>
+<TD></TD></TR>
+<TR VALIGN=TOP><TD></TD>
+<TD></TD></TR>
+<TR VALIGN=TOP><TD></TD>
+<TD></TD></TR>
+<TR VALIGN=TOP><TD>220, 230</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of the extrusion direction</TD></TR>
+<TR VALIGN=TOP><TD>280-289</TD>
+<TD>8-bit integer values</TD></TR>
+<TR VALIGN=TOP><TD>300-309</TD>
+<TD>Arbitrary text strings</TD></TR>
+<TR VALIGN=TOP><TD>310-319</TD>
+<TD>Arbitrary binary chunks with same representation and limits as 1004 group codes: hexadecimal strings of up to 254 characters represent data chunks of up to 127 bytes.</TD></TR>
+<TR VALIGN=TOP><TD>320-329</TD>
+<TD>Arbitrary object handles. Handle values that are taken "as is." They are not translated during INSERT and XREF operations. </TD></TR>
+<TR VALIGN=TOP><TD>330-339</TD>
+<TD>Soft-pointer handle. Arbitrary soft pointers to other objects within same DXF file or drawing. Translated during INSERT and XREF operations. </TD></TR>
+<TR VALIGN=TOP><TD>340-349</TD>
+<TD>Hard-pointer handle. Arbitrary hard pointers to other objects within same DXF file or drawing. Translated during INSERT and XREF operations. </TD></TR>
+<TR VALIGN=TOP><TD>350-359</TD>
+<TD>Soft-owner handle. Arbitrary soft ownership links to other objects within same DXF file or drawing. Translated during INSERT and XREF operations. </TD></TR>
+<TR VALIGN=TOP><TD>360-369</TD>
+<TD>Hard-owner handle. Arbitrary hard ownership links to other objects within same DXF file or drawing. Translated during INSERT and XREF operations. </TD></TR>
+<TR VALIGN=TOP><TD>999</TD>
+<TD>DXF: The 999 group code indicates that the line following it is a comment string. DXFOUT does not include such groups in a DXF output file, but DXFIN honors them and ignores the comments. You can use the 999 group to include comments in a DXF file that you've edited.</TD></TR>
+<TR VALIGN=TOP><TD>1000</TD>
+<TD>ASCII string (up to 255 bytes long) in extended data.</TD></TR>
+<TR VALIGN=TOP><TD>1001</TD>
+<TD>Registered application name (ASCII string up to 31 bytes long) for extended data.</TD></TR>
+<TR VALIGN=TOP><TD>1002</TD>
+<TD>Extended data control string ("<TT>{</TT>"or "<TT>}</TT>").</TD></TR>
+<TR VALIGN=TOP><TD>1003 </TD>
+<TD>Extended data layer name.</TD></TR>
+<TR VALIGN=TOP><TD>1004</TD>
+<TD>Chunk of bytes (up to 127 bytes long) in extended data.</TD></TR>
+<TR VALIGN=TOP><TD>1005</TD>
+<TD>Entity handle in extended data. Text string of up to 16 hexadecimal digits </TD></TR>
+<TR VALIGN=TOP><TD>1010</TD>
+<TD>A point in extended data <BR>
+DXF: <I>X </I>value (followed by 1020 and 1030 groups)<BR>
+APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>1020, 1030</TD>
+<TD>DXF<I>: Y</I> and <I>Z</I> values of a point</TD></TR>
+<TR VALIGN=TOP><TD>1011</TD>
+<TD>A 3D world space position in extended data <BR>
+DXF<I>: X </I>value (followed by 1021 and 1031 groups)<BR>
+APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>1021, 1031</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of a World space position</TD></TR>
+<TR VALIGN=TOP><TD>1012</TD>
+<TD>A 3D world space displacement in extended data<BR>
+DXF: <I>X </I>value (followed by 1022 and 1032 groups)<BR>
+APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>1022, 1032</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of a World space displacement</TD></TR>
+<TR VALIGN=TOP><TD>1013</TD>
+<TD>A 3D world space direction in extended data. <BR>
+DXF: <I>X </I>value (followed by 1022 and 1032 groups)<BR>
+APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>1023, 1033</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of a World space direction</TD></TR>
+<TR VALIGN=TOP><TD>1040</TD>
+<TD>Extended data floating-point value.</TD></TR>
+<TR VALIGN=TOP><TD>1041</TD>
+<TD>Extended data distance value.</TD></TR>
+<TR VALIGN=TOP><TD>1042</TD>
+<TD>Extended data scale factor.</TD></TR>
+<TR VALIGN=TOP><TD>1070</TD>
+<TD>Extended data 16-bit signed integer.</TD></TR>
+<TR VALIGN=TOP><TD>1071</TD>
+<TD>Extended data 32-bit signed long.</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_424718"></A><A NAME="ID_424719"></A><a name="Object_and_Entity_Codes"></a><H3>Object and Entity Codes</H3><P>
+In the DXF format, the definition of objects differs from entities: objects have no graphical representation and entities do. For example, dictionaries are objects not entities. Entities are also referred to as <I>graphical objects</I> while objects are referred to as <I>nongraphical objects</I>. <P>
+Entities appear in both the BLOCK and ENTITIES sections of the DXF file. The appearance of entities in the two sections is identical.<P>
+Some group codes that define an entity always appear; others are optional and appear only if their values differ from the defaults. <P>
+Programs that read DXF files should not assume that the groups describing an entity occur in the order given here. The end of an entity is indicated by the next 0 group, which begins the next entity or indicates the end of the section.<P>
+Note: Accommodating DXF files from future releases of AutoCAD will be easier if you write your DXF processing program in a table-driven way, ignore undefined group codes, and make no assumptions about the order of group codes in an entity. As AutoCAD is further enhanced, new group codes will be added to entities to accommodate additional features. <P>
+<a name="HEADER_Section"></a><hr><P>
+<A NAME="ID_418105"></A><a href="#TOP"><H2>HEADER Section</H2></a><P>
+The group codes described in this section pertain only to DXF files.<P>
+The HEADER section of the DXF file contains settings of variables associated with the drawing. Each variable is specified in the header section by a 9 group giving the variable's name, followed by groups that supply the variable's value. Note that some variables appearing in appendix A of the <I>AutoCAD Command Reference</I> do not appear in the DXF file.<P>
+Applications can retrieve the values of these variables with the <TT><B>getvar</B></TT> function. <P>
+The following is an example of the HEADER section of a DXF file:<P>
+<TABLE BORDER=1 >
+<TR VALIGN=TOP>
+<TD><TT>&nbsp;&nbsp;0<BR>
+SECTION<BR>
+&nbsp;&nbsp;2<BR>
+HEADER</TT></TD>
+<TD><I>Beginning of HEADER section</I></TD>
+</TR><TR VALIGN=TOP>
+<TD><TT>&nbsp;&nbsp;9<BR>
+$&ltvariable&gt<BR>
+&ltgroup&nbsp;code&gt<BR>
+&ltvalue&gt</TT></TD>
+<TD><I>Repeats for each header variable</I> </TD>
+</TR><TR VALIGN=TOP>
+<TD><TT>&nbsp;&nbsp;0<BR>
+ENDSEC</TT></TD>
+<TD><I>End of HEADER section</I> </TD>
+</TR></TABLE><P>
+
+The following table lists the   variables that are saved in a DXF file.<P>
+<I>DXF system variables <BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Variable</B></TD>
+<TD><B>Group code</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>$ACADVER</TD>
+<TD> 1</TD>
+<TD>The AutoCAD drawing database version number: AC1006 = R10, AC1009 = R11 and R12, AC1012 = R13 </TD></TR>
+<TR VALIGN=TOP><TD>$ANGBASE</TD>
+<TD>50</TD>
+<TD>Angle 0 direction </TD></TR>
+<TR VALIGN=TOP><TD>$ANGDIR</TD>
+<TD>70</TD>
+<TD>1 = clockwise angles, 0 = counterclockwise</TD></TR>
+<TR VALIGN=TOP><TD>$ATTDIA</TD>
+<TD>70</TD>
+<TD>Attribute entry dialogs: 1 = on, 0 = off</TD></TR>
+<TR VALIGN=TOP><TD>$ATTMODE</TD>
+<TD>70</TD>
+<TD>Attribute visibility: 0 = none, 1 = normal, 2 = all</TD></TR>
+<TR VALIGN=TOP><TD>$ATTREQ</TD>
+<TD>70</TD>
+<TD>Attribute prompting during INSERT: 1 = on, 0 = off</TD></TR>
+<TR VALIGN=TOP><TD>$AUNITS</TD>
+<TD>70</TD>
+<TD>Units format for angles</TD></TR>
+<TR VALIGN=TOP><TD>$AUPREC</TD>
+<TD>70</TD>
+<TD>Units precision for angles</TD></TR>
+<TR VALIGN=TOP><TD>$BLIPMODE</TD>
+<TD>70</TD>
+<TD>Blip mode on if nonzero</TD></TR>
+<TR VALIGN=TOP><TD>$CECOLOR</TD>
+<TD>62</TD>
+<TD>Current entity color number: 0 = BYBLOCK, 256 = BYLAYER</TD></TR>
+<TR VALIGN=TOP><TD>$CELTSCALE</TD>
+<TD> 40</TD>
+<TD>Current entity linetype scale </TD></TR>
+<TR VALIGN=TOP><TD>$CELTYPE</TD>
+<TD> 6</TD>
+<TD>Entity linetype name, or BYBLOCK or BYLAYER</TD></TR>
+<TR VALIGN=TOP><TD>$CHAMFERA</TD>
+<TD>40</TD>
+<TD>First chamfer distance</TD></TR>
+<TR VALIGN=TOP><TD>$CHAMFERB</TD>
+<TD>40</TD>
+<TD>Second chamfer distance</TD></TR>
+<TR VALIGN=TOP><TD>$CLAYER</TD>
+<TD> 8</TD>
+<TD>Current layer name</TD></TR>
+<TR VALIGN=TOP><TD>$CMLJUST</TD>
+<TD>70</TD>
+<TD>Current multiline justification: 0=Top,1=Middle, 2=Bottom</TD></TR>
+<TR VALIGN=TOP><TD>$CMLSCALE</TD>
+<TD>40</TD>
+<TD>Current multiline scale</TD></TR>
+<TR VALIGN=TOP><TD>$CMLSTYLE</TD>
+<TD>7</TD>
+<TD>Current multiline style name</TD></TR>
+<TR VALIGN=TOP><TD>$COORDS</TD>
+<TD>70</TD>
+<TD>Coordinate display: <BR>
+0 = static, 1 = continuous update, 2 = "<I>d</I>&lt<I>a</I>" format</TD></TR>
+<TR VALIGN=TOP><TD>$DELOBJ</TD>
+<TD>70</TD>
+<TD>Controls object deletion: 0=deleted, 1=retained</TD></TR>
+<TR VALIGN=TOP><TD>$DIMALT</TD>
+<TD>70</TD>
+<TD>Alternate unit dimensioning performed if nonzero</TD></TR>
+<TR VALIGN=TOP><TD>$DIMALTD</TD>
+<TD>70</TD>
+<TD>Alternate unit decimal places</TD></TR>
+<TR VALIGN=TOP><TD>$DIMALTF</TD>
+<TD>40</TD>
+<TD>Alternate unit scale factor</TD></TR>
+<TR VALIGN=TOP><TD>$DIMALTTD</TD>
+<TD>70</TD>
+<TD>Number of decimal places for tolerance values of an alternate units dimension </TD></TR>
+<TR VALIGN=TOP><TD>$DIMALTTZ</TD>
+<TD>70</TD>
+<TD>Controls suppression of zeros for alternate tolerance values: <BR>
+0 = Suppresses zero feet and precisely zero inches<BR>
+1 = Includes zero feet and precisely zero inches<BR>
+2 = Includes zero feet and suppresses zero inches<BR>
+3 = Includes zero inches and suppresses zero feet</TD></TR>
+<TR VALIGN=TOP><TD>$DIMALTU</TD>
+<TD>70</TD>
+<TD>Units format for alternate units of all dimension style family members except angular: <BR>
+1 = Scientific; 2 = Decimal; 3 = Engineering; <BR>
+4 = Architectural (stacked); 5 = Fractional (stacked);<BR>
+6 = Architectural; 7 = Fractional</TD></TR>
+<TR VALIGN=TOP><TD>$DIMALTZ</TD>
+<TD>70</TD>
+<TD>Controls suppression of zeros for alternate unit dimension values: <BR>
+0 = Suppresses zero feet and precisely zero inches<BR>
+1 = Includes zero feet and precisely zero inches<BR>
+2 = Includes zero feet and suppresses zero inches<BR>
+3 = Includes zero inches and suppresses zero feet</TD></TR>
+<TR VALIGN=TOP><TD>$DIMAPOST</TD>
+<TD> 1</TD>
+<TD>Alternate dimensioning suffix</TD></TR>
+<TR VALIGN=TOP><TD>$DIMASO</TD>
+<TD>70</TD>
+<TD>1 = create associative dimensioning, 0 = draw individual entities</TD></TR>
+<TR VALIGN=TOP><TD>$DIMASZ</TD>
+<TD>40</TD>
+<TD>Dimensioning arrow size</TD></TR>
+<TR VALIGN=TOP><TD>$DIMAUNIT</TD>
+<TD>70</TD>
+<TD>Angle format for angular dimensions: <BR>
+0=Decimal degrees, 1=Degrees/minutes/seconds, 2=Gradians, 3=Radians, 4=Surveyor's units</TD></TR>
+<TR VALIGN=TOP><TD>$DIMBLK</TD>
+<TD> 2</TD>
+<TD>Arrow block name</TD></TR>
+<TR VALIGN=TOP><TD>$DIMBLK1</TD>
+<TD> 1</TD>
+<TD>First arrow block name</TD></TR>
+<TR VALIGN=TOP><TD>$DIMBLK2</TD>
+<TD> 1</TD>
+<TD>Second arrow block name</TD></TR>
+<TR VALIGN=TOP><TD>$DIMCEN</TD>
+<TD>40</TD>
+<TD>Size of center mark/lines</TD></TR>
+<TR VALIGN=TOP><TD>$DIMCLRD</TD>
+<TD>70</TD>
+<TD>Dimension line color: range is 0 = BYBLOCK, 256 = BYLAYER</TD></TR>
+<TR VALIGN=TOP><TD>$DIMCLRE</TD>
+<TD>70</TD>
+<TD>Dimension extension line color:  range is 0 = BYBLOCK, <BR>
+256 = BYLAYER</TD></TR>
+<TR VALIGN=TOP><TD>$DIMCLRT</TD>
+<TD>70</TD>
+<TD>Dimension text color:  range is 0 = BYBLOCK, 256 = BYLAYER</TD></TR>
+<TR VALIGN=TOP><TD>$DIMDEC </TD>
+<TD>70</TD>
+<TD>Number of decimal places for the tolerance values of a primary units dimension</TD></TR>
+<TR VALIGN=TOP><TD>$DIMDLE</TD>
+<TD>40</TD>
+<TD>Dimension line extension</TD></TR>
+<TR VALIGN=TOP><TD>$DIMDLI</TD>
+<TD>40</TD>
+<TD>Dimension line increment</TD></TR>
+<TR VALIGN=TOP><TD>$DIMEXE</TD>
+<TD>40</TD>
+<TD>Extension line extension</TD></TR>
+<TR VALIGN=TOP><TD>$DIMEXO</TD>
+<TD>40</TD>
+<TD>Extension line offset</TD></TR>
+<TR VALIGN=TOP><TD>$DIMLFAC</TD>
+<TD>40</TD>
+<TD>Linear measurements scale factor</TD></TR>
+<TR VALIGN=TOP><TD>$DIMFIT </TD>
+<TD>70</TD>
+<TD>Placement of text and arrowheads; Possible values: 0 through 3 (see appendix A, "System Variables," in the <I>AutoCAD Command Reference</I>)</TD></TR>
+<TR VALIGN=TOP><TD>$DIMGAP</TD>
+<TD>40</TD>
+<TD>Dimension line gap</TD></TR>
+<TR VALIGN=TOP><TD>$DIMJUST </TD>
+<TD>70</TD>
+<TD>Horizontal dimension text position: 0=above dimension line and center-justified between extension lines, 1=above dimension line and next to first extension line, 2=above dimension line and next to second extension line, 3=above and center-justified to first extension line, 4=above and center-justified to second extension line</TD></TR>
+<TR VALIGN=TOP><TD>$DIMLIM</TD>
+<TD>70</TD>
+<TD>Dimension limits generated if nonzero</TD></TR>
+<TR VALIGN=TOP><TD>$DIMPOST</TD>
+<TD> 1</TD>
+<TD>General dimensioning suffix</TD></TR>
+<TR VALIGN=TOP><TD>$DIMRND</TD>
+<TD>40</TD>
+<TD>Rounding value for dimension distances</TD></TR>
+<TR VALIGN=TOP><TD>$DIMSAH</TD>
+<TD>70</TD>
+<TD>Use separate arrow blocks if nonzero</TD></TR>
+<TR VALIGN=TOP><TD>$DIMSCALE</TD>
+<TD>40</TD>
+<TD>Overall dimensioning scale factor</TD></TR>
+<TR VALIGN=TOP><TD>$DIMSD1</TD>
+<TD>70</TD>
+<TD>Suppression of first extension line:<BR>
+0=not suppressed, 1=suppressed</TD></TR>
+<TR VALIGN=TOP><TD>$DIMSD2</TD>
+<TD>70</TD>
+<TD>Suppression of second extension line:<BR>
+0=not suppressed, 1=suppressed</TD></TR>
+<TR VALIGN=TOP><TD>$DIMSE1</TD>
+<TD>70</TD>
+<TD>First extension line suppressed if nonzero</TD></TR>
+<TR VALIGN=TOP><TD>$DIMSE2</TD>
+<TD>70</TD>
+<TD>Second extension line suppressed if nonzero</TD></TR>
+<TR VALIGN=TOP><TD>$DIMSHO</TD>
+<TD>70</TD>
+<TD>1 = Recompute dimensions while dragging, <BR>
+0 = drag original image</TD></TR>
+<TR VALIGN=TOP><TD>$DIMSOXD</TD>
+<TD>70</TD>
+<TD>Suppress outside-extensions dimension lines if nonzero</TD></TR>
+<TR VALIGN=TOP><TD>$DIMSTYLE</TD>
+<TD> 2</TD>
+<TD>Dimension style name</TD></TR>
+<TR VALIGN=TOP><TD>$DIMTAD</TD>
+<TD>70</TD>
+<TD>Text above dimension line if nonzero</TD></TR>
+<TR VALIGN=TOP><TD>$DIMTDEC</TD>
+<TD>70</TD>
+<TD>Number of decimal places to display the tolerance values</TD></TR>
+<TR VALIGN=TOP><TD>$DIMTFAC</TD>
+<TD>40</TD>
+<TD>Dimension tolerance display scale factor</TD></TR>
+<TR VALIGN=TOP><TD>$DIMTIH</TD>
+<TD>70</TD>
+<TD>Text inside horizontal if nonzero</TD></TR>
+<TR VALIGN=TOP><TD>$DIMTIX</TD>
+<TD>70</TD>
+<TD>Force text inside extensions if nonzero</TD></TR>
+<TR VALIGN=TOP><TD>$DIMTM</TD>
+<TD>40</TD>
+<TD>Minus tolerance</TD></TR>
+<TR VALIGN=TOP><TD>$DIMTOFL</TD>
+<TD>70</TD>
+<TD>If text outside extensions, force line extensions between extensions if nonzero</TD></TR>
+<TR VALIGN=TOP><TD>$DIMTOH</TD>
+<TD>70</TD>
+<TD>Text outside horizontal if nonzero</TD></TR>
+<TR VALIGN=TOP><TD>$DIMTOL</TD>
+<TD>70</TD>
+<TD>Dimension tolerances generated if nonzero</TD></TR>
+<TR VALIGN=TOP><TD>$DIMTOLJ</TD>
+<TD>70</TD>
+<TD>Vertical justification for tolerance values:<BR>
+0=Top, 1=Middle, 2=Bottom</TD></TR>
+<TR VALIGN=TOP><TD>$DIMTP</TD>
+<TD>40</TD>
+<TD>Plus tolerance</TD></TR>
+<TR VALIGN=TOP><TD>$DIMTSZ</TD>
+<TD>40</TD>
+<TD>Dimensioning tick size:  0 = no ticks</TD></TR>
+<TR VALIGN=TOP><TD>$DIMTVP</TD>
+<TD>40</TD>
+<TD>Text vertical position</TD></TR>
+<TR VALIGN=TOP><TD>$DIMTXSTY </TD>
+<TD>70</TD>
+<TD>Dimension text style</TD></TR>
+<TR VALIGN=TOP><TD>$DIMTXT</TD>
+<TD>40</TD>
+<TD>Dimensioning text height</TD></TR>
+<TR VALIGN=TOP><TD>$DIMTZIN</TD>
+<TD>70</TD>
+<TD>Controls suppression of zeros for tolerance values: <BR>
+0 = Suppresses zero feet and precisely zero inches<BR>
+1 = Includes zero feet and precisely zero inches<BR>
+2 = Includes zero feet and suppresses zero inches<BR>
+3 = Includes zero inches and suppresses zero feet</TD></TR>
+<TR VALIGN=TOP><TD>$DIMUNIT</TD>
+<TD>70</TD>
+<TD>Units format for all dimension style family members except angular:  <BR>
+1 = Scientific; 2 = Decimal; 3 = Engineering; <BR>
+4 = Architectural (stacked); 5 = Fractional (stacked);<BR>
+6 = Architectural; 7 = Fractional</TD></TR>
+<TR VALIGN=TOP><TD>$DIMUPT</TD>
+<TD>70</TD>
+<TD>Cursor functionality for user positioned text:  0=controls only the dimension line location, 1=controls the text position as well as the dimension line location</TD></TR>
+<TR VALIGN=TOP><TD>$DIMZIN</TD>
+<TD>70</TD>
+<TD>Controls suppression of zeros for primary unit values: <BR>
+0 = Suppresses zero feet and precisely zero inches<BR>
+1 = Includes zero feet and precisely zero inches<BR>
+2 = Includes zero feet and suppresses zero inches<BR>
+3 = Includes zero inches and suppresses zero feet</TD></TR>
+<TR VALIGN=TOP><TD>$DISPSILH </TD>
+<TD>70 </TD>
+<TD>Controls the display of silhouette curves of body objects in wire-frame mode: 0=Off, 1=On</TD></TR>
+<TR VALIGN=TOP><TD>$DWGCODEPAGE</TD>
+<TD> 3</TD>
+<TD>Drawing code page; Set to the system code page when a new drawing is created, but not otherwise maintained by AutoCAD</TD></TR>
+<TR VALIGN=TOP><TD>$DRAGMODE</TD>
+<TD>70</TD>
+<TD>0 = off, 1 = on, 2 = auto</TD></TR>
+<TR VALIGN=TOP><TD>$ELEVATION</TD>
+<TD>40</TD>
+<TD>Current elevation set by ELEV command</TD></TR>
+<TR VALIGN=TOP><TD>$EXTMAX</TD>
+<TD>10, 20, 30</TD>
+<TD><I>X</I>, <I>Y</I>, and <I>Z</I> drawing extents upper-right corner (in WCS) </TD></TR>
+<TR VALIGN=TOP><TD>$EXTMIN</TD>
+<TD>10, 20, 30</TD>
+<TD><I>X</I>, <I>Y</I>, and <I>Z</I> drawing extents lower-left corner (in WCS) </TD></TR>
+<TR VALIGN=TOP><TD>$FILLETRAD</TD>
+<TD>40</TD>
+<TD>Fillet radius</TD></TR>
+<TR VALIGN=TOP><TD>$FILLMODE</TD>
+<TD>70</TD>
+<TD>Fill mode on if nonzero</TD></TR>
+<TR VALIGN=TOP><TD>$HANDSEED</TD>
+<TD> 5</TD>
+<TD>Next available handle</TD></TR>
+<TR VALIGN=TOP><TD>$INSBASE</TD>
+<TD>10, 20, 30</TD>
+<TD>Insertion base set by BASE command (in WCS) </TD></TR>
+<TR VALIGN=TOP><TD>$LIMCHECK</TD>
+<TD>70</TD>
+<TD>Nonzero if limits checking is on</TD></TR>
+<TR VALIGN=TOP><TD>$LIMMAX</TD>
+<TD>10, 20</TD>
+<TD><I>XY</I> drawing limits upper-right corner (in WCS) </TD></TR>
+<TR VALIGN=TOP><TD>$LIMMIN</TD>
+<TD>10, 20</TD>
+<TD><I>XY</I> drawing limits lower-left corner (in WCS) </TD></TR>
+<TR VALIGN=TOP><TD>$LTSCALE</TD>
+<TD>40</TD>
+<TD>Global linetype scale</TD></TR>
+<TR VALIGN=TOP><TD>$LUNITS</TD>
+<TD>70</TD>
+<TD>Units format for coordinates and distances</TD></TR>
+<TR VALIGN=TOP><TD>$LUPREC</TD>
+<TD>70</TD>
+<TD>Units precision for coordinates and distances</TD></TR>
+<TR VALIGN=TOP><TD>$MAXACTVP</TD>
+<TD>70</TD>
+<TD>Sets maximum number of viewports to be regenerated</TD></TR>
+<TR VALIGN=TOP><TD>$MENU</TD>
+<TD> 1</TD>
+<TD>Name of menu file</TD></TR>
+<TR VALIGN=TOP><TD>$MIRRTEXT</TD>
+<TD>70</TD>
+<TD>Mirror text if nonzero</TD></TR>
+<TR VALIGN=TOP><TD>$ORTHOMODE</TD>
+<TD>70</TD>
+<TD>Ortho mode on if nonzero</TD></TR>
+<TR VALIGN=TOP><TD>$OSMODE</TD>
+<TD>70</TD>
+<TD>Running object snap modes</TD></TR>
+<TR VALIGN=TOP><TD>$PDMODE</TD>
+<TD>70</TD>
+<TD>Point display mode</TD></TR>
+<TR VALIGN=TOP><TD>$PDSIZE</TD>
+<TD>40</TD>
+<TD>Point display size</TD></TR>
+<TR VALIGN=TOP><TD>$PELEVATION</TD>
+<TD>40</TD>
+<TD>Current paper space elevation</TD></TR>
+<TR VALIGN=TOP><TD>$PEXTMAX</TD>
+<TD>10, 20, 30</TD>
+<TD>Maximum <I>X</I>, <I>Y</I>, and <I>Z</I> extents for paper space</TD></TR>
+<TR VALIGN=TOP><TD>$PEXTMIN</TD>
+<TD>10, 20, 30</TD>
+<TD>Minimum <I>X</I>, <I>Y</I>, and <I>Z</I> extents for paper space</TD></TR>
+<TR VALIGN=TOP><TD>$PLIMCHECK</TD>
+<TD>70</TD>
+<TD>Limits checking in paper space when nonzero</TD></TR>
+<TR VALIGN=TOP><TD>$PLIMMAX</TD>
+<TD>10, 20</TD>
+<TD>Maximum <I>X</I> and <I>Y</I> limits in paper space</TD></TR>
+<TR VALIGN=TOP><TD>$PLIMMIN</TD>
+<TD>10, 20</TD>
+<TD>Minimum <I>X</I> and <I>Y</I> limits in paper space</TD></TR>
+<TR VALIGN=TOP><TD>$PICKSTYLE </TD>
+<TD>70</TD>
+<TD>Controls group selection and associative hatch selection:<BR>
+0=No group selection or associative hatch selection, <BR>
+1=Group selection, <BR>
+2 =Associative hatch selection, <BR>
+3 =Group selection and associative hatch selection</TD></TR>
+<TR VALIGN=TOP><TD>$PLINEGEN</TD>
+<TD>70</TD>
+<TD>Governs the generation of linetype patterns around the vertices of a 2D polyline:<BR>
+1 = linetype is generated in a continuous pattern around vertices of the polyline, <BR>
+0 = each segment of the polyline starts and ends with a dash</TD></TR>
+<TR VALIGN=TOP><TD>$PLINEWID</TD>
+<TD>40</TD>
+<TD>Default polyline width</TD></TR>
+<TR VALIGN=TOP><TD>$PSLTSCALE</TD>
+<TD>70</TD>
+<TD>Controls paper space linetype scaling:<BR>
+1 = no special linetype scaling<BR>
+0 = viewport scaling governs linetype scaling</TD></TR>
+<TR VALIGN=TOP><TD>$PUCSNAME</TD>
+<TD> 2</TD>
+<TD>Current paper space UCS name</TD></TR>
+<TR VALIGN=TOP><TD>$PUCSORG</TD>
+<TD>10, 20, 30</TD>
+<TD>Current paper space UCS origin</TD></TR>
+<TR VALIGN=TOP><TD>$PUCSXDIR</TD>
+<TD>10, 20, 30</TD>
+<TD>Current paper space UCS <I>X</I> axis</TD></TR>
+<TR VALIGN=TOP><TD>$PUCSYDIR</TD>
+<TD>10, 20, 30</TD>
+<TD>Current paper space UCS <I>Y</I> axis</TD></TR>
+<TR VALIGN=TOP><TD>$QTEXTMODE</TD>
+<TD>70</TD>
+<TD>Quick text mode on if nonzero</TD></TR>
+<TR VALIGN=TOP><TD>$REGENMODE</TD>
+<TD>70</TD>
+<TD>REGENAUTO mode on if nonzero</TD></TR>
+<TR VALIGN=TOP><TD>$SAVEIMAGES</TD>
+<TD>70</TD>
+<TD>Controls the writing of graphics metafiles for application-defined objects. For more information, see Appendix A of the <I>AutoCAD</I> <I>Command Reference</I>.</TD></TR>
+<TR VALIGN=TOP><TD>$SHADEDGE</TD>
+<TD>70</TD>
+<TD>0 = faces shaded, edges not highlighted <BR>
+1 = faces shaded, edges highlighted in black <BR>
+2 = faces not filled, edges in entity color <BR>
+3 = faces in entity color, edges in black</TD></TR>
+<TR VALIGN=TOP><TD>$SHADEDIF</TD>
+<TD>70</TD>
+<TD>Percent ambient/diffuse light, range 1-100, default 70</TD></TR>
+<TR VALIGN=TOP><TD>$SKETCHINC</TD>
+<TD>40</TD>
+<TD>Sketch record increment</TD></TR>
+<TR VALIGN=TOP><TD>$SKPOLY</TD>
+<TD>70</TD>
+<TD>0 = sketch lines, 1 = sketch polylines</TD></TR>
+<TR VALIGN=TOP><TD>$SPLFRAME</TD>
+<TD>70</TD>
+<TD>Spline control polygon display: 1 = on, 0 = of</TD></TR>
+<TR VALIGN=TOP><TD>$SPLINESEGS</TD>
+<TD>70</TD>
+<TD>Number of line segments per spline patch</TD></TR>
+<TR VALIGN=TOP><TD><A NAME="XREF_32335"></A>$SPLINETYPE</TD>
+<TD>70</TD>
+<TD>Spline curve type for PEDIT Spline</TD></TR>
+<TR VALIGN=TOP><TD>$SURFTAB1</TD>
+<TD>70</TD>
+<TD>Number of mesh tabulations in first direction</TD></TR>
+<TR VALIGN=TOP><TD>$SURFTAB2</TD>
+<TD>70</TD>
+<TD>Number of mesh tabulations in second direction</TD></TR>
+<TR VALIGN=TOP><TD>$SURFTYPE</TD>
+<TD>70</TD>
+<TD><A NAME="XREF__HEADER_Type___table____Updated_xre"></A>Surface type for PEDIT Smooth</TD></TR>
+<TR VALIGN=TOP><TD>$SURFU</TD>
+<TD>70</TD>
+<TD>Surface density (for PEDIT Smooth) in M direction</TD></TR>
+<TR VALIGN=TOP><TD>$SURFV</TD>
+<TD>70</TD>
+<TD>Surface density (for PEDIT Smooth) in N direction</TD></TR>
+<TR VALIGN=TOP><TD>$TDCREATE</TD>
+<TD>40</TD>
+<TD>Date/time of drawing creation</TD></TR>
+<TR VALIGN=TOP><TD>$TDINDWG</TD>
+<TD>40</TD>
+<TD>Cumulative editing time for this drawing</TD></TR>
+<TR VALIGN=TOP><TD>$TDUPDATE</TD>
+<TD>40</TD>
+<TD>Date/time of last drawing update</TD></TR>
+<TR VALIGN=TOP><TD>$TDUSRTIMER</TD>
+<TD>40</TD>
+<TD>User elapsed timer</TD></TR>
+<TR VALIGN=TOP><TD>$TEXTSIZE</TD>
+<TD>40</TD>
+<TD>Default text height</TD></TR>
+<TR VALIGN=TOP><TD>$TEXTSTYLE</TD>
+<TD> 7</TD>
+<TD>Current text style name</TD></TR>
+<TR VALIGN=TOP><TD>$THICKNESS</TD>
+<TD>40</TD>
+<TD>Current thickness set by ELEV command</TD></TR>
+<TR VALIGN=TOP><TD>$TILEMODE</TD>
+<TD>70</TD>
+<TD>1 for previous release compatibility mode, 0 otherwise</TD></TR>
+<TR VALIGN=TOP><TD>$TRACEWID</TD>
+<TD>40</TD>
+<TD>Default trace width</TD></TR>
+<TR VALIGN=TOP><TD>$UCSNAME</TD>
+<TD> 2</TD>
+<TD>Name of current UCS</TD></TR>
+<TR VALIGN=TOP><TD>$UCSORG</TD>
+<TD>10, 20, 30</TD>
+<TD>Origin of current UCS (in WCS) </TD></TR>
+<TR VALIGN=TOP><TD>$UCSXDIR</TD>
+<TD>10, 20, 30</TD>
+<TD>Direction of current UCS's <I>X</I> axis (in WCS) </TD></TR>
+<TR VALIGN=TOP><TD>$UCSYDIR</TD>
+<TD>10, 20, 30</TD>
+<TD>Direction of current UCS's <I>Y</I> axis (in WCS) </TD></TR>
+<TR VALIGN=TOP><TD>$UNITMODE</TD>
+<TD>70</TD>
+<TD>Low bit set = display fractions, feet-and-inches, and surveyor's angles in input format</TD></TR>
+<TR VALIGN=TOP><TD>$USERI1 - 5</TD>
+<TD>70</TD>
+<TD>Five integer variables intended for use by third-party developers</TD></TR>
+<TR VALIGN=TOP><TD>$USERR1 - 5</TD>
+<TD>40</TD>
+<TD>Five real variables intended for use by third-party developers</TD></TR>
+<TR VALIGN=TOP><TD>$USRTIMER</TD>
+<TD>70</TD>
+<TD>0 = timer off, 1 = timer on</TD></TR>
+<TR VALIGN=TOP><TD>$VISRETAIN</TD>
+<TD>70</TD>
+<TD>0 = don't retain xref-dependent visibility settings, 1 = retain xref-dependent visibility settings</TD></TR>
+<TR VALIGN=TOP><TD>$WORLDVIEW</TD>
+<TD>70</TD>
+<TD>1 = set UCS to WCS during DVIEW/VPOINT, 0 = don't change UCS</TD></TR>
+</TABLE><P>
+<P>
+The following header variables existed prior to AutoCAD Release 11 but now have independent settings for each active viewport. DXFIN honors these variables when read from DXF files, but if a VPORT symbol table with *ACTIVE entries is present (as is true for any DXF file produced by Release 11 or higher), the values in the VPORT table entries override the values of these header variables.<P>
+<I>Revised VPORT header variables <BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Variable</B></TD>
+<TD><B>Group code</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>$FASTZOOM</TD>
+<TD>70</TD>
+<TD>Fast zoom enabled if nonzero </TD></TR>
+<TR VALIGN=TOP><TD>$GRIDMODE</TD>
+<TD>70</TD>
+<TD>Grid mode on if nonzero </TD></TR>
+<TR VALIGN=TOP><TD>$GRIDUNIT</TD>
+<TD>10, 20</TD>
+<TD>Grid <I>X</I> and <I>Y</I> spacing </TD></TR>
+<TR VALIGN=TOP><TD>$SNAPANG</TD>
+<TD>50</TD>
+<TD>Snap grid rotation angle </TD></TR>
+<TR VALIGN=TOP><TD>$SNAPBASE</TD>
+<TD>10, 20</TD>
+<TD>Snap/grid base point (in UCS) </TD></TR>
+<TR VALIGN=TOP><TD>$SNAPISOPAIR</TD>
+<TD>70</TD>
+<TD>Isometric plane: 0 = left, 1 = top, 2 = right </TD></TR>
+<TR VALIGN=TOP><TD>$SNAPMODE</TD>
+<TD>70</TD>
+<TD>Snap mode on if nonzero </TD></TR>
+<TR VALIGN=TOP><TD>$SNAPSTYLE</TD>
+<TD>70</TD>
+<TD>Snap style: 0 = standard, 1 = isometric </TD></TR>
+<TR VALIGN=TOP><TD>$SNAPUNIT</TD>
+<TD>10, 20</TD>
+<TD>Snap grid <I>X</I> and <I>Y</I> spacing </TD></TR>
+<TR VALIGN=TOP><TD>$VIEWCTR</TD>
+<TD>10, 20</TD>
+<TD><I>XY</I> center of current view on screen </TD></TR>
+<TR VALIGN=TOP><TD>$VIEWDIR</TD>
+<TD>10, 20, 30</TD>
+<TD>Viewing direction (direction from target in WCS) </TD></TR>
+<TR VALIGN=TOP><TD>$VIEWSIZE</TD>
+<TD>40</TD>
+<TD>Height of view </TD></TR>
+</TABLE><P>
+<P>
+The date/time variables ($TDCREATE and $TDUPDATE) are output as real numbers in the following format:<P>
+&lt<I>Julian date</I>&gt.&ltFraction&gt<P>
+The elapsed time variables ($TDINDWG and $TDUSRTIMER) have a similar format:<P>
+&lt<I>number of days</I>&gt.&ltFraction&gt<P>
+<P>
+The date and time variables are described in the <I>AutoCAD Command Reference</I>.<P>
+<a name="CLASSES_Section"></a><hr><P>
+<A NAME="ID_418420"></A><a href="#TOP"><H2>CLASSES Section</H2></a><P>
+The group codes described in this section are found only in DXF files.<P>
+The CLASSES section holds the information for application-defined classes whose instances appear in the BLOCKS, ENTITIES, and OBJECTS sections of the database. It is assumed that a class definition is permanently fixed in the class hierarchy. All fields are required.<P>
+The following is an example of the CLASSES section of a DXF file:<P>
+<TABLE BORDER=1>
+<TR VALIGN=TOP>
+<TD><TT>&nbsp;&nbsp;0&nbsp;<BR>
+SECTION<BR>
+&nbsp;&nbsp;2<BR>
+CLASSES</TT></TD>
+<TD><I>Beginning of CLASSES section</I><BR><BR><BR></TD>
+</TR><TR VALIGN=TOP>
+<TD><TT>&nbsp;&nbsp;9<BR>
+&ltclass&nbsp;dxf&nbsp;record&gt<BR>
+&nbsp;&nbsp;1<BR>
+&ltclass&nbsp;name&gt<BR>
+&nbsp;&nbsp;2<BR>
+&ltapp&nbsp;name&gt<BR>
+&nbsp;90<BR>
+&ltver.&nbsp;nunber&gt<BR>
+280<BR>
+&ltflag&gt<BR>
+281<BR>
+&ltflag&gt</TT></TD>
+<TD><I>Repeats for each entry</I><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR></TD>
+</TR><TR VALIGN=TOP>
+<TD><TT>&nbsp;&nbsp;0<BR>
+ENDSEC</TT></TD>
+<TD><I>End of CLASSES section</I><BR>&nbsp;</TD>
+</TR></TABLE><P>
+
+Each entry in the CLASSES section contains the groups described in the following table.<P>
+<I>CLASSES section group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group  code</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>0 </TD>
+<TD>&lt<I>class DXF record name</I>&gt--identifies beginning of records in BLOCKS, ENTITIES, and OBJECTS sections. If two object types claim the same DXF name, AutoCAD appends unique numeric suffixes to them until they are distinct within the drawing.</TD></TR>
+<TR VALIGN=TOP><TD>1</TD>
+<TD>&lt<I>C++ class name</I>&gt--used to bind with software that defines object class behavior. These are always unique. Note that the same C++ class may have slightly different DXF names in different drawings.</TD></TR>
+<TR VALIGN=TOP><TD>2</TD>
+<TD>&lt<I>application name</I>&gt--posted in Alert box when a class definition listed in this section is not currently loaded. </TD></TR>
+<TR VALIGN=TOP><TD>90</TD>
+<TD>&lt<I>class version number&gt</I>--set to version of class that was loaded when instances of this class were last stored.</TD></TR>
+<TR VALIGN=TOP><TD>280</TD>
+<TD>&lt<I>was-a-zombie flag</I>&gt--set to 1 if class was not loaded when this DXF file was created, and 0 otherwise.</TD></TR>
+<TR VALIGN=TOP><TD>281</TD>
+<TD>&lt<I>is-an-entity flag&gt</I>--set to 1 if class was derived from the AcDbEntity class and can reside in the BLOCKS or ENTITIES section. If 0, instances may appear only in the OBJECTS section.</TD></TR>
+</TABLE><P>
+<P>
+<a name="TABLES_Section"></a><hr><P>
+<A NAME="ID_418439"></A><a href="#TOP"><H2>TABLES Section</H2></a><P>
+The group codes described in this section are found in DXF files and used by applications. The TABLES section contains several tables, each of which can contain a variable number of entries. These codes are also used by AutoLISP, ADS, and ARX applications in entity definition lists. <P>
+The group codes shown in this section can apply to DXF files, applications (AutoLISP, ADS, or ARX), or both. When the description of a code is different for applications and DXF files (or only applies to one or the other), the description is preceeded by the following indicators:<P>
+<DL COMPACT>
+<DT><B>APP</B><DD> Application-specific description
+<DT><B>DXF</B><DD> DXF file-specific description
+</DL>
+If the description is common to both DXF files and applications, no indicator is provided. Otherwise, the appropriate indicator is present. Optional codes are shown in gray. <P>
+
+<hr size=1><U><I>Topics in this section:</I></U><BR>
+<ul>
+<li><a href="#Symbol_Tables_in_DXF_Files">Symbol Tables in DXF Files</a>
+<li><a href="#Symbol_Table_Group_Codes">Symbol Table Group Codes</a>
+<li><a href="#Common_Group_Codes_for_Symbol_Table_Entries">Common Group Codes for Symbol Table Entries </a>
+<li><a href="#APPID">APPID</a>
+<li><a href="#BLOCK_RECORD">BLOCK_RECORD</a>
+<li><a href="#DIMSTYLE">DIMSTYLE</a>
+<li><a href="#LAYER">LAYER</a>
+<li><a href="#LTYPE">LTYPE</a>
+<li><a href="#STYLE">STYLE</a>
+<li><a href="#UCS">UCS</a>
+<li><a href="#VIEW">VIEW</a>
+<li><a href="#VPORT">VPORT</a>
+</ul><hr size=1>
+
+<A NAME="ID_426164"></A><a name="Symbol_Tables_in_DXF_Files"></a><H3>Symbol Tables in DXF Files</H3><P>
+The order of the tables may change, but the LTYPE table always precedes the LAYER table. Each table is introduced with a 0 group with the label TABLE. This is followed by a 2 group identifying the particular table (APPID, DIMSTYLE, LAYER, LTYPE, STYLE, UCS, VIEW, VPORT, or BLOCK_RECORD ), a 5 group (a handle), a group 100 (AcDbSymbolTable subclass marker), and a 70 group that specifies the maximum number of table entries that may follow. Table names are output in uppercase characters. The DIMSTYLE handle is a 105 group not a 5 group.<P>
+The tables in a drawing can contain deleted items, but these are not written to the DXF file. As a result, fewer table entries may follow the table header than are indicated by the 70 group, so do not use the count in the 70 group as an index to read in the table. This group is provided so that a program that reads DXF files can allocate an array large enough to hold all the table entries that follow.<P>
+Following this header for each table are the table entries. Each table item consists of a 0 group identifying the item type (same as table name, such as LTYPE or LAYER), a 2 group giving the name of the table entry, a 70 group specifying flags relevant to the table entry (defined for each following table), and additional groups that give the value of the table entry. The end of each table is indicated by a 0 group with the value ENDTAB.<P>
+The following is an example of the TABLES section of a DXF file:<P>
+<TABLE BORDER=1>
+<TR VALIGN=TOP>
+<TD><TT>&nbsp;&nbsp;0&nbsp;<BR>
+SECTION<BR>
+&nbsp;&nbsp;2<BR>
+TABLES</TT></TD>
+<TD><I>Beginning of TABLES section</I><BR><BR><BR></TD>
+</TR><TR VALIGN=TOP>
+<TD><TT>&nbsp;&nbsp;0<BR>
+TABLE<BR>
+&nbsp;&nbsp;2<BR>
+&lttable&nbsp;type&gt<BR>
+&nbsp;&nbsp;5<BR>
+&lthandle&gt<BR>
+100<BR>
+AcDbSymbolTable<BR>
+&nbsp;70<BR>
+&ltmax.&nbsp;entries&gt</TT></TD>
+<TD><I>Common table group codes,<BR>
+repeats for each table</I><BR><BR><BR><BR><BR><BR><BR><BR></TD>
+</TR><TR VALIGN=TOP>
+<TD><TT>&nbsp;&nbsp;0<BR>
+&lttable&nbsp;type&gt<BR>
+&nbsp;.<BR>
+&nbsp;.&nbsp;&ltdata&gt<BR>
+&nbsp;.</TT></TD>
+<TD><I>Table entry data, repeats<BR>
+for each table entry</I><BR><BR><BR></TD>
+</TR><TR VALIGN=TOP>
+<TD><TT>&nbsp;&nbsp;0<BR>
+ENDTAB</TD>
+<TD><I>End of table</I><BR></TD>
+</TR><TR VALIGN=TOP>
+<TD><TT>&nbsp;&nbsp;0<BR>
+ENDSEC</TT></TD>
+<TD><I>End of TABLES section</I><BR></TD>
+</TR></TABLE><P>
+
+Both symbol table records and symbol tables are database objects. At a very minimum, with all prevailing usage within AutoCAD, this implies that a handle is present, positioned after the 2 group codes for both the symbol table record objects and the symbol table objects.<P>
+The DIMSTYLE table is the only record type in the system with a handle code of 105 because of its earlier usage of group code 5. As a rule, programmers should not be concerned about this exception unless it is in the context of the DIMSTYLE table section. This is the only context in which this exception should occur.<P>
+<A NAME="ID_425987"></A><a name="Symbol_Table_Group_Codes"></a><H3>Symbol Table Group Codes</H3><P>
+The following table shows group codes that apply to all symbol tables. <P>
+<I>Group codes that apply to all symbol tables<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group code</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>-1</TD>
+<TD>APP: entity name (changes each time a drawing is opened)</TD></TR>
+<TR VALIGN=TOP><TD>0</TD>
+<TD>Object type (TABLE)</TD></TR>
+<TR VALIGN=TOP><TD>2</TD>
+<TD>Table name</TD></TR>
+<TR VALIGN=TOP><TD>5</TD>
+<TD>Handle </TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbSymbolTable)</TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>Maximum number of entries in table.</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_426441"></A><a name="Common_Group_Codes_for_Symbol_Table_Entries"></a><H3>Common Group Codes for Symbol Table Entries </H3><P>
+The following table shows group codes that apply to all symbol table entries. Optional codes are shown in gray. When you refer to the table of group codes by entity type, which lists the codes associated with specific entities, keep in mind that the codes shown here can also be present.<P>
+<I>Group codes that apply to all symbol table entries<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group code</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>-1</TD>
+<TD>APP: entity name (changes each time a drawing is opened)</TD></TR>
+<TR VALIGN=TOP><TD>0</TD>
+<TD>Entity type (table name)</TD></TR>
+<TR VALIGN=TOP><TD>5</TD>
+<TD>Handle (all except DIMSTYLE)</TD></TR>
+<TR VALIGN=TOP><TD>105</TD>
+<TD>Handle (DIMSTYLE table only)</TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>Start of application defined group "{<I>application_name</I>". For example, "{ACAD_REACTORS" indicates the start of the AutoCAD persistent reactors group </TD></TR>
+<TR VALIGN=TOP><TD><I>application-defined codes</I></TD>
+<TD>Codes and values within the 102 groups are application-defined.</TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>End of group, "}"</TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbSymbolTableRecord)</TD></TR>
+</TABLE><P>
+<P>
+The following table shows the group codes that are output if persistent reactors have been attached to an object. <P>
+<I>ACAD_REACTORS records<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group code</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>"{ACAD_REACTORS" indicates the start of the AutoCAD persistent reactors group </TD></TR>
+<TR VALIGN=TOP><TD>330</TD>
+<TD>Soft pointer ID/handle to owner dictionary</TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>End of group, "}"</TD></TR>
+</TABLE><P>
+<P>
+The following table shows the group codes that are output if an extension dictionary has been attached to an object. <P>
+<I>ACAD_XDICTIONARY records<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group code</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>"{ACAD_XDICTIONARY" indicates the start of an extension dictionary group.</TD></TR>
+<TR VALIGN=TOP><TD>360</TD>
+<TD>Hard-owner ID/handle to owner dictionary.</TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>End of group, "}".</TD></TR>
+</TABLE><P>
+<P>
+Common 70 group flag bit-coded values are described in the following tables. Additional 70 group values that apply to LAYER, STYLE, and VIEW table entries are described in those tables.<P>
+<I>Group 70 bit codes that apply to all table entries <BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Bit- coded value</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>16</TD>
+<TD>If set, table entry is externally dependent on an xref.</TD></TR>
+<TR VALIGN=TOP><TD>32</TD>
+<TD>If this bit and bit 16 are both set, the externally dependent xref has been successfully resolved.</TD></TR>
+<TR VALIGN=TOP><TD>64</TD>
+<TD>If set, the table entry was referenced by at least one entity in the drawing the last time the drawing was edited. (This flag is for the benefit of AutoCAD commands. It can be ignored by most programs that read DXF files and need not be set by programs that write DXF files.)</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_423553"></A><a name="APPID"></a><H3>APPID</H3><P>
+The following group codes apply to APPID symbol table entries. <P>
+<I>APPID group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbRegAppTableRecord)</TD></TR>
+<TR VALIGN=TOP><TD>2</TD>
+<TD>User-supplied application name (for extended data). These table entries maintain a set of names for all registered applications.</TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>Standard flag values:<BR>
+1 = If set, xdata associated with this APPID is not written when SAVEASR12 is performed.</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_423554"></A><a name="BLOCK_RECORD"></a><H3>BLOCK_RECORD</H3><P>
+The following group codes apply to BLOCK_RECORD symbol table entries. <P>
+<I>BLOCK_RECORD group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbBlockTableRecord)</TD></TR>
+<TR VALIGN=TOP><TD>2</TD>
+<TD>Block name</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_424875"></A><a name="DIMSTYLE"></a><H3>DIMSTYLE</H3><P>
+The following group codes apply to DIMSTYLE symbol table entries. The DIMSTYLE system variables are described in appendix A, "System Variables," in the <I>AutoCAD Command Reference</I>. <P>
+<I>DIMSTYLE group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbDimStyleTableRecord)</TD></TR>
+<TR VALIGN=TOP><TD>2</TD>
+<TD>Dimension style name</TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>Standard flag values</TD></TR>
+<TR VALIGN=TOP><TD>3</TD>
+<TD>DIMPOST </TD></TR>
+<TR VALIGN=TOP><TD>4</TD>
+<TD>DIMAPOST </TD></TR>
+<TR VALIGN=TOP><TD>5</TD>
+<TD>DIMBLK </TD></TR>
+<TR VALIGN=TOP><TD>6</TD>
+<TD>DIMBLK1 </TD></TR>
+<TR VALIGN=TOP><TD>7</TD>
+<TD>DIMBLK2 </TD></TR>
+<TR VALIGN=TOP><TD>40</TD>
+<TD>DIMSCALE </TD></TR>
+<TR VALIGN=TOP><TD>41</TD>
+<TD>DIMASZ </TD></TR>
+<TR VALIGN=TOP><TD>42</TD>
+<TD>DIMEXO </TD></TR>
+<TR VALIGN=TOP><TD>43</TD>
+<TD>DIMDLI </TD></TR>
+<TR VALIGN=TOP><TD>44</TD>
+<TD>DIMEXE</TD></TR>
+<TR VALIGN=TOP><TD>45</TD>
+<TD>DIMRND</TD></TR>
+<TR VALIGN=TOP><TD>46</TD>
+<TD>DIMDLE</TD></TR>
+<TR VALIGN=TOP><TD>47</TD>
+<TD>DIMTP</TD></TR>
+<TR VALIGN=TOP><TD>48</TD>
+<TD>DIMTM</TD></TR>
+<TR VALIGN=TOP><TD>140</TD>
+<TD>DIMTXT</TD></TR>
+<TR VALIGN=TOP><TD>141</TD>
+<TD>DIMCEN</TD></TR>
+<TR VALIGN=TOP><TD>142</TD>
+<TD>DIMTSZ</TD></TR>
+<TR VALIGN=TOP><TD>143</TD>
+<TD>DIMALTF</TD></TR>
+<TR VALIGN=TOP><TD>144</TD>
+<TD>DIMLFAC</TD></TR>
+<TR VALIGN=TOP><TD>145</TD>
+<TD>DIMTVP</TD></TR>
+<TR VALIGN=TOP><TD>146</TD>
+<TD>DIMTFAC</TD></TR>
+<TR VALIGN=TOP><TD>147</TD>
+<TD>DIMGAP</TD></TR>
+<TR VALIGN=TOP><TD>71</TD>
+<TD>DIMTOL</TD></TR>
+<TR VALIGN=TOP><TD>72</TD>
+<TD>DIMLIM</TD></TR>
+<TR VALIGN=TOP><TD>73</TD>
+<TD>DIMTIH</TD></TR>
+<TR VALIGN=TOP><TD>74</TD>
+<TD>DIMTOH</TD></TR>
+<TR VALIGN=TOP><TD>75</TD>
+<TD>DIMSE1</TD></TR>
+<TR VALIGN=TOP><TD>76</TD>
+<TD>DIMSE2</TD></TR>
+<TR VALIGN=TOP><TD>77</TD>
+<TD>DIMTAD</TD></TR>
+<TR VALIGN=TOP><TD>78</TD>
+<TD>DIMZIN</TD></TR>
+<TR VALIGN=TOP><TD>170</TD>
+<TD>DIMALT</TD></TR>
+<TR VALIGN=TOP><TD>171</TD>
+<TD>DIMALTD</TD></TR>
+<TR VALIGN=TOP><TD>172</TD>
+<TD>DIMTOFL</TD></TR>
+<TR VALIGN=TOP><TD>173</TD>
+<TD>DIMSAH</TD></TR>
+<TR VALIGN=TOP><TD>174</TD>
+<TD>DIMTIX</TD></TR>
+<TR VALIGN=TOP><TD>175</TD>
+<TD>DIMSOXD</TD></TR>
+<TR VALIGN=TOP><TD>176</TD>
+<TD>DIMDLRD</TD></TR>
+<TR VALIGN=TOP><TD>177</TD>
+<TD>DIMCLRE</TD></TR>
+<TR VALIGN=TOP><TD>178</TD>
+<TD>DIMCLRT</TD></TR>
+<TR VALIGN=TOP><TD>270</TD>
+<TD>DIMUNIT</TD></TR>
+<TR VALIGN=TOP><TD>271</TD>
+<TD>DIMDEC</TD></TR>
+<TR VALIGN=TOP><TD>272</TD>
+<TD>DIMTDEC</TD></TR>
+<TR VALIGN=TOP><TD>273</TD>
+<TD>DIMALTU</TD></TR>
+<TR VALIGN=TOP><TD>274</TD>
+<TD>DIMALTTD</TD></TR>
+<TR VALIGN=TOP><TD>340</TD>
+<TD>Handle of referenced STYLE object (used instead of storing DIMTXSTY value)</TD></TR>
+<TR VALIGN=TOP><TD>275</TD>
+<TD>DIMAUNIT</TD></TR>
+<TR VALIGN=TOP><TD>280</TD>
+<TD>DIMJUST</TD></TR>
+<TR VALIGN=TOP><TD>281</TD>
+<TD>DIMSD1</TD></TR>
+<TR VALIGN=TOP><TD>282</TD>
+<TD>DIMSD2</TD></TR>
+<TR VALIGN=TOP><TD>283</TD>
+<TD>DIMTOLJ</TD></TR>
+<TR VALIGN=TOP><TD>284</TD>
+<TD>DIMTZIN</TD></TR>
+<TR VALIGN=TOP><TD>285</TD>
+<TD>DIMALTZ</TD></TR>
+<TR VALIGN=TOP><TD>286</TD>
+<TD>DIMALTTZ</TD></TR>
+<TR VALIGN=TOP><TD>287</TD>
+<TD>DIMFIT</TD></TR>
+<TR VALIGN=TOP><TD>288</TD>
+<TD>DIMUPT</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_426875"></A><a name="LAYER"></a><H3>LAYER</H3><P>
+The following group codes apply to LAYER symbol table entries. <P>
+<I>LAYER group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbSymbolTableRecord)</TD></TR>
+<TR VALIGN=TOP><TD>2</TD>
+<TD>Layer name</TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>Standard flags. In addition to the standard flags, the following values apply to layers (bit-coded values)<BR>
+1 = Layer is frozen, otherwise layer is thawed <BR>
+2 = Layer is frozen by default in new viewports<BR>
+4 = Layer is locked</TD></TR>
+<TR VALIGN=TOP><TD>62</TD>
+<TD>Color number (if negative, layer is Off)</TD></TR>
+<TR VALIGN=TOP><TD>6</TD>
+<TD>Linetype name</TD></TR>
+</TABLE><P>
+<P>
+Xref-dependent layers are output during DXFOUT. For these layers, the associated linetype name in the DXF file is always CONTINUOUS. <P>
+<A NAME="ID_423925"></A><a name="LTYPE"></a><H3>LTYPE</H3><P>
+The following group codes apply to LTYPE symbol table entries.<P>
+<I>LTYPE group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbLinetypeTableRecord)</TD></TR>
+<TR VALIGN=TOP><TD>2</TD>
+<TD>Linetype name.</TD></TR>
+<TR VALIGN=TOP><TD>70 </TD>
+<TD>Standard flags.</TD></TR>
+<TR VALIGN=TOP><TD>3</TD>
+<TD>Descriptive text for linetype.</TD></TR>
+<TR VALIGN=TOP><TD>72</TD>
+<TD>Alignment code; value is always 65, the ASCII code for A.</TD></TR>
+<TR VALIGN=TOP><TD>73</TD>
+<TD>The number of linetype elements.</TD></TR>
+<TR VALIGN=TOP><TD>40</TD>
+<TD>Total pattern length. </TD></TR>
+<TR VALIGN=TOP><TD>49</TD>
+<TD>Dash, dot or space length (one entry per element). </TD></TR>
+<TR VALIGN=TOP><TD>74</TD>
+<TD>Complex linetype element type (one per element):<BR>
+0 = not complex,<BR>
+2 = embeded text string,<BR>
+4 = embeded shape</TD></TR>
+<TR VALIGN=TOP><TD>75</TD>
+<TD>Complex shape code (one per element if code 74 &gt 0)<BR>
+1 if code 74 = 2</TD></TR>
+<TR VALIGN=TOP><TD>340</TD>
+<TD>Pointer to STYLE object (one per element if code 74 &gt 0)</TD></TR>
+<TR VALIGN=TOP><TD>46</TD>
+<TD>S= scale value (optional). Multiple entries can exist. </TD></TR>
+<TR VALIGN=TOP><TD>50</TD>
+<TD>R= rotation value (optional). Multiple entries can exist. </TD></TR>
+<TR VALIGN=TOP><TD>44</TD>
+<TD>X= x offset value (optional). Multiple entries can exist. </TD></TR>
+<TR VALIGN=TOP><TD>45 </TD>
+<TD>Y= y offset value (optional). Multiple entries can exist. </TD></TR>
+<TR VALIGN=TOP><TD>9</TD>
+<TD>Text string (one per element if code 74 = 2)</TD></TR>
+</TABLE><P>
+<P>
+The group codes 74, 75, 340, 46, 50, 44, 45, and 9 are not returned by the <TT><B>tblsearch</B></TT> or <TT><B>tblnext</B></TT> functions. You must use <TT><B>tblobjname</B></TT> to retrieve these values within an application. <P>
+<A NAME="ID_423987"></A><a name="STYLE"></a><H3>STYLE</H3><P>
+The following group codes apply to STYLE symbol table entries.<P>
+<I>STYLE group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B> </TD>
+<TD><B>Description</B> </TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbTextStyleTableRecord)</TD></TR>
+<TR VALIGN=TOP><TD>2</TD>
+<TD>Style name</TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>Standard flag values (bit-coded values)<BR>
+1=if set, this entry describes a shape <BR>
+4=Vertical text</TD></TR>
+<TR VALIGN=TOP><TD>40</TD>
+<TD>Fixed text height; 0 if not fixed</TD></TR>
+<TR VALIGN=TOP><TD>41</TD>
+<TD>Width factor</TD></TR>
+<TR VALIGN=TOP><TD>50</TD>
+<TD>Oblique angle</TD></TR>
+<TR VALIGN=TOP><TD>71</TD>
+<TD>Text generation flags<BR>
+2=Text is backward (mirrored in <I>X</I>)<BR>
+4=Text is upside down (mirrored in <I>Y)</I> </TD></TR>
+<TR VALIGN=TOP><TD>42</TD>
+<TD>Last height used</TD></TR>
+<TR VALIGN=TOP><TD>3</TD>
+<TD>Primary font file name</TD></TR>
+<TR VALIGN=TOP><TD>4</TD>
+<TD>Bigfont file name; blank if none</TD></TR>
+</TABLE><P>
+<P>
+A STYLE table item is also used to record shape file LOAD command requests. In this case the first bit (1) is set in the 70 group flags and only the 3 group (shape file name) is meaningful (all the other groups are output, however).<P>
+<A NAME="ID_424031"></A><a name="UCS"></a><H3>UCS</H3><P>
+The following group codes apply to UCS symbol table entries.<P>
+<I>UCS group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbUCSTableRecord)</TD></TR>
+<TR VALIGN=TOP><TD>2</TD>
+<TD>UCS name</TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>Standard flag values</TD></TR>
+<TR VALIGN=TOP><TD>10 </TD>
+<TD>Origin (in WCS). DXF<I>: X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF<I>: Y</I> and <I>Z</I> values of origin (in WCS)</TD></TR>
+<TR VALIGN=TOP><TD>11 </TD>
+<TD><I>X</I>-axis direction (in WCS). DXF<I>: X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>21, 31</TD>
+<TD>DXF<I>: Y</I> and <I>Z</I> values of <I>X</I>-axis direction (in WCS)</TD></TR>
+<TR VALIGN=TOP><TD>12 </TD>
+<TD><I>Y-</I>axis direction (in WCS). DXF<I>: X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>22, 32</TD>
+<TD>DXF<I>: Y</I> and <I>Z</I> values of <I>Y-</I>axis direction (in WCS)</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_424102"></A><a name="VIEW"></a><H3>VIEW</H3><P>
+The following group codes apply to VIEW symbol table entries.<P>
+<I>VIEW group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbViewTableRecord)</TD></TR>
+<TR VALIGN=TOP><TD>2</TD>
+<TD>Name of view</TD></TR>
+<TR VALIGN=TOP><TD>70 </TD>
+<TD>Standard flag values (bit-coded values)<BR>
+1 = if set, this is a paper space view</TD></TR>
+<TR VALIGN=TOP><TD>40</TD>
+<TD>View height (in DCS)</TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>View center point (in DCS). DXF<I>: X</I> value; APP: 2D point</TD></TR>
+<TR VALIGN=TOP><TD>20</TD>
+<TD>DXF<I>: Y</I> value of view center point (in DCS)</TD></TR>
+<TR VALIGN=TOP><TD>41</TD>
+<TD>View width (in DCS)</TD></TR>
+<TR VALIGN=TOP><TD>11</TD>
+<TD>View direction from target (in WCS)<BR>
+DXF<I>: X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>21, 31</TD>
+<TD>DXF<I>: Y</I> and <I>Z</I> values of view direction from target (in WCS)</TD></TR>
+<TR VALIGN=TOP><TD>12</TD>
+<TD>Target point (in WCS). DXF<I>: X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>22, 32</TD>
+<TD>DXF<I>: Y</I> and <I>Z</I> values of target point (in WCS)</TD></TR>
+<TR VALIGN=TOP><TD>42</TD>
+<TD>Lens length</TD></TR>
+<TR VALIGN=TOP><TD>43</TD>
+<TD>Front clipping plane (offset from target point)</TD></TR>
+<TR VALIGN=TOP><TD>44</TD>
+<TD>Back clipping plane (offset from target point)</TD></TR>
+<TR VALIGN=TOP><TD>50 </TD>
+<TD>Twist angle</TD></TR>
+<TR VALIGN=TOP><TD>71</TD>
+<TD>View mode (see VIEWMODE system variable)</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_424232"></A><a name="VPORT"></a><H3>VPORT</H3><P>
+The following group codes apply to VPORT symbol table entries.<P>
+<I>VPORT group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbViewportTableRecord)</TD></TR>
+<TR VALIGN=TOP><TD>2</TD>
+<TD>Viewport name</TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>Standard flag values</TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>Lower-left corner of viewport. <BR>
+DXF<I>: X</I> value; APP: 2D point</TD></TR>
+<TR VALIGN=TOP><TD>20</TD>
+<TD>DXF<I>: Y</I> value of lower-left corner of viewport</TD></TR>
+<TR VALIGN=TOP><TD>11</TD>
+<TD>Upper-right corner of viewport <BR>
+DXF<I>: X</I> value; APP: 2D point</TD></TR>
+<TR VALIGN=TOP><TD>21</TD>
+<TD>DXF<I>: Y</I> value of upper-right corner of viewport </TD></TR>
+<TR VALIGN=TOP><TD>12</TD>
+<TD>View center point (in DCS). DXF<I>: X</I> value; APP: 2D point</TD></TR>
+<TR VALIGN=TOP><TD>22</TD>
+<TD>DXF<I>: Y</I> value of view center point (in DCS)</TD></TR>
+<TR VALIGN=TOP><TD>13</TD>
+<TD>Snap base point. DXF<I>: X</I> value; APP: 2D point</TD></TR>
+<TR VALIGN=TOP><TD>23</TD>
+<TD>DXF<I>: Y</I> value of snap base point</TD></TR>
+<TR VALIGN=TOP><TD>14</TD>
+<TD>Snap spacing <I>X</I> and <I>Y</I>. DXF<I>: X</I> value; APP: 2D point</TD></TR>
+<TR VALIGN=TOP><TD>24</TD>
+<TD>DXF<I>: Y</I> value of snap spacing <I>X</I> and <I>Y</I> </TD></TR>
+<TR VALIGN=TOP><TD>15</TD>
+<TD>Grid spacing <I>X</I> and <I>Y</I>. DXF<I>: X</I> value; APP: 2D point</TD></TR>
+<TR VALIGN=TOP><TD>25</TD>
+<TD>DXF<I>: Y</I> value of grid spacing <I>X</I> and <I>Y</I> </TD></TR>
+<TR VALIGN=TOP><TD>16</TD>
+<TD>View direction from target point (in WCS) <BR>
+DXF<I>: X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>26, 36</TD>
+<TD>DXF<I>: Y</I> and <I>Z</I> values of view direction from target point (in WCS) </TD></TR>
+<TR VALIGN=TOP><TD>17</TD>
+<TD>View target point (in WCS). DXF<I>: X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>27, 37</TD>
+<TD>DXF<I>: Y</I> and <I>Z</I> values of view target point (in WCS) </TD></TR>
+<TR VALIGN=TOP><TD>40</TD>
+<TD>View height</TD></TR>
+<TR VALIGN=TOP><TD>41</TD>
+<TD>Viewport aspect ratio</TD></TR>
+<TR VALIGN=TOP><TD>42</TD>
+<TD>Lens length</TD></TR>
+<TR VALIGN=TOP><TD>43</TD>
+<TD>Front clipping plane (offset from target point)</TD></TR>
+<TR VALIGN=TOP><TD>44</TD>
+<TD>Back clipping plane (offset from target point)</TD></TR>
+<TR VALIGN=TOP><TD>50</TD>
+<TD>Snap rotation angle</TD></TR>
+<TR VALIGN=TOP><TD>51</TD>
+<TD>View twist angle</TD></TR>
+<TR VALIGN=TOP><TD>68</TD>
+<TD>APP: Status field (<I>never</I> saved in DXF)</TD></TR>
+<TR VALIGN=TOP><TD>69</TD>
+<TD>APP: ID (<I>never</I> saved in DXF)</TD></TR>
+<TR VALIGN=TOP><TD>71</TD>
+<TD>View mode (see VIEWMODE system variable)</TD></TR>
+<TR VALIGN=TOP><TD>72</TD>
+<TD>Circle zoom percent</TD></TR>
+<TR VALIGN=TOP><TD>73</TD>
+<TD>Fast zoom setting</TD></TR>
+<TR VALIGN=TOP><TD>74</TD>
+<TD>UCSICON setting</TD></TR>
+<TR VALIGN=TOP><TD>75</TD>
+<TD>Snap on/off</TD></TR>
+<TR VALIGN=TOP><TD>76</TD>
+<TD>Grid on/off</TD></TR>
+<TR VALIGN=TOP><TD>77</TD>
+<TD>Snap style</TD></TR>
+<TR VALIGN=TOP><TD>78</TD>
+<TD>Snap isopair</TD></TR>
+</TABLE><P>
+<P>
+The VPORT table is unique: it may contain several entries with the same name (indicating a multiple-viewport configuration). The entries corresponding to the active viewport configuration all have the name *ACTIVE. The first such entry describes the current viewport.<P>
+<a name="BLOCKS_Section"></a><hr><P>
+<A NAME="ID_418450"></A><a href="#TOP"><H2>BLOCKS Section</H2></a><P>
+The group codes described in this section are found in DXF files and used by applications. The BLOCKS section contains an entry for each block reference in the drawing.<P>
+The group codes shown in this section can apply to DXF files, applications (AutoLISP, ADS, or ARX), or both. When the description of a code is different for applications and DXF files (or only applies to one or the other), the description is preceeded by the following indicators:<P>
+<DL COMPACT>
+<DT><B>APP</B><DD> Application-specific description
+<DT><B>DXF</B><DD> DXF file-specific description
+</DL>
+If the description is common to both DXF files and applications, no indicator is provided. Otherwise, the appropriate indicator is present. Optional codes are shown in gray. <P>
+
+<hr size=1><U><I>Topics in this section:</I></U><BR>
+<ul>
+<li><a href="#Blocks_in_DXF_Files">Blocks in DXF Files</a>
+<li><a href="#BLOCK">BLOCK</a>
+<li><a href="#ENDBLK">ENDBLK</a>
+</ul><hr size=1>
+
+<A NAME="ID_428100"></A><a name="Blocks_in_DXF_Files"></a><H3>Blocks in DXF Files</H3><P>
+The BLOCKS section of the DXF file contains all the block definitions. It contains the entities that make up the blocks used in the drawing, including anonymous blocks generated by the HATCH command and by associative dimensioning. The format of the entities in this section is identical to those in the ENTITIES section. All entities in the BLOCKS section appear between block and endblk entities. Block and endblk entities appear only in the BLOCKS section. Block definitions are never nested (that is, no block or endblk entity ever appears within another block-endblk pair), although a block definition can contain an insert entity.<P>
+External references are written in the DXF file as block definitions, except that they also include a string (group code 1) that specifies the path and file name of the external reference. <P>
+The block table handle, along with any xdata and persistent reactors, appears in each block definition immediately following the BLOCK record, which contains all of the specific information that a block table record stores. Therefore, each block definition has the following sequence of records: <P>
+The following is an example of the BLOCKS section of a DXF file:<P>
+<TABLE BORDER=1>
+<TR VALIGN=TOP>
+<TD><TT>&nbsp;&nbsp;0&nbsp;<BR>
+SECTION<BR>
+&nbsp;&nbsp;2<BR>
+BLOCKS</TT></TD>
+<TD><I>Begins each block entry<BR>
+(a block entity definition)</I><BR><BR></TD>
+</TR><TR VALIGN=TOP>
+<TD><TT>&nbsp;&nbsp;0<BR>
+BLOCK<BR>
+&nbsp;&nbsp;5<BR>
+&lthandle&gt<BR>
+100<BR>
+AcDbEntity<BR>
+&nbsp;&nbsp;8<BR>
+&ltlayer&gt<BR>
+100<BR>
+AcDbBlockBegin<BR>
+&nbsp;&nbsp;2<BR>
+&ltblock&nbsp;name&gt<BR>
+&nbsp;70<BR>
+&ltflag&gt<BR>
+&nbsp;10<BR>
+&ltX&nbsp;value&gt<BR>
+&nbsp;20<BR>
+&ltY&nbsp;value&gt<BR>
+&nbsp;30<BR>
+&ltZ&nbsp;value&gt<BR>
+&nbsp;&nbsp;3<BR>
+&ltblock&nbsp;name&gt<BR>
+&nbsp;&nbsp;1<BR>
+&ltxref&nbsp;path&gt</TT></TD>
+<TD><I>Begins each block entry<BR>
+(a block entity definition)</I><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR></TD>
+</TR><TR VALIGN=TOP>
+<TD><TT>&nbsp;&nbsp;0<BR>
+&ltentity&nbsp;type&gt<BR>
+&nbsp;.<BR>
+&nbsp;.&nbsp;&ltdata&gt<BR>
+&nbsp;.</TT></TD>
+<TD><I>Table entry data, repeats<BR>
+for each table entry</I><BR><BR><BR></TD>
+</TR><TR VALIGN=TOP>
+<TD><TT>&nbsp;&nbsp;0<BR>
+ENDBLK<BR>
+&nbsp;&nbsp;5<BR>
+&lthandle&gt<BR>
+100<BR>
+AcDbBlockEnd</TT></TD>
+<TD><I>End of each block entry<BR>
+(an endblk entity definition)</I><BR><BR><BR><BR></TD>
+</TR><TR VALIGN=TOP>
+<TD><TT>&nbsp;&nbsp;0<BR>
+ENDSEC</TT></TD>
+<TD><I>End of BLOCKS section</I><BR></TD>
+</TR></TABLE><P>
+
+<A NAME="ID_435901"></A><a name="BLOCK"></a><H3>BLOCK</H3><P>
+The following group codes apply to block entities.<P>
+<I>Block group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>0</TD>
+<TD>Entity type (BLOCK)</TD></TR>
+<TR VALIGN=TOP><TD>5</TD>
+<TD>Handle</TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>Start of application defined group "{<I>application_name</I>". For example, "{ACAD_REACTORS" indicates the start of the AutoCAD persistent reactors group </TD></TR>
+<TR VALIGN=TOP><TD><I>application-defined codes</I></TD><P>
+<TD>Codes and values within the 102 groups are application-defined.</TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>End of group, "}"</TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbEntity)</TD></TR>
+<TR VALIGN=TOP><TD>8</TD>
+<TD>Layer name</TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbBlockBegin)</TD></TR>
+<TR VALIGN=TOP><TD>2</TD>
+<TD>Block name</TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>Block-type flags (bit coded values, may be combined): <BR>
+1 = This is an anonymous block generated by hatching, associative dimensioning, other internal operations, or an application<BR>
+ 2 = This block has attribute definitions<BR>
+ 4 = This block is an external reference (xref)<BR>
+ 8 = This block is an xref overlay <BR>
+16 = This block is externally dependent<BR>
+32 = This is a resolved external reference, or dependent of an external reference (ignored on input)<BR>
+64 = This definition is a referenced external reference (ignored on input)</TD></TR><P>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>Base point. DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of base point</TD></TR>
+<TR VALIGN=TOP><TD>3</TD>
+<TD>Block name</TD></TR>
+<TR VALIGN=TOP><TD>1</TD>
+<TD>Xref path name (optional; present only if the block is an xref)</TD></TR>
+</TABLE><P>
+<P>
+The UCS in effect when a block definition is created becomes the WCS for all entities in the block definition. The new origin for these entities is shifted to match the base point defined for the block definition. All entity data is translated to fit this new WCS. <P>
+<A NAME="ID_431986"></A><H5>*MODEL_SPACE and *PAPER_SPACE Block Definition</H5><P>
+Now, there are always two extra, empty definitions in the BLOCKS section, titled *MODEL_SPACE and *PAPER_SPACE. These definitions manifest the new representation of model space and paper space as block definitions internally. The entities contained in these definitions still appear in the ENTITIES section for compatibility. <P>
+<A NAME="ID_427916"></A><H5>Model Space and Paper Space Entity Segregation</H5><P>
+The interleaving between model space and paper space will no longer occurs, because of internal organization. Instead, all paper space entities are output, followed by model space entities. The flag distinguishing them is the group code 67.<P>
+<A NAME="ID_427638"></A><a name="ENDBLK"></a><H3>ENDBLK</H3><P>
+The following group codes apply to endblk objects.<P>
+<I>Endblk group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>0</TD>
+<TD>Entity type (ENDBLK)</TD></TR>
+<TR VALIGN=TOP><TD>5</TD>
+<TD>Handle</TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>Start of application defined group "{<I>application_name</I>". For example, "{ACAD_REACTORS" indicates the start of the AutoCAD persistent reactors group </TD></TR>
+<TR VALIGN=TOP><TD><I>application-defined codes</I></TD>
+<TD>Codes and values within the 102 groups are application-defined.</TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>End of group, "}"</TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbBlockEnd)</TD></TR>
+</TABLE><P>
+<P>
+<a name="ENTITIES_Section"></a><hr><P>
+<A NAME="XREF_51881"></A><A NAME="ID_424498"></A><a href="#TOP"><H2>ENTITIES Section</H2></a><P>
+This section presents the group codes that apply to graphical objects. These codes are found in the ENTITIES section of a DXF file and are used by AutoLISP, ADS, and ARX applications in entity definition lists. <P>
+The group codes shown in this section can apply to DXF files, applications (AutoLISP, ADS, or ARX), or both. When the description of a code is different for applications and DXF files (or only applies to one or the other), the description is preceeded by the following indicators:<P>
+<DL COMPACT>
+<DT><B>APP</B><DD> Application-specific description
+<DT><B>DXF</B><DD> DXF file-specific description
+</DL>
+If the description is common to both DXF files and applications, no indicator is provided. Otherwise, the appropriate indicator is present. Optional codes are shown in gray. <P>
+
+<hr size=1><U><I>Topics in this section:</I></U><BR>
+<ul>
+<li><a href="#Common_Group_Codes_for_Graphical_Objects">Common Group Codes for Graphical Objects</a>
+<li><a href="#3DFACE">3DFACE</a>
+<li><a href="#3DSOLID">3DSOLID</a>
+<li><a href="#ARC">ARC</a>
+<li><a href="#ATTDEF">ATTDEF</a>
+<li><a href="#ATTRIB">ATTRIB</a>
+<li><a href="#BODY">BODY</a>
+<li><a href="#CIRCLE">CIRCLE</a>
+<li><a href="#DIMENSION">DIMENSION</a>
+<li><a href="#ELLIPSE">ELLIPSE</a>
+<li><a href="#INSERT">INSERT</a>
+<li><a href="#LEADER">LEADER</a>
+<li><a href="#LINE">LINE</a>
+<li><a href="#MLINE">MLINE</a>
+<li><a href="#MTEXT">MTEXT</a>
+<li><a href="#OLEFRAME">OLEFRAME</a>
+<li><a href="#POINT">POINT</a>
+<li><a href="#POLYLINE">POLYLINE</a>
+<li><a href="#RAY">RAY</a>
+<li><a href="#REGION">REGION</a>
+<li><a href="#SEQEND">SEQEND</a>
+<li><a href="#SHAPE">SHAPE</a>
+<li><a href="#SOLID">SOLID</a>
+<li><a href="#SPLINE">SPLINE</a>
+<li><a href="#TEXT">TEXT</a>
+<li><a href="#TOLERANCE">TOLERANCE</a>
+<li><a href="#TRACE">TRACE</a>
+<li><a href="#VERTEX">VERTEX</a>
+<li><a href="#VIEWPORT">VIEWPORT</a>
+<li><a href="#XLINE">XLINE</a>
+<li><a href="#ACAD_ZOMBIE_ENTITY">ACAD_ZOMBIE_ENTITY</a>
+</ul><hr size=1>
+
+<A NAME="ID_396714"></A><a name="Common_Group_Codes_for_Graphical_Objects"></a><H3>Common Group Codes for Graphical Objects</H3><P>
+The following table shows group codes that apply to virtually all graphical objects. Some of the group codes shown here are included with an entity definition only if the entity has nondefault values for the property. When you refer to the group codes by entity type, which lists the codes associated with specific entities, keep in mind that the codes shown here are also present.<P>
+When a group is omitted, its default value upon input (when using DXFIN) is indicated in the third column. If the value of a group code is equal to the default, it is omitted upon output (when using DXFOUT). <P>
+<I>Group codes that apply to all graphical objects<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><BR>
+<B>Group code</B></TD>
+<TD><BR>
+<B>Description</B></TD>
+<TD><B>If omitted,<BR>
+</B><B>defaults to...</B></TD></TR>
+<TR VALIGN=TOP><TD>-1</TD>
+<TD>APP: entity name (changes each time a drawing is opened)</TD>
+<TD><I>Not</I> omitted</TD></TR>
+<TR VALIGN=TOP><TD>0</TD>
+<TD>Entity type</TD>
+<TD><I>Not</I> omitted</TD></TR>
+<TR VALIGN=TOP><TD>5</TD>
+<TD>Handle </TD>
+<TD><I>Not</I> omitted</TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbEntity)</TD>
+<TD><I>Not</I> omitted</TD></TR>
+<TR VALIGN=TOP><TD>67</TD>
+<TD>Absent or zero indicates entity is in model space. One indicates entity is in paper space. (optional)</TD>
+<TD>0</TD></TR>
+<TR VALIGN=TOP><TD>8</TD>
+<TD>Layer name</TD>
+<TD><I>Not</I> omitted</TD></TR>
+<TR VALIGN=TOP><TD>6</TD>
+<TD>Linetype name (present if not BYLAYER). The special name BYBLOCK indicates a floating linetype. (optional)</TD>
+<TD>BYLAYER</TD></TR>
+<TR VALIGN=TOP><TD>62</TD>
+<TD>Color number (present if not BYLAYER). Zero indicates the BYBLOCK (floating) color. 256 indicates BYLAYER. A negative value indicates that the layer is turned off. (optional)</TD>
+<TD>BYLAYER</TD></TR>
+<TR VALIGN=TOP><TD>48</TD>
+<TD>Linetype scale (optional)</TD>
+<TD>1.0 </TD></TR>
+<TR VALIGN=TOP><TD>60</TD>
+<TD>Object visibility (optional): <BR>
+0 = visible, 1 = invisible. </TD>
+<TD>0 </TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>Start of application defined group "{<I>application_name</I>". For example, "{ACAD_REACTORS" indicates the start of the AutoCAD persistent reactors group </TD>
+<TD>no default</TD></TR>
+<TR VALIGN=TOP><TD><I>application-defined codes</I></TD>
+<TD>Codes and values within the 102 groups are application-defined.</TD>
+<TD>no default</TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>End of group, "}"</TD>
+<TD>no default</TD></TR>
+</TABLE><P>
+<P>
+The following table shows the group codes that are output if persistent reactors have been attached to an entity. <P>
+<I>ACAD_REACTORS records<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group code</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>"{ACAD_REACTORS" indicates the start of the AutoCAD persistent reactors group </TD></TR>
+<TR VALIGN=TOP><TD>330</TD>
+<TD>Soft pointer ID/handle to owner dictionary</TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>End of group, "}"</TD></TR>
+</TABLE><P>
+<P>
+The following table shows the group codes that are output if an extension dictionary has been attached to an entity. <P>
+<I>ACAD_XDICTIONARY records<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group code</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>"{ACAD_XDICTIONARY" indicates the start of an extension dictionary group </TD></TR>
+<TR VALIGN=TOP><TD>360</TD>
+<TD>Hard owner ID/handle to owner dictionary</TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>End of group, "}"</TD></TR>
+</TABLE><P>
+<P>
+Note: Do <I>not</I> write programs that rely on the order shown in these DXF code tables. Although these tables show the order of group codes as they usually appear, the order can change under certain conditions or in a future AutoCAD release. The code that controls an entity should be driven by a case (switch) or a table so that it can process each group correctly even if the order is unexpected.<P>
+<A NAME="ID_404526"></A><a name="3DFACE"></a><H3>3DFACE</H3><P>
+The following group codes apply to 3dface entities. <P>
+<I>3dface group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbFace) </TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>First corner (in WCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of first corner (in WCS) </TD></TR>
+<TR VALIGN=TOP><TD>11</TD>
+<TD>Second corner (in WCS). DXF: <I>X </I>value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>21, 31</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of second corner (in WCS)</TD></TR>
+<TR VALIGN=TOP><TD>12</TD>
+<TD>Third corner (in WCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>22, 32</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of third corner (in WCS) </TD></TR>
+<TR VALIGN=TOP><TD>13</TD>
+<TD>Fourth corner (in WCS). If only three corners are entered, this is the same as the third corner<BR>
+DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>23, 33</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of fourth corner (in WCS) </TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>Invisible edge flags (optional; default = 0):<BR>
+1 = First edge is invisible.<BR>
+2 = Second edge is invisible.<BR>
+4 = Third edge is invisible.<BR>
+8 = Fourth edge is invisible.</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_405414"></A><a name="3DSOLID"></a><H3>3DSOLID</H3><P>
+The following group codes apply to 3dsolid entities.<P>
+<I>3dsolid group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbModelerGeometry) </TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>Modeler format version number (currently = 1)</TD></TR>
+<TR VALIGN=TOP><TD>1</TD>
+<TD>Proprietary data (multiple lines &lt 255 characters each)</TD></TR>
+<TR VALIGN=TOP><TD>3</TD>
+<TD>Additional lines of proprietary data (if previous group 1 string is greater than 255 characters) </TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_406957"></A><a name="ARC"></a><H3>ARC</H3><P>
+The following group codes apply to arc entities.<P>
+<I>Arc group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbCircle) </TD></TR>
+<TR VALIGN=TOP><TD>39</TD>
+<TD>Thickness (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>Center point (in OCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of center point (in OCS) </TD></TR>
+<TR VALIGN=TOP><TD>40</TD>
+<TD>Radius</TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbArc) </TD></TR>
+<TR VALIGN=TOP><TD>50</TD>
+<TD>Start angle</TD></TR>
+<TR VALIGN=TOP><TD>51</TD>
+<TD>End angle</TD></TR>
+<TR VALIGN=TOP><TD>210</TD>
+<TD>Extrusion direction. Present only if the entity's extrusion direction is not parallel to the WCS <I>Z</I> axis (optional; default = 0, 0, 1). DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>220, 230</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of extrusion direction</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_407190"></A><a name="ATTDEF"></a><H3>ATTDEF</H3><P>
+The following group codes apply to attdef (attribute definition) entities.<P>
+<I>Attdef group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group&nbsp;codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbText) </TD></TR>
+<TR VALIGN=TOP><TD>39</TD>
+<TD>Thickness (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>Text start point (in OCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of text start point (in OCS) </TD></TR>
+<TR VALIGN=TOP><TD>40</TD>
+<TD>Text height</TD></TR>
+<TR VALIGN=TOP><TD>1</TD>
+<TD>Default value (string) </TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbAttributeDefinition) </TD></TR>
+<TR VALIGN=TOP><TD>3</TD>
+<TD>Prompt string</TD></TR>
+<TR VALIGN=TOP><TD>2</TD>
+<TD>Tag string</TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>Attribute flags<BR>
+1 = Attribute is invisible (does not appear).<BR>
+2 = This is a constant attribute.<BR>
+4 = Verification is required on input of this attribute.<BR>
+8 = Attribute is preset (no prompt during insertion).</TD></TR>
+<TR VALIGN=TOP><TD>73</TD>
+<TD>Field length (optional; default = 0) (not currently used) </TD></TR>
+<TR VALIGN=TOP><TD>50</TD>
+<TD>Text rotation (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>41</TD>
+<TD>Relative X scale factor (width) (optional; default = 1)<BR>
+This value is also adjusted when fit-type text is used.</TD></TR>
+<TR VALIGN=TOP><TD>51</TD>
+<TD>Oblique angle (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>7</TD>
+<TD>Text style name (optional, default = STANDARD)</TD></TR>
+<TR VALIGN=TOP><TD>71</TD>
+<TD>Text generation flags (optional, default = 0). See TEXT</TD></TR>
+<TR VALIGN=TOP><TD>72</TD>
+<TD>Horizontal text justification type (optional, default = 0). See TEXT</TD></TR>
+<TR VALIGN=TOP><TD>74</TD>
+<TD>Vertical text justification type (optional, default = 0). See group code 73 in TEXT</TD></TR>
+<TR VALIGN=TOP><TD>11</TD>
+<TD>Alignment point (in OCS). DXF: <I>X </I>value; APP: 3D point <BR>
+Present only if 72 or 74 group is present and nonzero</TD></TR>
+<TR VALIGN=TOP><TD>21, 31</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of alignment point (in OCS)</TD></TR>
+<TR VALIGN=TOP><TD>210</TD>
+<TD>Extrusion direction. Present only if the entity's extrusion direction is not parallel to the WCS <I>Z</I> axis (optional; default = 0, 0, 1). DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>220, 230</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of extrusion direction</TD></TR>
+</TABLE><P>
+<P>
+If group 72 and/or 74 values are nonzero then the text insertion point values are ignored, and AutoCAD calculates new values based on the text alignment point and the length of the text string itself (after applying the text style). If the 72 and 74 values are zero or missing, then the text alignment point is ignored and recalculated based on the text insertion point and the length of the text string itself (after applying the text style). <P>
+<A NAME="ID_407525"></A><a name="ATTRIB"></a><H3>ATTRIB</H3><P>
+The following group codes apply to attrib (attribute) entities.<P>
+<I>Attrib group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbText) </TD></TR>
+<TR VALIGN=TOP><TD>39</TD>
+<TD>Thickness (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>Text start point (in OCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of text start point (in OCS) </TD></TR>
+<TR VALIGN=TOP><TD>40</TD>
+<TD>Text height</TD></TR>
+<TR VALIGN=TOP><TD>1</TD>
+<TD>Default value (string)</TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbAttribute) </TD></TR>
+<TR VALIGN=TOP><TD>2</TD>
+<TD>Attribute tag (string)</TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>Attribute flags<BR>
+1 = Attribute is invisible (does not appear).<BR>
+2 = This is a constant attribute.<BR>
+4 = Verification is required on input of this attribute.<BR>
+8 = Attribute is preset (no prompt during insertion).</TD></TR>
+<TR VALIGN=TOP><TD>73</TD>
+<TD>Field length (optional; default = 0) (not currently used) </TD></TR>
+<TR VALIGN=TOP><TD>50</TD>
+<TD>Text rotation (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>41</TD>
+<TD>Relative X scale factor (width) (optional; default = 1).<BR>
+This value is also adjusted when fit-type text is used.</TD></TR>
+<TR VALIGN=TOP><TD>51</TD>
+<TD>Oblique angle (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>7</TD>
+<TD>Text style name (optional, default = STANDARD)</TD></TR>
+<TR VALIGN=TOP><TD>71</TD>
+<TD>Text generation flags (optional, default = 0). See TEXT</TD></TR>
+<TR VALIGN=TOP><TD>72</TD>
+<TD>Horizontal text justification type (optional, default = 0). See TEXT.</TD></TR>
+<TR VALIGN=TOP><TD>74</TD>
+<TD>Vertical text justification type (optional, default = 0). See group code 73 in TEXT.</TD></TR>
+<TR VALIGN=TOP><TD>11</TD>
+<TD>Alignment point (in OCS). DXF: <I>X </I>value; APP: 3D point.<BR>
+Present only if 72 or 74 group is present and nonzero.</TD></TR>
+<TR VALIGN=TOP><TD>21, 31</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of alignment point (in OCS)</TD></TR>
+<TR VALIGN=TOP><TD>210</TD>
+<TD>Extrusion direction. Present only if the entity's extrusion direction is not parallel to the WCS Z axis (optional; default = 0, 0, 1). DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>220, 230</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of extrusion direction</TD></TR>
+</TABLE><P>
+<P>
+If group 72 and/or 74 values are nonzero then the text insertion point values are ignored, and AutoCAD calculates new values based on the text alignment point and the length of the text string itself (after applying the text style). If the 72 and 74 values are zero or missing, then the text alignment point is ignored and recalculated based on the text insertion point and the length of the text string itself (after applying the text style). <P>
+<A NAME="ID_407651"></A><a name="BODY"></a><H3>BODY</H3><P>
+The following group codes apply to body entities.<P>
+<I>Body group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbModelerGeometry) </TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>Modeler format version number (currently = 1)</TD></TR>
+<TR VALIGN=TOP><TD>1</TD>
+<TD>Proprietary data (multiple lines &lt 255 characters each)</TD></TR>
+<TR VALIGN=TOP><TD>3</TD>
+<TD>Additional lines of proprietary data (if previous group 1 string is greater than 255 characters) </TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_407682"></A><a name="CIRCLE"></a><H3>CIRCLE</H3><P>
+The following group codes apply to circle entities.<P>
+<I>Circle group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbCircle) </TD></TR>
+<TR VALIGN=TOP><TD>39</TD>
+<TD>Thickness (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>Center point (in OCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of center point (in OCS) </TD></TR>
+<TR VALIGN=TOP><TD>40</TD>
+<TD>Radius</TD></TR>
+<TR VALIGN=TOP><TD>210</TD>
+<TD>Extrusion direction. Present only if the entity's extrusion direction is not parallel to the WCS <I>Z</I> axis (optional; default = 0, 0, 1). DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>220, 230</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of extrusion direction</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_407749"></A><a name="DIMENSION"></a><H3>DIMENSION</H3><P>
+Dimension entity definitions consist of group codes that are common to all dimension types, followed by codes specific to the type.<P>
+<A NAME="ID_408017"></A><H4>Common Dimension Group Codes</H4><P>
+The following group codes apply to all dimension entitiy types.<P>
+<I>Common dimension group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group&nbsp;codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbDimension) </TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>Definition point (in WCS). DXF: <I>X</I> value; APP: 3D point.</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of definition point (in WCS) </TD></TR>
+<TR VALIGN=TOP><TD>11</TD>
+<TD>Middle point of dimension text. (in OCS).<BR>
+DXF: <I>X </I>value; APP: 3D point.</TD></TR>
+<TR VALIGN=TOP><TD>21, 31</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of middle point of dimension text. (in OCS)</TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>Dimension type<BR>
+0 = Rotated, horizontal, or vertical<BR>
+1 = Aligned<BR>
+2 = Angular<BR>
+3 = Diameter<BR>
+4 = Radius<BR>
+5 = Angular 3 point<BR>
+6 = Ordinate<BR>
+70 = Ordinate type. This is a bit value (bit 7) used only with integer value 6. If set (70), ordinate is X-type; if not set (6), ordinate is Y-type. <BR>
+128 = This is a bit value (bit 8) added to the other group 70 values if the dimension text has been positioned at a user-defined location rather than at the default location.</TD></TR>
+<TR VALIGN=TOP><TD>1</TD>
+<TD>Dimension text explicitly entered by the user. Optional; default is the measurement. If null or "&lt&gt", the dimension measurement is drawn as the text, if " " (one blank space), the text is suppressed. Anything else is drawn as the text.</TD></TR>
+<TR VALIGN=TOP><TD>53</TD>
+<TD>The optional group code 53 is the rotation angle of the dimension text away from its default orientation (the direction of the dimension line).</TD></TR>
+<TR VALIGN=TOP><TD>51</TD>
+<TD>All dimension types have an optional 51 group code, which indicates the horizontal direction for the dimension entity. It determines the orientation of dimension text and lines for horizontal, vertical, and rotated linear dimensions. <BR>
+This group value is the negative of the angle between the OCS <I>X</I> axis and the UCS <I>X</I> axis. It is always in the <I>XY</I> plane of the OCS.</TD></TR>
+<TR VALIGN=TOP><TD>210</TD>
+<TD>Extrusion direction. Present only if the entity's extrusion direction is not parallel to the WCS <I>Z</I> axis (optional; default = 0, 0, 1). DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>220, 230</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of extrusion direction</TD></TR>
+<TR VALIGN=TOP><TD>3</TD>
+<TD>Dimension style name</TD></TR>
+</TABLE><P>
+<P>
+Xdata belonging to the application ID <TT>"ACAD"</TT> may follow a dimension entity. This describes any dimension overrides that have been applied to this entity. See <A HREF="#XREF_62386">"Dimension Style Overrides."</A> <P>
+For all dimension types, the following group codes represent 3D WCS points: (10, 20, 30), (13, 23, 33), (14, 24, 34), and (15, 25, 35). For all dimension types, the following group codes represent 3D OCS points: (11, 21, 31), (12, 22, 32), and (16, 26, 36).<P>
+<A NAME="ID_408102"></A><H4>Aligned, Linear, and Rotated Dimension Group Codes</H4><P>
+The following group codes apply to aligned, linear, and rotated dimensions.<P>
+<I>Aligned, linear, and rotated dimension group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbAlignedDimension) </TD></TR>
+<TR VALIGN=TOP><TD>12</TD>
+<TD>Insertion point for clones of a dimension--Baseline and Continue (in OCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>22, 32</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of insertion point for clones of a dimension--Baseline and Continue (in OCS).</TD></TR>
+<TR VALIGN=TOP><TD>13</TD>
+<TD>Definition point for linear and angular dimensions (in WCS). DXF: <I>X </I>value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>23, 33</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of definition point for linear and angular dimensions (in WCS).</TD></TR>
+<TR VALIGN=TOP><TD>14</TD>
+<TD>Definition point for linear and angular dimensions (in WCS). DXF: <I>X </I>value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>24, 34</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of definition point for linear and angular dimensions (in WCS).</TD></TR>
+</TABLE><P>
+<P>
+The point (13,23,33) specifies the start point of the first extension line and the point (14,24,34) specifies the start point of the second extension line. Point (10,20,30) specifies the dimension line location. The point (11,21,31) specifies the midpoint of the dimension text.<P>
+<IMG SRC="al_ac01u.gif" ><P>
+<A NAME="ID_408462"></A><H4>Linear and Rotated Dimension Group Codes</H4><P>
+The following group codes apply to linear and rotated dimensions.<P>
+<I>Linear and rotated dimension group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>50</TD>
+<TD>Angle of rotated, horizontal, or vertical dimensions.</TD></TR>
+<TR VALIGN=TOP><TD>52</TD>
+<TD>Linear dimension types with an oblique angle have an optional group code 52. When added to the rotation angle of the linear dimension (group code 50), it gives the angle of the extension lines.</TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbRotatedDimension) </TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_408540"></A><H4>Radial and Diameter Dimension Group Codes</H4><P>
+The following group codes apply to radial and diameter dimensions.<P>
+<I>Radial and diameter dimension group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbRadialDimension or AcDbDiametricDimension) </TD></TR>
+<TR VALIGN=TOP><TD>15</TD>
+<TD>Definition point for diameter, radius, and angular dimensions (in WCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>25, 35</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of definition point for diameter, radius, and angular dimensions (in WCS).</TD></TR>
+<TR VALIGN=TOP><TD>40</TD>
+<TD>Leader length for radius and diameter dimensions.</TD></TR>
+</TABLE><P>
+<P>
+The point (15,25,35) specifies the first point of the dimension line on the circle/arc and the point (10,20,30) specifies the point opposite the first point. The point (11,21,31) specifies the midpoint of the dimension text.<P>
+<IMG SRC="al_ac02u.gif" ><P>
+The point (15,25,35) specifies the first point of the dimension line on the circle/arc and the point (10,20,30) specifies the center of the circle/arc. The point (11,21,31) specifies the midpoint of the dimension text.<P>
+<IMG SRC="al_ac03u.gif" ><P>
+<A NAME="ID_408636"></A><H4>Angular Dimension Group Codes</H4><P>
+The following group codes apply to angular dimensions.<P>
+<I>Angular dimension group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDb3PointAngularDimension) </TD></TR>
+<TR VALIGN=TOP><TD>13</TD>
+<TD>Definition point for linear and angular dimensions (in WCS). DXF: <I>X </I>value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>23, 33</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of definition point for linear and angular dimensions (in WCS).</TD></TR>
+<TR VALIGN=TOP><TD>14</TD>
+<TD>Definition point for linear and angular dimensions (in WCS). DXF: <I>X </I>value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>24, 34</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of definition point for linear and angular dimensions (in WCS).</TD></TR>
+<TR VALIGN=TOP><TD>15</TD>
+<TD>Definition point for diameter, radius, and angular dimensions (in WCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>25, 35</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of definition point for diameter, radius, and angular dimensions (in WCS).</TD></TR>
+<TR VALIGN=TOP><TD>16</TD>
+<TD>Point defining dimension arc for angular dimensions. (in OCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>26, 36</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of point defining dimension arc for angular dimensions (in OCS).</TD></TR>
+</TABLE><P>
+<P>
+The points (13,23,33) and (14,24,34) specify the endpoints of the line used to determine the first extension line and points (10,20,30) and (15,25,35) specify the endpoints of the line used to determine the second extension line. Point (16,26,36) specifies the location of the dimension line arc. The point (11,21,31) specifies the midpoint of the dimension text.<P>
+<IMG SRC="al_ac04u.gif" ><P>
+The point (15,25,35) specifies the vertex of the angle. The points (13,23,33) and (14,24,34) specify the endpoints of the extension lines. The point (10,20,30) specifies the locatioon of the dimension line arc and the point (11,21,31) specifies the midpoint of the dimension text.<P>
+<IMG SRC="al_ac05u.gif" ><P>
+<A NAME="ID_408753"></A><H4>Ordinate Dimension Group Codes</H4><P>
+The following group codes apply to ordinate dimensions. <P>
+<I>Ordinate dimension group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbOrdinateDimension) </TD></TR>
+<TR VALIGN=TOP><TD>13</TD>
+<TD>Definition point for linear and angular dimensions (in WCS). DXF: <I>X </I>value; APP: 3D point.</TD></TR>
+<TR VALIGN=TOP><TD>23, 33</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of definition point for linear and angular dimensions (in WCS).</TD></TR>
+<TR VALIGN=TOP><TD>14</TD>
+<TD>Definition point for linear and angular dimensions (in WCS). DXF: <I>X </I>value; APP: 3D point.</TD></TR>
+<TR VALIGN=TOP><TD>24, 34</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of definition point for linear and angular dimensions (in WCS).</TD></TR>
+</TABLE><P>
+<P>
+The point (13,23,33) specifies the feature location and the point (14,24,34) specifies the leader end point. The point (11,21,31) specifies the midpoint of the dimension text. Point (10,20,30) is placed at the origin of the UCS that is current when the dimension is created.<P>
+<IMG SRC="al_ac06u.gif" ><P>
+<A NAME="XREF_62386"></A><A NAME="ID_408835"></A><H4>Dimension Style Overrides</H4><P>
+Dimension style overrides can be applied to dimension, leader, and tolerance entities. Any overrides applied to these entities are stored in the entity as xdata. The overriden dimension variable group codes and the related values are contained within group 1002 control strings. The following example shows the xdata of a dimension entity where the DIMTOL and DIMCLRE variables have been overriden.<P>
+<TT>(setq&nbsp;diment&nbsp;(car&nbsp;(entsel)))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;&nbsp;Select&nbsp;dimension&nbsp;entity<BR>
+(setq&nbsp;elst&nbsp;(entget&nbsp;diment&nbsp;'("ACAD")))&nbsp;;&nbsp;Get&nbsp;entity&nbsp;definition&nbsp;list<BR>
+(assoc&nbsp;-3&nbsp;elst)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;&nbsp;Extract&nbsp;xdata&nbsp;only&nbsp;&nbsp;<BR>
+<BR>
+</TT>This code returns the following: <P>
+<TT>(-3&nbsp;("ACAD"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<I>Start&nbsp;of&nbsp;the&nbsp;ACAD&nbsp;APPID&nbsp;section&nbsp;of&nbsp;xdata</I>&nbsp;<BR>
+&nbsp;&nbsp;(1000&nbsp;.&nbsp;"DSTYLE")&nbsp;(1002&nbsp;.&nbsp;"{")&nbsp;<I>&nbsp;&nbsp;Beginning&nbsp;of&nbsp;the&nbsp;dimstyle&nbsp;subsection</I>&nbsp;<BR>
+&nbsp;&nbsp;(1070&nbsp;.&nbsp;177)&nbsp;(1070&nbsp;.&nbsp;3)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<I>The&nbsp;DIMCLRE&nbsp;(code&nbsp;177)&nbsp;override&nbsp;+&nbsp;value&nbsp;(3)</I>&nbsp;<BR>
+&nbsp;&nbsp;(1070&nbsp;.&nbsp;71)&nbsp;(1070&nbsp;.&nbsp;1)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<I>The&nbsp;DIMTOL&nbsp;(code&nbsp;71)&nbsp;override&nbsp;+&nbsp;value&nbsp;(1)</I>&nbsp;<BR>
+&nbsp;&nbsp;(1002&nbsp;.&nbsp;"}")&nbsp;))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<I>End&nbsp;dimstyle&nbsp;subsection&nbsp;and&nbsp;ACAD&nbsp;section</I>&nbsp;<BR>
+<BR>
+</TT><A NAME="ID_431176"></A><a name="ELLIPSE"></a><H3>ELLIPSE</H3><P>
+The following group codes apply to ellipse entities.<P>
+<I>Ellipse group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbEllipse) </TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>Center point (in WCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of center point (in WCS) </TD></TR>
+<TR VALIGN=TOP><TD>11</TD>
+<TD>Endpoint of major axis, relative to the center.<BR>
+DXF: <I>X</I> value; APP: 3D point.</TD></TR>
+<TR VALIGN=TOP><TD>21, 31</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of endpoint of major axis, relative to the center</TD></TR>
+<TR VALIGN=TOP><TD>210</TD>
+<TD>Extrusion direction. Present only if the entity's extrusion direction is not parallel to the WCS <I>Z</I> axis (optional; default = 0, 0, 1). DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>220, 230</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of extrusion direction</TD></TR>
+<TR VALIGN=TOP><TD>40</TD>
+<TD>Ratio of minor axis to major axis</TD></TR>
+<TR VALIGN=TOP><TD>41</TD>
+<TD>Start parameter (this value is 0.0 for a full ellipse)</TD></TR>
+<TR VALIGN=TOP><TD>42</TD>
+<TD>End parameter (this value is 2pi for a full elliipse)</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_411746"></A><a name="INSERT"></a><H3>INSERT</H3><P>
+The following group codes apply to insert (block reference) entities.<P>
+<I>Insert group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbBlockReference) </TD></TR>
+<TR VALIGN=TOP><TD>66</TD>
+<TD>Variable attributes-follow flag (optional; default = 0); if the value of attributes-follow flag is 1, a series of attribute entities is expected to follow the insert, terminated by a seqend entity.</TD></TR>
+<TR VALIGN=TOP><TD>2</TD>
+<TD>Block name</TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>Insertion point (in OCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of insertion point (in OCS) </TD></TR>
+<TR VALIGN=TOP><TD>41</TD>
+<TD><I>X</I> scale factor (optional; default = 1)</TD></TR>
+<TR VALIGN=TOP><TD>42</TD>
+<TD><I>Y</I> scale factor (optional; default = 1)</TD></TR>
+<TR VALIGN=TOP><TD>43</TD>
+<TD><I>Z</I> scale factor (optional; default = 1)</TD></TR>
+<TR VALIGN=TOP><TD>50</TD>
+<TD>Rotation angle (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>Column count (optional; default = 1)</TD></TR>
+<TR VALIGN=TOP><TD>71</TD>
+<TD>Row count (optional; default = 1)</TD></TR>
+<TR VALIGN=TOP><TD>44</TD>
+<TD>Column spacing (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>45</TD>
+<TD>Row spacing (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>210</TD>
+<TD>Extrusion direction. Present only if the entity's extrusion direction is not parallel to the WCS Z axis (optional; default = 0, 0, 1). DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>220, 230</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of extrusion direction</TD></TR>
+</TABLE><P>
+<P>
+Xdata belonging to the application ID <TT>"ACAD"</TT> may follow. This contains information related to hatch block properties.<P>
+<I>Hatch block xdata group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group   </B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>1001 </TD>
+<TD>Application name ("ACAD")</TD></TR>
+<TR VALIGN=TOP><TD>1000 </TD>
+<TD>Begin hatch pattern data ("HATCH")</TD></TR>
+<TR VALIGN=TOP><TD>1002 </TD>
+<TD>Begin hatch pattern description data ("{")</TD></TR>
+<TR VALIGN=TOP><TD>1070 </TD>
+<TD>Hatch version number, currently 16 </TD></TR>
+<TR VALIGN=TOP><TD>1000 </TD>
+<TD>Pattern name. (such as, ESCHER, ZIGZAG, ANSI31)</TD></TR>
+<TR VALIGN=TOP><TD>1040 </TD>
+<TD>Pattern scale or spacing</TD></TR>
+<TR VALIGN=TOP><TD>1040 </TD>
+<TD>Pattern angle</TD></TR>
+<TR VALIGN=TOP><TD>1070 </TD>
+<TD> Present only if the Pattern is User-Defined.  Non-zero if double pattern Zero if single pattern.</TD></TR>
+<TR VALIGN=TOP><TD>1000 </TD>
+<TD>Begin associative boundary description data. This field will always be "ASC_BOUNDS"</TD></TR>
+<TR VALIGN=TOP><TD>1070 </TD>
+<TD>The number of closed boundaries associated with the hatch block. Each closed boundary is made up of a set of entities. If Select objects was invoked during the Bhatch command, all the entities that were selected will be considered a single closed boundary and this number will be increased by one. This is true even if the set of entities is disjoint.<BR>
+This value specifies the number of times the following two 1070 codes and multiple 1005 codes repeat as a group. </TD></TR>
+<TR VALIGN=TOP><TD>1070 </TD>
+<TD>Bit encoded classification flag.  Indicates the type of entities handles that follow (repeats for each closed boundary).<BR>
+1 = Derived polyline boundary or original geometry, both of which were determined by the Bhatch algorithm. That is, the user pushed the "Pick Points" button  <BR>
+2 = Selected object. The user pushed the "Select objects button.</TD></TR>
+<TR VALIGN=TOP><TD>1070 </TD>
+<TD>The actual number of entity handles that follow for each closed boundary (repeats for each closed boundary)</TD></TR>
+<TR VALIGN=TOP><TD>1005 </TD>
+<TD>The entity handle of the boundary segment (repeats the number of times specified in previous 1070 group) .</TD></TR>
+<TR VALIGN=TOP><TD>1000 </TD>
+<TD>Begin internal point description data ("ASC_SEEDPOINT")</TD></TR>
+<TR VALIGN=TOP><TD>1011 </TD>
+<TD>Seed point</TD></TR>
+<TR VALIGN=TOP><TD>1002 </TD>
+<TD>End hatch pattern description data ("}") </TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_411966"></A><a name="LEADER"></a><H3>LEADER</H3><P>
+The following group codes apply to leader entities.<P>
+<I>Leader group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbLeader) </TD></TR>
+<TR VALIGN=TOP><TD>3</TD>
+<TD>Dimension style name</TD></TR>
+<TR VALIGN=TOP><TD>71</TD>
+<TD>Arrowhead flag: 0 = disabled; 1 = enabled</TD></TR>
+<TR VALIGN=TOP><TD>72</TD>
+<TD>Leader path type: 0 = Straight line segments; 1 = Spline</TD></TR>
+<TR VALIGN=TOP><TD>73</TD>
+<TD>Leader creation flag (default = 3):<BR>
+0 = leader created with text annotation.<BR>
+1 = created with Tolerance annotation<BR>
+2 = created with Block Ref annotation<BR>
+3 = created without any annotation</TD></TR>
+<TR VALIGN=TOP><TD>74</TD>
+<TD>Hookline direction flag:<BR>
+0 = hookline (or end of tangent for a splined leader) is the opposite direction from the horizontal vector.<BR>
+1 = hookline (or end of tangent for a splined leader) is the same direction as horizontal vector (see code 75).</TD></TR>
+<TR VALIGN=TOP><TD>75</TD>
+<TD>Hookline flag: 0 = no hookline; 1 = has a hookline</TD></TR>
+<TR VALIGN=TOP><TD>40</TD>
+<TD>Text annotation height</TD></TR>
+<TR VALIGN=TOP><TD>41</TD>
+<TD>Text annotation width</TD></TR>
+<TR VALIGN=TOP><TD>76</TD>
+<TD>Number of vertices in leader (ignored for DXFIN)</TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>Vertex coordinates (one entry for each vertex)<BR>
+DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of vertex coordinates </TD></TR>
+<TR VALIGN=TOP><TD>77</TD>
+<TD>Color to use if leader's DIMCLRD=BYBLOCK</TD></TR>
+<TR VALIGN=TOP><TD>340</TD>
+<TD>Hard reference to associated mtext entity</TD></TR>
+<TR VALIGN=TOP><TD>210</TD>
+<TD>Normal vector. DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>220, 230</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of normal vector</TD></TR>
+<TR VALIGN=TOP><TD>211</TD>
+<TD>"Horizontal" direction for leader.<BR>
+DXF: <I>X</I> value; APP: 3D vector.</TD></TR>
+<TR VALIGN=TOP><TD>221,231</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of "horizontal" direction for leader</TD></TR>
+<TR VALIGN=TOP><TD>212</TD>
+<TD>Direction of annotation offset from last leader vertex.<BR>
+DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>222,232</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of direction of annotation offset from last leader vertex</TD></TR>
+</TABLE><P>
+<P>
+Xdata belonging to the application ID <TT>"ACAD"</TT> may follow. This describes any dimension overrides that have been applied to this entity. See <A HREF="#XREF_62386">"Dimension Style Overrides."</A> <P>
+<A NAME="ID_412531"></A><a name="LINE"></a><H3>LINE</H3><P>
+The following group codes apply to line entities.<P>
+<I>Line group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbLine) </TD></TR>
+<TR VALIGN=TOP><TD>39</TD>
+<TD>Thickness (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>Start point (in WCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of start point (in WCS)</TD></TR>
+<TR VALIGN=TOP><TD>11</TD>
+<TD>End point (in WCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>21, 31</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of end point (in WCS)</TD></TR>
+<TR VALIGN=TOP><TD>210</TD>
+<TD>Extrusion direction. Present only if the entity's extrusion direction is not parallel to the WCS <I>Z</I> axis (optional; default = 0, 0, 1). DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>220, 230</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of extrusion direction</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_412633"></A><a name="MLINE"></a><H3>MLINE</H3><P>
+The following group codes apply to mline entities.<P>
+<I>Mline group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbMline) </TD></TR>
+<TR VALIGN=TOP><TD>2</TD>
+<TD>String of up to 32 characters. The name of the style used for this mline. An entry for this style must exist in the MLINESTYLE dictionary. <BR>
+<B>Note</B> Do <I>not</I> modify this field.</TD></TR>
+<TR VALIGN=TOP><TD>340</TD>
+<TD>Pointer-handle/ID of MLINESTYLE dictionary</TD></TR>
+<TR VALIGN=TOP><TD>40</TD>
+<TD>Scale factor.</TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>Justification: 0=top, 1=zero, 2=bottom</TD></TR>
+<TR VALIGN=TOP><TD>71</TD>
+<TD>Open/closed flag: 1=open, 3=closed</TD></TR>
+<TR VALIGN=TOP><TD>72</TD>
+<TD>Number of vertices</TD></TR>
+<TR VALIGN=TOP><TD>73</TD>
+<TD>Number of elements in MLINESTYLE defenition</TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>Start point (in WCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of start point (in WCS)</TD></TR>
+<TR VALIGN=TOP><TD>210</TD>
+<TD>Extrusion direction. Present only if the entity's extrusion direction is not parallel to the WCS <I>Z</I> axis (optional; default = 0, 0, 1). DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>220, 230</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of extrusion direction</TD></TR>
+<TR VALIGN=TOP><TD>11</TD>
+<TD>Vertex coordinates (multiple entries; one entry for each vertex). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>21, 31</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of vertex coordinates</TD></TR>
+<TR VALIGN=TOP><TD>12</TD>
+<TD>Direction vector of segment starting at this vertex  (multiple entries; one for each vertex).<BR>
+DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>22, 32</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of direction vector of segment starting at this vertex</TD></TR>
+<TR VALIGN=TOP><TD>13</TD>
+<TD>Direction vector of miter at this vertex (multiple entries: one for each vertex). DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>23, 33</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of direction vector of miter</TD></TR>
+<TR VALIGN=TOP><TD>74</TD>
+<TD>Number of parameters for this element (repeats for each element in segment)</TD></TR>
+<TR VALIGN=TOP><TD>41</TD>
+<TD>Element parameters (repeats based on previous code 74)</TD></TR>
+<TR VALIGN=TOP><TD>75</TD>
+<TD>Number of area fill parameters for this element (repeats for each element in segment)</TD></TR>
+<TR VALIGN=TOP><TD>42</TD>
+<TD>Area fill parameters (repeats based on previous code 75)</TD></TR>
+</TABLE><P>
+<P>
+The group code 41 parameterization is a list of real values, one real per group code 41. The list  may contain zero or more items. The first group code 41 value is the distance from the segment vertex along the miter vector to the point where the line element's path intersects the miter vector. The next group code 41 value is the distance along the line element's path from the point defined by the first group 41 to the actual start of the line element. The next is the distance from the start of the line element to the first break (or cut) in the line element. The successive group code 41 values continue to list the start and stop points of the line element in this segment of the mline. Linetypes do not affect group 41 lists.<P>
+The group code 42 parameterization is also a list of real values. Similar to the 41 parameterization, it describes the parameterization of the fill area for this mline segment. The values are interperted identically to the 41 parameters and when taken as a whole for all line elements in the mline segment, they define the boundary of the fill area for the mline segment.<P>
+A common example of the use of the group code 42 mechanism is when an unfilled mline crosses over a filled mline and mledit is used to cause the filled mline to appear unfilled in the crossing area. This would result in two group 42s for each line element in the affected mline segment,  one for the fill stop and one for the fill start.<P>
+The 2 group codes in mline entities and mlinestyle objects are redundant fields. These groups should <I>not</I> be modified under any circumstances, although it is safe to read them and use their values. The correct fields to modify are as follows:<P>
+<B>Mline<P>
+<UL></B>The 340 group in the same object, which indicates the proper mlinestyle object.
+</UL><B>Mlinestyle<P>
+<UL></B>The 3 group value in the mlinestyle dictionary which precedes the 350 group that has the handle or entity name of the current mlinestyle.
+</UL><A NAME="ID_413039"></A><a name="MTEXT"></a><H3>MTEXT</H3><P>
+The following group codes apply to mtext entities.<P>
+<I>Mtext group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbMText) </TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>Insertion point. DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of insertion point</TD></TR>
+<TR VALIGN=TOP><TD>40</TD>
+<TD>Default text height</TD></TR>
+<TR VALIGN=TOP><TD>41</TD>
+<TD>Reference rectangle width</TD></TR>
+<TR VALIGN=TOP><TD>71</TD>
+<TD>Attachment point:<BR>
+1 = Top left; 2 = Top center; 3 = Top right ; <BR>
+4 = Middle left; 5 = Middle center; 6 = Middle right<BR>
+7 = Bottom left; 8 = Bottom center; 9 = Bottom right</TD></TR>
+<TR VALIGN=TOP><TD>72</TD>
+<TD>Drawing direction:<BR>
+1 = Left to right; 2 = Right to left<BR>
+3 = Top to bottom; 4 = Bottom to top</TD></TR>
+<TR VALIGN=TOP><TD>1</TD>
+<TD>Text string. If the text string is less than 250 characters, all characters appear in group 1. If the text string is greater than 250 characters, the string is divided into 250 character chunks, which appear in one or more group 3 codes. If group 3 codes are used, the last group is a group 1 and has fewer than 250 characters.</TD></TR>
+<TR VALIGN=TOP><TD>3</TD>
+<TD>Additional text (always in 250 character chunks).</TD></TR>
+<TR VALIGN=TOP><TD>7</TD>
+<TD>Text style name (STANDARD if not provided)</TD></TR>
+<TR VALIGN=TOP><TD>210</TD>
+<TD>Extrusion direction. Present only if the entity's extrusion direction is not parallel to the WCS <I>Z</I> axis (optional; default = 0, 0, 1). DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>220, 230</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of extrusion direction</TD></TR>
+<TR VALIGN=TOP><TD>11</TD>
+<TD><I>X</I>-axis direction vector (in WCS)<BR>
+DXF: <I>X</I> value; APP: 3D vector<BR>
+<B>Note</B>  A group code 50 (rotation angle in radians) passed as DXF input is converted to the equivalent direction vector (if both a code 50 and codes 11,21,31 are passed, the last one wins). This is provided as a convenience for conversions from text objects.</TD></TR>
+<TR VALIGN=TOP><TD>21, 31</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of <I>X</I>-axis direction vector (in WCS)</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_413536"></A><a name="OLEFRAME"></a><H3>OLEFRAME</H3><P>
+The following group codes apply to oleframe entities.<P>
+<I>Oleframe group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbOleFrame) </TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>OLE version number </TD></TR>
+<TR VALIGN=TOP><TD>90</TD>
+<TD>Length of binary data</TD></TR>
+<TR VALIGN=TOP><TD>310</TD>
+<TD>Binary data (multiple lines)</TD></TR>
+<TR VALIGN=TOP><TD>1</TD>
+<TD>End of Ole data (the string "OLE")</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_413622"></A><a name="POINT"></a><H3>POINT</H3><P>
+The following group codes apply to point entities.<P>
+<I>Point group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbPoint) </TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>Point location (in WCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of point location (in WCS)</TD></TR>
+<TR VALIGN=TOP><TD>39</TD>
+<TD>Thickness (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>210</TD>
+<TD>Extrusion direction. Present only if the entity's extrusion direction is not parallel to the WCS <I>Z</I> axis (optional; default = 0, 0, 1). DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>220, 230</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of extrusion direction</TD></TR>
+<TR VALIGN=TOP><TD>50</TD>
+<TD>Angle of the <I>X</I> axis for the UCS in effect when the point was drawn (optional, default = 0); used when PDMODE is nonzero</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_413740"></A><a name="POLYLINE"></a><H3>POLYLINE</H3><P>
+The following group codes apply to polyline entities.<P>
+<I>Polyline group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDb2dPolyline or AcDb3dPolyline) </TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>DXF: always 0<BR>
+APP: a "dummy" point; the <I>X</I> and <I>Y</I> values are always 0, and the <I>Z</I> value is the polyline's elevation (in OCS when 2D, WCS when 3D)</TD></TR>
+<TR VALIGN=TOP><TD>20</TD>
+<TD>DXF: always 0</TD></TR>
+<TR VALIGN=TOP><TD>30</TD>
+<TD>DXF: polyline's elevation (in OCS when 2D, WCS when 3D)</TD></TR>
+<TR VALIGN=TOP><TD>39</TD>
+<TD>Thickness (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>Polyline flag (bit-coded); default is 0:<BR>
+1 = This is a closed polyline (or a polygon mesh closed in  the M direction).<BR>
+2 = Curve-fit vertices have been added.<BR>
+4 = Spline-fit vertices have been added.<BR>
+8 = This is a 3D polyline.<BR>
+16 = This is a 3D polygon mesh.<BR>
+32 = The polygon mesh is closed in the N direction.<BR>
+64 = The polyline is a polyface mesh.<BR>
+128 = The linetype pattern is generated continuously around the vertices of this polyline.</TD></TR>
+<TR VALIGN=TOP><TD>40</TD>
+<TD>Default starting width (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>41</TD>
+<TD>Default ending width (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>71</TD>
+<TD>Polygon mesh M vertex count (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>72</TD>
+<TD>Polygon mesh N vertex count (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>73</TD>
+<TD>Smooth surface M density (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>74</TD>
+<TD>Smooth surface N density (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>75</TD>
+<TD>Curves and smooth surface type (optional; default = 0); integer codes, not bit-coded:<BR>
+0 = No smooth surface fitted<BR>
+5 = Quadratic B-spline surface<BR>
+6 = Cubic B-spline surface<BR>
+8 = Bezier surface</TD></TR>
+<TR VALIGN=TOP><TD>210</TD>
+<TD>Extrusion direction. Present only if the entity's extrusion direction is not parallel to the WCS Z axis (optional; default = 0, 0, 1). DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>220, 230</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of extrusion direction</TD></TR>
+</TABLE><P>
+<P>
+Xdata with the <TT>"AUTOCAD_POSTSCRIPT_FIGURE"</TT> application ID may follow. This contains information related to PostScript images and PostScript fill information.<P>
+Xdata with the <TT>"ACAD"</TT> application ID may follow. This contains information related to associative hatch boundaries.<P>
+<I>Hatch boundary xdata group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>1001 </TD>
+<TD>Application name ("ACAD") </TD></TR>
+<TR VALIGN=TOP><TD>1000 </TD>
+<TD>Begin associative boundary description data ("ASC_BOUNDS")</TD></TR>
+<TR VALIGN=TOP><TD>1002 </TD>
+<TD>Begin boundary description data ("{")</TD></TR>
+<TR VALIGN=TOP><TD>1070 </TD>
+<TD>Hatch version number, currently 19 </TD></TR>
+<TR VALIGN=TOP><TD>1005 </TD>
+<TD>The entity handle of the associative hatch block. Additional handles will follow for those boundary segments that are common to other hatch blocks.</TD></TR>
+<TR VALIGN=TOP><TD>1002 </TD>
+<TD>End hatch pattern description data. ("}") </TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_436943"></A><H4>Polyface Meshes</H4><P>
+A polyface mesh is represented in DXF as a variant of a polyline entity. The polyline header is identified as introducing a polyface mesh by the presence of the 64 bit in the polyline flags (70) group. The 71 group specifies the number of vertices in the mesh, and the 72 group specifies the number of faces. Although these counts are correct for all meshes created with the PFACE command, applications are not required to place correct values in these fields. Following the polyline header is a sequence of vertex entities that specify the vertex coordinates, then followed by faces that compose the mesh.<P>
+The AutoCAD entity structure imposes a limit on the number of vertices that a given face entity can specify. You can represent more complex polygons by decomposing them into triangular wedges. Their edges should be made invisible to prevent visible artifacts of this subdivision from being drawn. The PFACE command performs this subdivision automatically, but when applications generate polyface meshes directly, the applications must do this themselves. The number of vertices per face is the key parameter in this subdivision process. The PFACEVMAX system variable provides an application with the number of vertices per face entity. This value is read-only and is set to 4.<P>
+Polyface meshes created with the PFACE command are always generated with all the vertex coordinate entities first, followed by the face definition entities. The code within AutoCAD that processes polyface meshes requires this ordering. Programs that generate polyface meshes in DXF should generate all the vertices then all the faces. However, programs that read polyface meshes from DXF should be tolerant of odd vertex and face ordering. <P>
+<A NAME="ID_414281"></A><a name="RAY"></a><H3>RAY</H3><P>
+The following group codes apply to ray entities.<P>
+<I>Ray group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbRay) </TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>Start point (in WCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of start point (in WCS)</TD></TR>
+<TR VALIGN=TOP><TD>11</TD>
+<TD>Unit direction vector (in WCS). <BR>
+DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>21, 31</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of unit direction vector (in WCS)</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_414371"></A><a name="REGION"></a><H3>REGION</H3><P>
+The following group codes apply to region entities.<P>
+<I>Region group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbModelerGeometry) </TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>Modeler format version number (currently = 1)</TD></TR>
+<TR VALIGN=TOP><TD>1</TD>
+<TD>Proprietary data (multiple lines &lt 255 characters each)</TD></TR>
+<TR VALIGN=TOP><TD>3</TD>
+<TD>Additional lines of proprietary data (if previous group 1 string is greater than 255 characters) </TD></TR>
+</TABLE><P>
+<P>
+Xdata with the <TT>"ACAD"</TT> application ID may follow. This contains information related to associative hatch boundaries.<P>
+<I>Hatch boundary xdata group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>1001 </TD>
+<TD>Application name ("ACAD") </TD></TR>
+<TR VALIGN=TOP><TD>1000 </TD>
+<TD>Begin associative boundary description data ("ASC_BOUNDS")</TD></TR>
+<TR VALIGN=TOP><TD>1002 </TD>
+<TD>Begin boundary description data ("{")</TD></TR>
+<TR VALIGN=TOP><TD>1070 </TD>
+<TD>Hatch version number, currently 19 </TD></TR>
+<TR VALIGN=TOP><TD>1005 </TD>
+<TD>The entity handle of the associative hatch block. Additional handles will follow for those boundary segments that are common to other hatch blocks.</TD></TR>
+<TR VALIGN=TOP><TD>1002 </TD>
+<TD>End hatch pattern description data. ("}") </TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_414413"></A><a name="SEQEND"></a><H3>SEQEND</H3><P>
+The following group codes apply to seqend entities.<P>
+<I>Seqend group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>-2</TD>
+<TD>APP: name of entity that began the sequence. This entity marks the end of vertex (vertex type name) for a polyline, or the end of attribute entities (attrib type name) for an insert entity that has attributes (indicated) by 66 group present and nonzero in insert entity). <BR>
+This code is not saved in a DXF file.</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_414535"></A><a name="SHAPE"></a><H3>SHAPE</H3><P>
+The following group codes apply to shape entities.<P>
+<I>Shape group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbShape) </TD></TR>
+<TR VALIGN=TOP><TD>39</TD>
+<TD>Thickness (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>Insertion point (in WCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of insertion point (in WCS)</TD></TR>
+<TR VALIGN=TOP><TD>40 </TD>
+<TD>Size</TD></TR>
+<TR VALIGN=TOP><TD>2</TD>
+<TD>Shape name</TD></TR>
+<TR VALIGN=TOP><TD>50</TD>
+<TD>Rotation angle (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>41</TD>
+<TD>Relative X scale factor (optional; default =1)</TD></TR>
+<TR VALIGN=TOP><TD>51</TD>
+<TD>Oblique angle (optional; default =0)</TD></TR>
+<TR VALIGN=TOP><TD>210</TD>
+<TD>Extrusion direction. Present only if the entity's extrusion direction is not parallel to the WCS <I>Z</I> axis (optional; default = 0, 0, 1). DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>220, 230</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of extrusion direction</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_414665"></A><a name="SOLID"></a><H3>SOLID</H3><P>
+The following group codes apply to solid entities.<P>
+<I>Solid group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbTrace) </TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>First corner. DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of first corner </TD></TR>
+<TR VALIGN=TOP><TD>11</TD>
+<TD>Second corner. DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>21, 31</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of second corner</TD></TR>
+<TR VALIGN=TOP><TD>12</TD>
+<TD>Third corner. DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>22, 32</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of third corner</TD></TR>
+<TR VALIGN=TOP><TD>13</TD>
+<TD>Fourth corner. If only three corners are entered to define the SOLID, then the fourth corner coordinate is the same as the third<BR>
+DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>23, 33</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of fourth corner</TD></TR>
+<TR VALIGN=TOP><TD>39</TD>
+<TD>Thickness (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>210</TD>
+<TD>Extrusion direction. Present only if the entity's extrusion direction is not parallel to the WCS <I>Z</I> axis (optional; default = 0, 0, 1). DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>220, 230</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of extrusion direction</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_414846"></A><a name="SPLINE"></a><H3>SPLINE</H3><P>
+The following group codes apply to spline entities.<P>
+<I>Spline group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbSpline) </TD></TR>
+<TR VALIGN=TOP><TD>210</TD>
+<TD>Normal vector (omitted if the spline is nonplanar)<BR>
+DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>220, 230</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of normal vector</TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>Spline flag (bit coded):<BR>
+1 = Closed spline<BR>
+2 = Periodic spline<BR>
+4 = Rational spline<BR>
+8 = Planar<BR>
+16 = Linear (planar bit is also set) </TD></TR>
+<TR VALIGN=TOP><TD>71</TD>
+<TD>Degree of the spline curve</TD></TR>
+<TR VALIGN=TOP><TD>72</TD>
+<TD>Number of knots</TD></TR>
+<TR VALIGN=TOP><TD>73</TD>
+<TD>Number of control points</TD></TR>
+<TR VALIGN=TOP><TD>74</TD>
+<TD>Number of fit points (if any)</TD></TR>
+<TR VALIGN=TOP><TD>42</TD>
+<TD>Fit tolerance (default = 0.0000001)</TD></TR>
+<TR VALIGN=TOP><TD>43</TD>
+<TD>Control-point tolerance (default = 0.0000001)</TD></TR>
+<TR VALIGN=TOP><TD>44</TD>
+<TD>Fit tolerance (if a fit spline)</TD></TR>
+<TR VALIGN=TOP><TD>12</TD>
+<TD>Start tangent--may be omitted (in WCS).<BR>
+DXF: <I>X</I> value; APP: 3D point.</TD></TR>
+<TR VALIGN=TOP><TD>22, 32</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of start tangent--may be omitted (in WCS).</TD></TR>
+<TR VALIGN=TOP><TD>13</TD>
+<TD>End tangent--may be omitted (in WCS).<BR>
+DXF: <I>X</I> value; APP: 3D point.</TD></TR>
+<TR VALIGN=TOP><TD>23, 33</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of end tangent--may be omitted (in WCS)</TD></TR>
+<TR VALIGN=TOP><TD>40</TD>
+<TD>Knot value (one entry per knot)</TD></TR>
+<TR VALIGN=TOP><TD>41</TD>
+<TD>Weight (if not 1); with multiple group pairs, are present if all are not 1</TD></TR>
+<TR VALIGN=TOP><TD>11</TD>
+<TD>Fit points (in WCS) one entry per fit point.<BR>
+DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>21, 31</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of fit points (in WCS) (one entry per fit point)</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_415251"></A><a name="TEXT"></a><H3>TEXT</H3><P>
+The following group codes apply to text entities.<P>
+<I>Text group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbText) </TD></TR>
+<TR VALIGN=TOP><TD>39</TD>
+<TD>Thickness (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>Text insertion point (in OCS). <BR>
+DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of text insertion point (in OCS) </TD></TR>
+<TR VALIGN=TOP><TD>40</TD>
+<TD>Text height</TD></TR>
+<TR VALIGN=TOP><TD>1</TD>
+<TD>Default value (the string itself )</TD></TR>
+<TR VALIGN=TOP><TD>50</TD>
+<TD>Text rotation (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>41</TD>
+<TD>Relative <I>X</I> scale factor--width (optional; default = 1).<BR>
+This value is also adjusted when fit-type text is used.</TD></TR>
+<TR VALIGN=TOP><TD>51</TD>
+<TD>Oblique angle (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>7</TD>
+<TD>Text style name (optional, default = STANDARD)</TD></TR>
+<TR VALIGN=TOP><TD>71</TD>
+<TD>Text generation flags (optional, default = 0):<BR>
+2 = Text is backward (mirrored in X),<BR>
+4 = Text is upside down (mirrored in Y)</TD></TR>
+<TR VALIGN=TOP><TD>72</TD>
+<TD>Horizontal text justification type (optional, default = 0) integer codes (not bit-coded)<BR>
+0 = Left;1= Center; 2 = Right<BR>
+3 = Aligned (if vertical alignment = 0)<BR>
+4 = Middle (if vertical alignment = 0)<BR>
+5 = Fit (if vertical alignment = 0)<BR>
+See the following table for clarification</TD></TR>
+<TR VALIGN=TOP><TD>73</TD>
+<TD>Vertical text justification type (optional, default = 0): integer codes (not bit- coded)<BR>
+0 = Baseline; 1 = Bottom; 2 = Middle; 3 = Top<BR>
+See the following table for clarification.</TD></TR>
+<TR VALIGN=TOP><TD>11</TD>
+<TD>Alignment point (in OCS). DXF: <I>X </I>value; APP: 3D point.<BR>
+Present only if 72 or 73 group is present and nonzero; if the justification is anything other than baseline/left (groups 72 and 73 both 0), group codes 11, 21, and 31 specify the alignment point (or the second alignment point for Aligned or Fit).</TD></TR>
+<TR VALIGN=TOP><TD>21, 31</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of alignment point (in OCS)</TD></TR>
+<TR VALIGN=TOP><TD>210</TD>
+<TD>Extrusion direction. Present only if the entity's extrusion direction is not parallel to the WCS <I>Z</I> axis (optional; default = 0, 0, 1). DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>220, 230</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of extrusion direction</TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbText) </TD></TR>
+</TABLE><P>
+<P>
+The following table describes the group 72 and 73 codes in greater detail.<P>
+<I>Group 72 and 73 integer codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group 73 (vertical alignment)</B></TD>
+<TD><B>Group 72 (horizontal alignment)</B></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD></TR>
+<TR VALIGN=TOP><TD></TD>
+<TD><B>0</B></TD>
+<TD><B>1</B></TD>
+<TD><B>2</B></TD>
+<TD><B>3</B></TD>
+<TD><B>4</B></TD>
+<TD><B>5</B></TD></TR>
+<TR VALIGN=TOP><TD>3 (top)</TD>
+<TD>TLeft</TD>
+<TD>TCenter</TD>
+<TD>TRight</TD>
+<TD></TD>
+<TD></TD>
+<TD></TD></TR>
+<TR VALIGN=TOP><TD>2 (middle)</TD>
+<TD>MLeft</TD>
+<TD>MCenter</TD>
+<TD>MRight</TD>
+<TD></TD>
+<TD></TD>
+<TD></TD></TR>
+<TR VALIGN=TOP><TD>1 (bottom)</TD>
+<TD>BLeft</TD>
+<TD>BCenter</TD>
+<TD>BRight</TD>
+<TD></TD>
+<TD></TD>
+<TD></TD></TR>
+<TR VALIGN=TOP><TD>0 (baseline)</TD>
+<TD>Left</TD>
+<TD>Center</TD>
+<TD>Right</TD>
+<TD>Aligned</TD>
+<TD>Middle</TD>
+<TD>Fit</TD></TR>
+</TABLE><P>
+<P>
+If group 72 and/or 73 values are nonzero then the text insertion point values are ignored and AutoCAD calculates new values based on the text alignment point and the length of the text string itself (after applying the text style). If the 72 and 73 values are zero or missing, then the text alignment point is ignored and recalculated based on the text insertion point and the length of the text string itself (after applying the text style). <P>
+<A NAME="ID_415800"></A><a name="TOLERANCE"></a><H3>TOLERANCE</H3><P>
+The following group codes apply to tolerance entities.<P>
+<I>Tolerance group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbFcf) </TD></TR>
+<TR VALIGN=TOP><TD>3</TD>
+<TD>Dimension style name</TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>Insertion point. (in WCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of insertion point (in WCS)</TD></TR>
+<TR VALIGN=TOP><TD>210</TD>
+<TD>Extrusion direction. Present only if the entity's extrusion direction is not parallel to the WCS Z axis (optional; default = 0, 0, 1). DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>220, 230</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of extrusion direction</TD></TR>
+<TR VALIGN=TOP><TD>11</TD>
+<TD>X-axis direction vector (in WCS)<BR>
+DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>21, 31</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of X-axis direction vector (in WCS)</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_415926"></A><a name="TRACE"></a><H3>TRACE</H3><P>
+The following group codes apply to trace entities.<P>
+<I>Trace group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbTrace) </TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>First corner (in OCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z </I>values of first corner (in OCS)</TD></TR>
+<TR VALIGN=TOP><TD>11</TD>
+<TD>Second corner (in OCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>21, 31</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of second corner (in OCS)</TD></TR>
+<TR VALIGN=TOP><TD>12</TD>
+<TD>Third corner (in OCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>22, 32</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of third corner (in OCS)</TD></TR>
+<TR VALIGN=TOP><TD>13</TD>
+<TD>Fourth corner (in OCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>23, 33</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of fourth corner (in OCS)</TD></TR>
+<TR VALIGN=TOP><TD>39</TD>
+<TD>Thickness (optional; default = 0)</TD></TR>
+<TR VALIGN=TOP><TD>210</TD>
+<TD>Extrusion direction. Present only if the entity's extrusion direction is not parallel to the WCS <I>Z</I> axis (optional; default = 0, 0, 1). DXF: <I>X</I> value; APP: 3D vector</TD></TR>
+<TR VALIGN=TOP><TD>220, 230</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of extrusion direction</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_416033"></A><a name="VERTEX"></a><H3>VERTEX</H3><P>
+The following group codes apply to vertex entities.<P>
+<I>Vertex group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbVertex) </TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDb2dVertex or AcDb3dPolylineVertex) </TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>Location point (in OCS when 2D, and WCS when 3D).<BR>
+DXF: <I>X</I> value; APP: 3D point.</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of location point (in OCS when 2D, and WCS when 3D)</TD></TR>
+<TR VALIGN=TOP><TD>40</TD>
+<TD>Starting width (optional; default is 0)</TD></TR>
+<TR VALIGN=TOP><TD>41</TD>
+<TD>Ending width (optional; default is 0)</TD></TR>
+<TR VALIGN=TOP><TD>42</TD>
+<TD>Bulge (optional; default is 0). The bulge is the tangent of one fourth the included angle for an arc segment, made negative if the arc goes clockwise from the start point to the endpoint. A bulge of 0 indicates a straight segment, and a bulge of 1 is a semicircle.</TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>Vertex flags:<BR>
+1 = Extra vertex created by curve-fitting.<BR>
+2 = Curve-fit tangent defined for this vertex. A curve-fit tangent direction of 0 may be omitted from DXF output but is significant if this bit is set.<BR>
+4 = Not used<BR>
+8 = Spline vertex created by spline-fitting<BR>
+16 = Spline frame control point<BR>
+32 = 3D polyline vertex<BR>
+64 = 3D polygon mesh<BR>
+128 = Polyface mesh vertex</TD></TR>
+<TR VALIGN=TOP><TD>50</TD>
+<TD>Curve fit tangent direction</TD></TR>
+<TR VALIGN=TOP><TD>71</TD>
+<TD>Polyface mesh vertex index. Optional. Present only if nonzero.</TD></TR>
+<TR VALIGN=TOP><TD>72</TD>
+<TD>Polyface mesh vertex index. Optional. Present only if nonzero.</TD></TR>
+<TR VALIGN=TOP><TD>73</TD>
+<TD>Polyface mesh vertex index. Optional. Present only if nonzero.</TD></TR>
+<TR VALIGN=TOP><TD>74</TD>
+<TD>Polyface mesh vertex index. Optional. Present only if nonzero.</TD></TR>
+</TABLE><P>
+<P>
+Every vertex that is part of a polyface mesh has its vertex flag 128 bit set. If the entity supplies the coordinate of a vertex of the mesh, its 64 bit is set as well, and the 10, 20, 30 groups give the vertex coordinate. The vertex index values are determined by the order in which the vertex entities appear within the polyline, with the first being numbered 1.<P>
+If the vertex defines a face of the mesh, its vertex flags group has the 128 bit set but not the 64 bit. In this case, the 10, 20, 30 (location) groups of the face entity are irrelevant and are always written as 0 in a DXF file. The vertex indexes that define the mesh are given by 71, 72, 73, and 74 group codes, the values of which specify one of the previously defined vertexes by index. If the index is negative, the edge that begins with that vertex is invisible. The first 0 vertex marks the end of the vertices of the face.<P>
+<A NAME="ID_416535"></A><a name="VIEWPORT"></a><H3>VIEWPORT</H3><P>
+The following group codes apply to viewport entities.<P>
+<I>Viewport group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbViewport) </TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>Center point (in WCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of center point (in WCS)</TD></TR>
+<TR VALIGN=TOP><TD>40</TD>
+<TD>Width in paper space units</TD></TR>
+<TR VALIGN=TOP><TD>41</TD>
+<TD>Height in paper space units. </TD></TR>
+<TR VALIGN=TOP><TD>68</TD>
+<TD>Viewport status field:<BR>
+1 = On, but is fully off screen, or is one of the viewports that is not active because the $MAXACTVP count is currently being exceeded.<BR>
+0 = Off &ltpositive value &gt = On and active. The value indicates the order of stacking for the viewports, where 1 is the active viewport, 2 is the next, and so forth.</TD></TR>
+<TR VALIGN=TOP><TD>69</TD>
+<TD>Viewport ID. Changes each time a drawing is opened. Never saved, except for the paper space viewport, which is always 1.</TD></TR>
+</TABLE><P>
+<P>
+The following table lists the xdata that can be attached to viewport entities. In contrast to normal entity data, the order of the extended group codes is important. Also group codes can appear multiple times.<P>
+<I>Viewport xdata group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>1001</TD>
+<TD>Application ID ("ACAD"). This begins a section of xdata that describes the viewport.</TD></TR>
+<TR VALIGN=TOP><TD>1000</TD>
+<TD>Begin viewport data. This field is always the string MVIEW. Other data groups may appear in the future.</TD></TR>
+<TR VALIGN=TOP><TD>1002</TD>
+<TD>Begin window descriptor data. This field always is the string.</TD></TR>
+<TR VALIGN=TOP><TD>1070</TD>
+<TD>Extended data version number. Always the integer 16.</TD></TR>
+<TR VALIGN=TOP><TD>1010</TD>
+<TD>View target point (in WCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>1020,1030</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of view target point (in WCS)</TD></TR>
+<TR VALIGN=TOP><TD>1010</TD>
+<TD>View direction vector (in WCS). <BR>
+DXF: <I>X</I> value; APP: 3D vector.</TD></TR>
+<TR VALIGN=TOP><TD>1020,1030</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of view direction vector (in WCS)</TD></TR>
+<TR VALIGN=TOP><TD>1040</TD>
+<TD>View twist angle</TD></TR>
+<TR VALIGN=TOP><TD>1040</TD>
+<TD>View height</TD></TR>
+<TR VALIGN=TOP><TD>1040</TD>
+<TD>View center point <I>X</I> value (in DCS)</TD></TR>
+<TR VALIGN=TOP><TD>1040</TD>
+<TD>View center point <I>Y</I> value (in DCS)</TD></TR>
+<TR VALIGN=TOP><TD>1040</TD>
+<TD>Perspective lens length</TD></TR>
+<TR VALIGN=TOP><TD>1040</TD>
+<TD>Front clip plane <I>Z</I> value</TD></TR>
+<TR VALIGN=TOP><TD>1040</TD>
+<TD>Back clip plane <I>Z</I> value</TD></TR>
+<TR VALIGN=TOP><TD>1070</TD>
+<TD>View mode</TD></TR>
+<TR VALIGN=TOP><TD>1070</TD>
+<TD>Circle zoom</TD></TR>
+<TR VALIGN=TOP><TD>1070</TD>
+<TD>Fast zoom setting</TD></TR>
+<TR VALIGN=TOP><TD>1070</TD>
+<TD>UCSICON setting</TD></TR>
+<TR VALIGN=TOP><TD>1070</TD>
+<TD>Snap ON/OFF</TD></TR>
+<TR VALIGN=TOP><TD>1070</TD>
+<TD>Grid ON/OFF</TD></TR>
+<TR VALIGN=TOP><TD>1070</TD>
+<TD>Snap style</TD></TR>
+<TR VALIGN=TOP><TD>1070</TD>
+<TD>Snap ISOPAIR</TD></TR>
+<TR VALIGN=TOP><TD>1040</TD>
+<TD>Snap angle</TD></TR>
+<TR VALIGN=TOP><TD>1040</TD>
+<TD>Snap base point UCS <I>X</I> value of coordinate</TD></TR>
+<TR VALIGN=TOP><TD>1040</TD>
+<TD>Snap base point UCS <I>Y</I> value of coordinate</TD></TR>
+<TR VALIGN=TOP><TD>1040</TD>
+<TD>Snap <I>X</I> spacing</TD></TR>
+<TR VALIGN=TOP><TD>1040</TD>
+<TD>Snap <I>Y</I> spacing</TD></TR>
+<TR VALIGN=TOP><TD>1040</TD>
+<TD>Grid <I>X</I> spacing</TD></TR>
+<TR VALIGN=TOP><TD>1040</TD>
+<TD>Grid <I>Y</I> spacing</TD></TR>
+<TR VALIGN=TOP><TD>1070</TD>
+<TD>Hidden in plot flag</TD></TR>
+<TR VALIGN=TOP><TD>1002</TD>
+<TD>Begin frozen layer list (possibly empty). This field always is the string "{".</TD></TR>
+<TR VALIGN=TOP><TD>1003</TD>
+<TD>The names of layers frozen in this viewport. This list may include xref-dependent layers. Any number of 1003 groups may appear here.</TD></TR>
+<TR VALIGN=TOP><TD>1002</TD>
+<TD>End frozen layer list. This field always is the string "}".</TD></TR>
+<TR VALIGN=TOP><TD>1002</TD>
+<TD>End viewport data. This field always is the string "}".</TD></TR>
+</TABLE><P>
+<P>
+Note: The ZOOM XP factor is calculated with the following formula: group_41 / 2nd_group_1040 (or pspace_height / mspace_height). <P>
+<A NAME="ID_417347"></A><a name="XLINE"></a><H3>XLINE</H3><P>
+The following group codes apply to xline entities.<P>
+<I>Xline group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbXline) </TD></TR>
+<TR VALIGN=TOP><TD>10</TD>
+<TD>First point (in WCS). DXF: <I>X</I> value; APP: 3D point</TD></TR>
+<TR VALIGN=TOP><TD>20, 30</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of first point (in WCS)</TD></TR>
+<TR VALIGN=TOP><TD>11</TD>
+<TD>Unit direction vector (in WCS). <BR>
+DXF: <I>X</I> value; APP: 3D vector.</TD></TR>
+<TR VALIGN=TOP><TD>21, 31</TD>
+<TD>DXF: <I>Y</I> and <I>Z</I> values of unit direction vector (in WCS)</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_433021"></A><a name="ACAD_ZOMBIE_ENTITY"></a><H3>ACAD_ZOMBIE_ENTITY</H3><P>
+The following group codes apply to zombie entities. <P>
+<I>Acad_zombie_entity group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>AcDbZombieEntity</TD></TR>
+<TR VALIGN=TOP><TD>90</TD>
+<TD>Zombie entity class ID</TD></TR>
+<TR VALIGN=TOP><TD>91</TD>
+<TD>Actual application entity's class ID</TD></TR>
+<TR VALIGN=TOP><TD>92</TD>
+<TD>Size of graphics data in bytes</TD></TR>
+<TR VALIGN=TOP><TD>310</TD>
+<TD>Binary graphics data (multiple entries can appear)</TD></TR>
+<TR VALIGN=TOP><TD>93</TD>
+<TD>Size of entity data in bits</TD></TR>
+<TR VALIGN=TOP><TD>310</TD>
+<TD>Binary entity data (multiple entries can appear)</TD></TR>
+<TR VALIGN=TOP><TD>330 or 340 or 350 or 360</TD>
+<TD>An object ID (multiple entries can appear)</TD></TR>
+<TR VALIGN=TOP><TD>94</TD>
+<TD> 0 (indicates end of object ID section)</TD></TR>
+</TABLE><P>
+<P>
+<a name="OBJECTS_Section"></a><hr><P>
+<A NAME="ID_418502"></A><a href="#TOP"><H2>OBJECTS Section</H2></a><P>
+This section presents the group codes that apply to nongraphical objects. These codes are found in the OBJECTS section of a DXF file and are used by AutoLISP, ADS, and ARX applications in entity definition lists. <P>
+The group codes shown in this section can apply to DXF files, applications (AutoLISP, ADS, or ARX), or both. When the description of a code is different for applications and DXF files (or only applies to one or the other), the description is preceeded by the following indicators:<P>
+<DL COMPACT>
+<DT><B>APP</B><DD> Application-specific description
+<DT><B>DXF</B><DD> DXF file-specific description
+</DL>
+If the description is common to both DXF files and applications, no indicator is provided. Otherwise, the appropriate indicator is present. Optional codes are shown in gray. <P>
+Objects are similar to entities, except that they have no graphical or geometric meaning. All objects that are not entities or symbol table records or symbol tables are stored in this section. This section represents a homogeneous heap of objects with topological ordering of objects by ownership, such that the owners always appear before the objects they own. <P>
+The root owner of all objects appearing in this section is the named object dictionary, which is, therefore, always the first object that appears in this section. Objects in this section may be defined by AutoCAD or by applications with access to ARX API. The DXF names of application-defined object types should always be associated with a class name in the CLASS section of the DXF file, or else the object record cannot be bound to the application that will interpret it.<P>
+
+<hr size=1><U><I>Topics in this section:</I></U><BR>
+<ul>
+<li><a href="#Named_Object_Dictionary">Named Object Dictionary</a>
+<li><a href="#Object_Group_Codes_in_DXF_Files">Object Group Codes in DXF Files</a>
+<li><a href="#Common_Object_Group_Codes">Common Object Group Codes</a>
+<li><a href="#DICTIONARY">DICTIONARY</a>
+<li><a href="#XRECORD">XRECORD</a>
+<li><a href="#ACAD_ZOMBIE_OBJECT">ACAD_ZOMBIE_OBJECT</a>
+</ul><hr size=1>
+
+<A NAME="ID_424534"></A><A NAME="ID_424535"></A><a name="Named_Object_Dictionary"></a><H3>Named Object Dictionary</H3><P>
+The named-object dictionary is the root owner of all nongraphical objects in the drawing with the exception of objects and classes associated with the DXF structure prior to Release 13. As with other dictionaries, the named-object dictionary record consists solely of associated pairs of entry names and hard ownership pointer references to the associated object.<P>
+AutoCAD adds objects to the dictionary with a name (key) that is always prefixed with ACAD_. Other Autodesk applications reserve the right to any prefix that begins with <I>AC</I>. Other software vendors are required to use their registered developer prefix for their entries, in order to avoid name collision. Objects of any type may be given a prefix.<P>
+<A NAME="ID_424539"></A><a name="Object_Group_Codes_in_DXF_Files"></a><H3>Object Group Codes in DXF Files</H3><P>
+The following is an example of the OBJECTS section of a DXF file:<P>
+<TABLE BORDER=1>
+<TR VALIGN=TOP>
+<TD><TT>&nbsp;&nbsp;0&nbsp;<BR>
+SECTION<BR>
+&nbsp;&nbsp;2<BR>
+OBJECTS</TT></TD>
+<TD><I>Beginning of OBJECTS section</I><BR><BR><BR></TD>
+</TR><TR VALIGN=TOP>
+<TD><TT>&nbsp;&nbsp;0<BR>
+&ltobject&nbsp;type&gt<BR>
+&nbsp;.<BR>
+&nbsp;.&nbsp;&ltdata&gt<BR>
+&nbsp;.</TT></TD>
+<TD><I>Groups of object data</I><BR><BR><BR><BR></TD>
+</TR><TR VALIGN=TOP>
+<TD><TT>&nbsp;&nbsp;0<BR>
+ENDSEC</TT></TD>
+<TD><I>End of OBJECTS section</I><BR></TD>
+</TR></TABLE><P>
+
+<A NAME="ID_428692"></A><a name="Common_Object_Group_Codes"></a><H3>Common Object Group Codes</H3><P>
+The following table shows group codes that apply to virtually all non-graphical entities (objects). When you refer to the table of group codes by entity type, which lists the codes associated with specific entities, keep in mind that the codes shown here can also be present. Some of the group codes are included with an entity only if the entity has non-default values for these properties. When a group is omitted, its default value upon input (when using DXFIN) is indicated in the third column. If the value of a group code is equal to the default, it is omitted upon output (when using DXFOUT).<P>
+<I>Common object group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>0</TD>
+<TD>Entity type (DICTIONARY or XRECORD)</TD></TR>
+<TR VALIGN=TOP><TD>5</TD>
+<TD>Handle</TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>Start of application defined group "{<I>application_name</I>". For example, "{ACAD_REACTORS" indicates the start of the AutoCAD persistent reactors group.</TD></TR>
+<TR VALIGN=TOP><TD><I>application-defined codes</I></TD>
+<TD>Codes and values within the 102 groups are application-defined.</TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>End of group, "}"</TD></TR>
+</TABLE><P>
+<P>
+The following table shows the group codes that are output if persistent reactors have been attached to an object. <P>
+<I>ACAD_REACTORS records<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group code</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>"{ACAD_REACTORS" indicates the start of the AutoCAD persistent reactors group </TD></TR>
+<TR VALIGN=TOP><TD>330</TD>
+<TD>Soft-pointer ID/handle to owner dictionary</TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>End of group, "}"</TD></TR>
+</TABLE><P>
+<P>
+The following table shows the group codes that are output if an extension dictionary has been attached to an object. <P>
+<I>ACAD_XDICTIONARY records<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group code</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>"{ACAD_XDICTIONARY" indicates the start of an extension dictionary group </TD></TR>
+<TR VALIGN=TOP><TD>360</TD>
+<TD>Hard-owner ID/handle to owner dictionary</TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>End of group, "}"</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_429052"></A><a name="DICTIONARY"></a><H3>DICTIONARY</H3><P>
+The following group codes are common to all dictionary objects. <P>
+<I>Common object group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbDictionary)</TD></TR>
+<TR VALIGN=TOP><TD>3</TD>
+<TD>Entry name (one for each entry)</TD></TR>
+<TR VALIGN=TOP><TD>350</TD>
+<TD>Handle of entry object (one for each entry)</TD></TR>
+</TABLE><P>
+<P>
+AutoCAD maintains items such as mline styles and group definitions as objects in dictionaries. The following sections describe the AutoCAD object group codes maintained in dictionaries; however, other applications are free to create and use their own dictionaries as they see fit. Note that the prefix <TT>"ACAD_"</TT> is reserved for use by AutoCAD applications. <P>
+<A NAME="ID_430668"></A><H4>GROUP Dictionary -- ACAD_GROUP</H4><P>
+The following group codes are used by AutoCAD groups. <P>
+<I>ACAD_GROUP group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>0</TD>
+<TD>Object name (GROUP)</TD></TR>
+<TR VALIGN=TOP><TD>5</TD>
+<TD>Handle</TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>Start of persistent reactors group; always "{ACAD_REACTORS" (persistent reactors group appears in all dictionaries except the main dictionary)</TD></TR>
+<TR VALIGN=TOP><TD>330</TD>
+<TD>Soft-pointer ID/handle to owner dictionary</TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>End of persistent reactors group, always "}"</TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbGroup)</TD></TR>
+<TR VALIGN=TOP><TD>300</TD>
+<TD>Group description</TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>"Unnamed" flag: 1 = unnamed; 0 = named</TD></TR>
+<TR VALIGN=TOP><TD>71</TD>
+<TD>Selectability flag: 1 = selectable; 0 = not selectable</TD></TR>
+<TR VALIGN=TOP><TD>340</TD>
+<TD>Handle of entity in group (one entry per object)</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_430724"></A><H4>MLINESTYLE Dictionary -- ACAD_MLINESTYLE </H4><P>
+The following group codes define mline styles. <P>
+<I>ACAD_MLINESTYLE group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>0</TD>
+<TD>Object name (MLINESTYLE)</TD></TR>
+<TR VALIGN=TOP><TD>5</TD>
+<TD>Handle</TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>Start of persistent reactors group; always "{ACAD_REACTORS" (persistent reactors group appears in all dictionaries except the main dictionary)</TD></TR>
+<TR VALIGN=TOP><TD>330</TD>
+<TD>Soft-pointer ID/handle to owner dictionary</TD></TR>
+<TR VALIGN=TOP><TD>102</TD>
+<TD>End of persistent reactors group; always "}"</TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbMlineStyle)</TD></TR>
+<TR VALIGN=TOP><TD>2</TD>
+<TD>Mline style name</TD></TR>
+<TR VALIGN=TOP><TD>70</TD>
+<TD>Flags (bit coded):<BR>
+1 = fill on<BR>
+2 = display miters<BR>
+16 = Start square end (line) cap<BR>
+32 = Start inner arcs cap<BR>
+64 = Start round (outer arcs) cap<BR>
+256 = End square (line) cap<BR>
+512 = End inner arcs<BR>
+1024 = End round (outer arcs) cap</TD></TR>
+<TR VALIGN=TOP><TD>3</TD>
+<TD>Style description (string, 255 characters maximum)</TD></TR>
+<TR VALIGN=TOP><TD>62</TD>
+<TD>Fill color (integer, default = 256). Multiple entries can exist; one entry for each element.</TD></TR>
+<TR VALIGN=TOP><TD>51</TD>
+<TD>Start angle (real, default is 90 degrees)</TD></TR>
+<TR VALIGN=TOP><TD>52</TD>
+<TD>End angle (real, default is 90 degrees)</TD></TR>
+<TR VALIGN=TOP><TD>71</TD>
+<TD>Number of elements</TD></TR>
+<TR VALIGN=TOP><TD>49</TD>
+<TD>Element offset (real, no default). Multiple entries can exist; one entry for each element.</TD></TR>
+<TR VALIGN=TOP><TD>62</TD>
+<TD>Element color (integer, default = 0). Multiple entries can exist; one entry for each element.</TD></TR>
+<TR VALIGN=TOP><TD>6</TD>
+<TD>Element linetype (string, default = BYLAYER). Multiple entries can exist; one entry for each element.</TD></TR>
+</TABLE><P>
+<P>
+The 2 group codes in mline entities and mlinestyle objects are redundant fields. These groups should <I>not</I> be modified under any circumstances, although it is safe to read them and use their values. The correct fields to modify are:<P>
+<B>Mline<P>
+<UL></B>The 340 group in the same object, which indicates the proper MLINESTYLE object.
+</UL><B>Mlinestyle<P>
+<UL></B>The 3 group value in the MLINESTYLE dictionary, which precedes the 350 group that has the handle or entity name of the current MLINESTYLE.
+</UL><A NAME="ID_430626"></A><a name="XRECORD"></a><H3>XRECORD</H3><P>
+The following group codes are common to all xrecord objects. <P>
+<I>Xrecord group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>Subclass marker (AcDbXrecord)</TD></TR>
+<TR VALIGN=TOP><TD>1-369 (except 5 and 105)</TD>
+<TD>These values can be used by an application in any way. </TD></TR>
+</TABLE><P>
+<P>
+Xrecord objects are used to store and manage arbitrary data. They are composed of DXF group codes with "normal object" groups, (that is, non-xdata group codes) ranging from 1 through 369 for supported ranges. This object is similar in concept to xdata but is not limited by size or order. <P>
+Xrecord objects are designed to work in such a way as to not offend releases R13c0 through R13c3. However, if read into a pre-R13c4 level of AutoCAD, xrecord objects disappear. <P>
+<A NAME="ID_433138"></A><a name="ACAD_ZOMBIE_OBJECT"></a><H3>ACAD_ZOMBIE_OBJECT</H3><P>
+The following group codes apply to zombie objects. <P>
+<I>Acad_zombie_object group codes<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Group codes</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>100</TD>
+<TD>AcDbZombieObject</TD></TR>
+<TR VALIGN=TOP><TD>90</TD>
+<TD>Zombie object class ID</TD></TR>
+<TR VALIGN=TOP><TD>91</TD>
+<TD>Actual application object's class ID</TD></TR>
+<TR VALIGN=TOP><TD>93</TD>
+<TD>Size of object data in bits</TD></TR>
+<TR VALIGN=TOP><TD>310</TD>
+<TD>Binary object data (multiple entries can appear). </TD></TR>
+<TR VALIGN=TOP><TD>330 or 340 or 350 or 360</TD>
+<TD>An object ID (multiple entries can appear). </TD></TR>
+<TR VALIGN=TOP><TD>94</TD>
+<TD> 0 (indicates end of object ID section)</TD></TR>
+</TABLE><P>
+<P>
+The 92 field is not used for AcDbZombieObject. Objects of this class never have graphics.<P>
+<a name="Advanced_DXF_Issues"></a><hr><P>
+<A NAME="XREF_31407"></A><A NAME="ID_425499"></A><a href="#TOP"><H2>Advanced DXF Issues</H2></a><P>
+This section discusses the advanced concepts related to DXF group codes. <P>
+
+<hr size=1><U><I>Topics in this section:</I></U><BR>
+<ul>
+<li><a href="#Database_Objects">Database Objects</a>
+<li><a href="#Persistent_Inter-Object_Reference_Handles">Persistent Inter-Object Reference Handles</a>
+<li><a href="#Subclass_Markers">Subclass Markers</a>
+<li><a href="#Extension_Dictionary_and_Persistent_Reactors">Extension Dictionary and Persistent Reactors</a>
+<li><a href="#Extended_Data">Extended Data</a>
+<li><a href="#Object_Coordinate_Systems_(OCS)">Object Coordinate Systems (OCS)</a>
+</ul><hr size=1>
+
+<A NAME="ID_425502"></A><A NAME="XREF_38024"></A><A NAME="ID_425503"></A><a name="Database_Objects"></a><H3>Database Objects</H3><P>
+AutoCAD drawings consist largely of structured containers for database objects. Database objects each have the following:<P>
+<ul>
+<li>Handle whose value is unique to the drawing/DXF file, and is constant for the lifetime of the drawing. This format has existed since AutoCAD Release 10, but as of AutoCAD Release 13, handles are always enabled.
+<li>Optional xdata table, just as entities have had since AutoCAD Release 11.
+<li>Optional persistent reactor table.
+<li>Optional ownership pointer to an extension dictionary, which in turn owns subobjects placed in it by an application.
+</ul>
+Symbol tables and symbol table records are database objects and, thus, have a handle. They can also have xdata and persistent reactors in their DXF records.<P>
+<A NAME="ID_425511"></A><A NAME="XREF_95526"></A><A NAME="ID_425512"></A><a name="Persistent_Inter-Object_Reference_Handles"></a><H3>Persistent Inter-Object Reference Handles</H3><P>
+A set of group code ranges permit objects to directly specify references to other objects within the same drawing/DXF file. There are four ranges to go with the four types of relationships that can be specified: <P>
+<ul>
+<li>Soft-pointer handle 
+<li>Hard-pointer handle 
+<li>Soft-owner handle 
+<li>Hard-owner handle
+</ul>
+These handle types are manifested as entity names in AutoLISP, as ads_name values in ADS and as like-named classes derived from ARX. These values are always maintained in insert, xref, and wblock operations such that references between objects in a set being copied are updated to point to the copied objects, while references to other objects remain unchanged.<P>
+Also, a group code range for "arbitrary" handles is defined to allow convenient storage of handle values that are <I>not </I>converted to entity names and then translated in insert, xref, or wblock.<P>
+Note: If you use 1005 xdata group codes to store handles, they are treated as soft-pointer handles, which means that when groups of objects are copied or are inserted into another drawing, references between the involved objects are translated. Although 1005 xdata items are always returned as handles in AutoLISP and ADS, all of the reference handle group code ranges are represented as "entity names" in AutoLISP and as ads_name structures in ADS.<P>
+<A NAME="ID_425521"></A><A NAME="ID_425522"></A><H4>Pointer and Ownership References </H4><P>
+A pointer is a reference that indicates usage but not possession or responsibility for another object. Pointer references mean that the object uses the other object in some way, and shares access to it.<P>
+An ownership reference means that an owner object is responsible for the objects for which it has an owner handle. Ownership references direct the writing of the entire DWG and DXF files in a generic manner, such as beginning from a few key root objects, the writing of an owner handle.<P>
+An object can have any number of pointer references associated with it, but it can have only one owner.<P>
+<A NAME="ID_425526"></A><A NAME="ID_425527"></A><H4>Hard and Soft</H4><P>
+Hard references, whether they are pointer or owner, protect an object from being purged. Soft references do not.<P>
+In AutoCAD, block definitions and complex entities are hard owners of their elements. A symbol table and dictionaries are soft owners of their elements. Polyline entities are hard owners of their vertex and seqend entities. Insert entities are hard owners of their attrib and seqend entities. <P>
+When establishing a reference to another object, it is recommended that you think about whether the reference should protect an object from the PURGE command.<P>
+<A NAME="ID_425531"></A><A NAME="ID_425532"></A><H4>Arbitrary Handles</H4><P>
+Arbitrary handles are distinct in that they are not translated to session persistent identifiers internally, to entity names in AutoLISP, and so on. They are stored as handles. When translation of handle values are translated in drawing-merge operations, arbitrary handles are ignored.<P>
+In all environments, arbitrary handles can be exchanged for entity names of the current drawing by means of the <TT><B>handent</B></TT> functions. A common usage of arbitrary handles is to refer to objects in external DXF and DWG files.<P>
+<A NAME="ID_439205"></A><A NAME="ID_439206"></A><H4>1005 Group Codes</H4><P>
+1005 xdata group codes have the same behavior and semantics as soft pointers, which means that they are translated whenever the host object is merged into a different drawing. However, 1005 items are not translated to session-persistent identifiers, internally entity names in AutoLISP and ADS. They are stored as handles.<P>
+<A NAME="ID_425539"></A><A NAME="XREF_11832"></A><A NAME="ID_425540"></A><a name="Subclass_Markers"></a><H3>Subclass Markers</H3><P>
+A big problem with filing a stream of group data is that a single object may be composed of several filer members, one for each level of inheritance where filing is done, which can be done by different developers. Because each level of inheritance can evolve separately, it is necessary to segregate the data of each class filer member from each other.<P>
+All class filer members are expected to preceded their class-specific portion of instance data with a "subclass" marker--a 100 group code followed by a string with the actual name of the class. This does not affect the state needed to define the object's state, but it provides a means for the DXF file parsers to direct the group codes to the corresponding application software.<P>
+For example, an object which has data from different derived classes would be represented as follows: <P>
+<TT>999<BR>
+FOOGRANDCHILD,&nbsp;defined&nbsp;by&nbsp;class&nbsp;AcDbSonOfSonOfFoo,&nbsp;which&nbsp;<BR>
+999<BR>
+&nbsp;is&nbsp;derived&nbsp;from&nbsp;AcDbSonOfFoo<BR>
+&nbsp;&nbsp;0<BR>
+FOOGRANDCHILD<BR>
+&nbsp;&nbsp;5<BR>
+C2<BR>
+100<BR>
+AcDbFoo<BR>
+999<BR>
+Uses&nbsp;10/20/30&nbsp;group&nbsp;codes<BR>
+&nbsp;10<BR>
+1.1<BR>
+&nbsp;20<BR>
+2.3<BR>
+&nbsp;30<BR>
+7.3<BR>
+100<BR>
+AcDbSonOfFoo<BR>
+999<BR>
+Also&nbsp;uses&nbsp;10/20/30&nbsp;group&nbsp;codes,&nbsp;for&nbsp;a&nbsp;different&nbsp;purpose<BR>
+&nbsp;10<BR>
+1.1<BR>
+&nbsp;20<BR>
+2.3<BR>
+&nbsp;30<BR>
+7.3<BR>
+100<BR>
+AcDbSonOfSonOfFoo<BR>
+999<BR>
+Also&nbsp;uses&nbsp;10/20/30&nbsp;group&nbsp;codes,&nbsp;for&nbsp;yet&nbsp;another&nbsp;purpose<BR>
+&nbsp;10<BR>
+13.2<BR>
+&nbsp;20<BR>
+23.1<BR>
+&nbsp;30<BR>
+31.2<BR>
+999<BR>
+Now&nbsp;for&nbsp;the&nbsp;Xdata<BR>
+1001<BR>
+APP_1<BR>
+1070<BR>
+45<BR>
+1001<BR>
+APP_2<BR>
+1004<BR>
+18A5B3EF2C199A<BR>
+</TT><P>
+<A NAME="ID_425594"></A><A NAME="XREF_38714"></A><A NAME="ID_425595"></A><a name="Extension_Dictionary_and_Persistent_Reactors"></a><H3>Extension Dictionary and Persistent Reactors</H3><P>
+The extension dictionary is an optional sequence that stores the handle of a dictionary object that belongs to the current object, which in turn may contain entries. This facility allows attachment of arbitrary database objects to any database object. Any object or entity may have this section.<P>
+Persistent reactors are an optional sequence that stores object handles of objects registering themselves as reactors on the current object. Any object or entity may have this section.<P>
+<A NAME="ID_425600"></A><A NAME="ID_425599"></A><A NAME="XREF_36502"></A><A NAME="ID_425601"></A><a name="Extended_Data"></a><H3>Extended Data</H3><P>
+Extended data is created by AutoLISP or ADS applications. If an entity contains extended data, it follows the entity's normal definition data. The group codes 1000 through 1071 describe extended data. The following is an example of an entity containing extended data in DXF format.<P>
+<i>Normal entity definition data:</i><br> 
+<TT>&nbsp;&nbsp;0&nbsp;<BR>
+INSERT<BR>
+&nbsp;&nbsp;5<BR>
+F11<BR>
+100<BR>
+AcDbEntity<BR>
+&nbsp;&nbsp;8<BR>
+TOP<BR>
+100<BR>
+AcDbBlockReference<BR>
+&nbsp;&nbsp;2<BR>
+BLOCK_A<BR>
+&nbsp;10<BR>
+0.0<BR>
+&nbsp;20<BR>
+0.0<BR>
+&nbsp;30<BR>
+0.0<P></TT>
+<i>Extended entity definition data:</i><br> 
+<TT>1001<BR>
+AME_SOL<BR>
+1002<BR>
+{<BR>
+1070<BR>
+&nbsp;&nbsp;0<BR>
+1071<BR>
+&nbsp;1.95059E+06<BR>
+1070<BR>
+&nbsp;519<BR>
+1010<BR>
+2.54717<BR>
+1020<BR>
+2.122642<BR>
+1030<BR>
+2.049201<BR>
+1005<BR>
+ECD<BR>
+1005<BR>
+EE9<BR>
+1005<BR>
+&nbsp;&nbsp;0<BR>
+1040<BR>
+0.0<BR>
+1040<BR>
+1.0<BR>
+1000<BR>
+MILD_STEEL<P>
+</TT>The group code 1001 indicates the beginning of extended data. In contrast to normal entity data, with extended data the same group code can appear multiple times, and order is important.<P>
+Extended data are grouped by registered application name. Each registered application's group begins with a 1001 group code with the application name as the string value. Registered application names correspond to APPID symbol table entries.<P>
+An application can use as many APPID names as needed. APPID names are permanent, although they can be purged if they aren't currently used in the drawing. Each APPID name can have no more than one data group attached to each entity. Within an application's group, the sequence of extended data groups and their meaning is defined by the application.<P>
+The extended data group codes listed in the following table values as described:<P>
+<I>Extended data group codes and descriptions<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Entity name</B></TD>
+<TD><B>Group code</B></TD>
+<TD><B>Description</B></TD></TR>
+<TR VALIGN=TOP><TD>String</TD>
+<TD>1000</TD>
+<TD>Strings in extended data can be up to 255 bytes long (with the 256th byte reserved for the null character).</TD></TR>
+<TR VALIGN=TOP><TD>Application name</TD>
+<TD>1001<BR>
+also a string value</TD>
+<TD>Application names can be up to 31 bytes long (the 32nd byte is reserved for the null character).<BR>
+Note: Do <I>not</I> add a 1001 group into your extended data because AutoCAD assumes it is the beginning of a new application extended data group. </TD></TR>
+<TR VALIGN=TOP><TD>Control string</TD>
+<TD>1002</TD>
+<TD>An extended data control string can be either "{"or "}". These braces enable applications to organize their data by subdividing the data into lists. The left brace begins a list, and the right brace terminates the most recent list. Lists can be nested.<BR>
+When AutoCAD reads the extended data for a particular application, it checks to ensure that braces are balanced.</TD></TR>
+<TR VALIGN=TOP><TD>Layer name</TD>
+<TD>1003</TD>
+<TD>Name of the layer associated with the extended data.</TD></TR>
+<TR VALIGN=TOP><TD>Binary data</TD>
+<TD>1004</TD>
+<TD>Binary data is organized into variable-length <I>chunks</I>. The maximum length of each chunk is 127 bytes. In ASCII DXF files, binary data is represented as a string of hexadecimal digits, two per binary byte.</TD></TR>
+<TR VALIGN=TOP><TD>Database <BR>
+handle</TD>
+<TD>1005</TD>
+<TD>Handles of entities in the drawing database.<BR>
+Note: When a drawing with handles and extended data handles is imported into another drawing using INSERT, INSERT *, XREF Bind, XBIND, or partial DXFIN, the extended data handles are translated in the same manner as their corresponding entity handles, thus maintaining their binding. This is also done in the EXPLODE block operation or for any other AutoCAD operation. When AUDIT detects an extended data handle that doesn't match the handle of an entity in the drawing file, it is considered an error. If AUDIT is fixing entities, it sets the handle to 0.</TD></TR>
+<TR VALIGN=TOP><TD>3 reals</TD>
+<TD>1010, 1020, 1030 </TD>
+<TD>Three real values, in the order <I>X</I>, <I>Y</I>, <I>Z</I>. They can be used as a point or vector record. AutoCAD never alters their value.</TD></TR>
+<TR VALIGN=TOP><TD>World space position</TD>
+<TD>1011, 1021, 1031</TD>
+<TD>Unlike a simple 3D point, the world space coordinates are moved, scaled, rotated, and mirrored along with the parent entity to which the extended data belongs. The world space position is also stretched when the STRETCH command is applied to the parent entity and this point lies within the select window.</TD></TR>
+<TR VALIGN=TOP><TD>World space displacement</TD>
+<TD>1012, 1022, 1032</TD>
+<TD>Also a 3D point that is scaled, rotated, and mirrored along with the parent (but is not moved or stretched).</TD></TR>
+<TR VALIGN=TOP><TD>World direction</TD>
+<TD>1013, 1023, 1033</TD>
+<TD>Also a 3D point that is rotated and mirrored along with the parent (but is not moved, scaled, or stretched). </TD></TR>
+<TR VALIGN=TOP><TD>Real</TD>
+<TD>1040</TD>
+<TD>A real value.</TD></TR>
+<TR VALIGN=TOP><TD>Distance</TD>
+<TD>1041</TD>
+<TD>A real value that is scaled along with the parent entity.</TD></TR>
+<TR VALIGN=TOP><TD>Scale factor</TD>
+<TD>1042</TD>
+<TD>Also a real value that is scaled along with the parent. The difference between a distance and a scale factor is application-defined.</TD></TR>
+<TR VALIGN=TOP><TD>Integer</TD>
+<TD>1070</TD>
+<TD>A 16-bit integer (signed or unsigned).</TD></TR>
+<TR VALIGN=TOP><TD>Long</TD>
+<TD>1071</TD>
+<TD>A 32-bit signed (long) integer.</TD></TR>
+</TABLE><P>
+<P>
+<A NAME="ID_425797"></A><A NAME="ID_425798"></A><a name="Object_Coordinate_Systems_(OCS)"></a><H3>Object Coordinate Systems (OCS)</H3><P>
+To save space in the drawing database (and in the DXF file), the points associated with each entity are expressed in terms of the entity's own object coordinate system (OCS). The OCS was referred to as ECS in previous releases of AutoCAD. With OCS, the only additional information needed to describe the entity's position in 3D space is the 3D vector describing the <I>Z</I> axis of the OCS, and the elevation value.<P>
+For a given <I>Z</I> axis (or extrusion) direction, there are an infinite number of coordinate systems, defined by translating the origin in 3D space and by rotating the <I>X</I> and <I>Y</I> axes around the <I>Z </I>axis. However, for the same <I>Z</I> axis direction, there is only one OCS. It has the following properties:<P>
+<ul>
+<li>Its origin coincides with the WCS origin.
+<li>The orientation of the <I>X</I> and <I>Y</I> axes within the <I>XY</I> plane are calculated in an arbitrary but consistent manner. AutoCAD performs this calculation using the arbitrary axis algorithm (see <A HREF="#XREF_24259">"Arbitrary Axis Algorithm"</A>).
+</ul>
+For some entities, the OCS is equivalent to the WCS and all points (DXF groups 10-37) are expressed in World coordinates. See the following table.<P>
+<I>Coordinate systems associated with an entity type<BR>
+</I><TABLE BORDER=1><TR VALIGN=TOP><TD><B>Entities</B></TD>
+<TD><B>Notes</B></TD></TR>
+<TR VALIGN=TOP><TD>3D entities such as<BR>
+line, point, 3dface, 3D polyline, <BR>
+3D vertex, 3D mesh, 3D mesh vertex</TD>
+<TD>These entities do not lie in a particular plane. All points are expressed in world coordinates. Of these entities, only lines and points can be extruded. Their extrusion direction can differ from the World <I>Z</I> axis.</TD></TR>
+<TR VALIGN=TOP><TD>2D entities such as<BR>
+circle, arc, solid, trace, text, attrib, attdef, shape, insert, <BR>
+2D polyline, 2D vertex</TD>
+<TD>These entities are planar in nature. All points are expressed in object coordinates. All of these entities can be extruded. Their extrusion direction can differ from the World <I>Z </I>axis.</TD></TR>
+<TR VALIGN=TOP><TD>Dimension</TD>
+<TD>Some of a dimension's points are expressed in WCS and some in OCS.</TD></TR>
+<TR VALIGN=TOP><TD>Viewport</TD>
+<TD>Expressed in World coordinates.</TD></TR>
+</TABLE><P>
+<P>
+Once AutoCAD has established the OCS for a given entity, the OCS works as follows:<P>
+The elevation value stored with an entity indicates how far to shift the <I>XY </I>plane along the <I>Z </I>axis (from the WCS origin) to make it coincide with the plane that contains the entity. How much of this is the user-defined elevation is unimportant.<P>
+Any 2D points entered through the UCS are transformed into the corresponding 2D points in the OCS, which is shifted and rotated with respect to the UCS.<P>
+These are a few ramifications of this process:<P>
+<ul>
+<li>You cannot reliably find out what UCS was in effect when an entity was acquired.
+<li>When you enter the <I>XY</I> coordinates of an entity in a given UCS and then do a DXFOUT, you probably won't recognize those <I>XY</I> coordinates in the DXF file. You must know the method by which AutoCAD calculates the <I>X</I> and <I>Y</I> axes in order to work with these values.
+<li>The elevation value stored with an entity and output in DXF files is a sum of the <I>Z</I>-coordinate difference between the UCS <I>XY</I> plane and the OCS <I>XY</I> plane, and the elevation value that the user specified at the time the entity was drawn.
+</ul>
+<A NAME="ID_425848"></A><A NAME="XREF_24259"></A><A NAME="ID_425847"></A><A NAME="ID_425849"></A><H4>Arbitrary Axis Algorithm</H4><P>
+The arbitrary axis algorithm is used by AutoCAD internally to implement the arbitrary but consistent generation of object coordinate systems for all entities which use object coordinates.<P>
+Given a unit-length vector to be used as the <I>Z</I> axis of a coordinate system, the arbitrary axis algorithm generates a corresponding <I>X</I> axis for the coordinate system. The <I>Y</I> axis follows by application of the right-hand rule.<P>
+The method is to examine the given <I>Z</I> axis (also called the <I>normal vector</I>) and see if it is close to the positive or negative World <I>Z</I> axis. If it is, cross the World <I>Y</I> axis with the given <I>Z</I> axis to arrive at the arbitrary <I>X</I> axis. If not, cross the World <I>Z</I> axis with the given <I>Z</I> axis to arrive at the arbitrary <I>X</I> axis. The boundary at which the decision is made was chosen to be both inexpensive to calculate and completely portable across machines. This is achieved by having a sort of "square" polar cap, the bounds of which is 1/64, which is precisely specifiable in six decimal-fraction digits and in six binary-fraction bits.<P>
+The algorithm does the following. (All vectors are assumed to be in 3D space and specified in the World Coordinate System).<P>
+<TT>Let&nbsp;the&nbsp;given&nbsp;normal&nbsp;vector&nbsp;be&nbsp;called&nbsp;N.<BR>
+Let&nbsp;the&nbsp;world&nbsp;Y&nbsp;axis&nbsp;be&nbsp;called&nbsp;Wy,&nbsp;which&nbsp;is&nbsp;always&nbsp;(0,1,0).<BR>
+Let&nbsp;the&nbsp;world&nbsp;Z&nbsp;axis&nbsp;be&nbsp;called&nbsp;Wz,&nbsp;which&nbsp;is&nbsp;always&nbsp;(0,0,1).<P>
+</TT>Here we are looking for the arbitrary <I>X</I> and <I>Y</I> axes to go with the normal <I>N</I>. They will be called <I>Ax</I> and <I>Ay</I>. <I>N</I> could also be called <I>Az</I> (the arbitrary <I>Z</I> axis) as follows:<P>
+<TT>If&nbsp;(abs&nbsp;(Nx)&nbsp;&lt&nbsp;1/64)&nbsp;and&nbsp;(abs&nbsp;(Ny)&nbsp;&lt&nbsp;1/64)&nbsp;&nbsp;then<BR>
+	Ax&nbsp;=&nbsp;Wy&nbsp;X&nbsp;N&nbsp;&nbsp;(where&nbsp;"X"&nbsp;is&nbsp;the&nbsp;cross-product&nbsp;operator).<BR>
+Otherwise,<BR>
+	Ax&nbsp;=&nbsp;Wz&nbsp;X&nbsp;N.<BR>
+Scale&nbsp;Ax&nbsp;to&nbsp;unit&nbsp;length.<P>
+</TT>The method of getting the Ay vector is<P>
+<TT>Ay&nbsp;=&nbsp;N&nbsp;X&nbsp;Ax.&nbsp;&nbsp;Scale&nbsp;Ay&nbsp;to&nbsp;unit&nbsp;length.<P>
+</TT>
+
+<hr><center><font size=2><tt>
+. <a href="dxf_toc.htm">CONTENTS</a> . | . <a href="#Top">DXF GROUP CODES (TOP)</a> . | . <a href="al_u04_d.htm">DRAWING INTERCHANGE FILE FORMATS</a> . </tt></font></center>
+<hr>
+
+</BODY></HTML>

@@ -1,0 +1,370 @@
+<!-- init section -->
+
+	<head>
+		<title>Interface Definition Language (IDL) Syntax</title>
+	</head>
+	<body bgcolor="#ffffff" text="#000000" alink="#ff0000" vlink="#002080" link="#0f00ff">
+	<font face="VERDANA, ARIAL, HELVETICA">
+	<center>
+	<table>
+
+
+
+<!-- title section -->
+
+	<table border=0 cellspacing=0 cellpadding=0 width=600>
+	<font face="Arial, Helvetica" size=1>
+		<tr>
+			<td width=150><a href=/><img src=../art/top-root.gif alt="root" width=150 height=25 border=0 vspace=0></a><br></td>
+			<td width=150><a href=../../index.html><img src=../art/top-back.gif alt="previous" width=150 height=25 border=0 vspace=0></a><br></td>
+			<td width=150><a href=../index.html><img src=../art/top-index.gif alt="index" width=150 height=25 border=0 vspace=0></a><br></td>
+			<td width=150><a href=mailto:koch3@uni-weimar.de><img src=../art/top-mail.gif alt="mail" width=150 height=25 border=0 vspace=0></a><br></td>
+		</tr>
+	</table>
+
+
+<!-- page section -->
+
+	<table border=0 cellspacing=0 cellpadding=0 width=600>
+		<tr>
+			<td bgcolor=#ffffff text=#000000 width=600 valign=top align=left>
+			<font face="Verdana,Arial, Helvetica" size=2>
+			<br>
+			<hr size=1>
+			<br><h2><b><i>Interface Definition Language (IDL) Syntax</i></b></h2>
+
+This page describes features of the <a href="http://www.omg.org">OMG</a>'s 
+IDL specification.  This is <b>NOT</b> the entire specification, but only
+a highlighting of parts that I find important and usefull.  The full 
+specification can be found in the CORBA specification.  That is where most
+of the information on this page came from.
+
+<p>
+<h3>Comments</h3>
+IDL comments are similar to those used in C++.  The // characters start a
+comment that concludes at the end of the line on which they occured.  The
+/* comments all text occuring between it and the next */.  
+
+<h3>Identifiers</h3>
+IDL identifiers are an arbitrarily long sequence of alphabetic, digit, and
+underscore ("_") characters.  The first character must be alphabetic.  IDL is
+case insensitive, (if two identifiers differ only in the case of a character,
+they are considered redefinitions of one another).
+
+<h3>Keywords</h3>
+The following is a list of the keywords defined in IDL, each of which must 
+follow the indentifier rules defined above.
+<p>
+<center>
+<table border=2 cellpadding=5>
+<tr>
+<td>any</td><td>default</td><td>inout</td><td>out</td><td>switch</td>
+</tr>
+<tr>
+<td>attribute</td><td>double</td><td>interface</td><td>raises</td><td>TRUE</td>
+</tr>
+<tr>
+<td>boolean</td><td>enum</td><td>long</td><td>readonly</td><td>typedef</td>
+</tr>
+<tr>
+<td>case</td><td>exception</td><td>module</td><td>sequence</td>
+<td>unsigned</td></tr>
+<tr>
+<td>char</td><td>FALSE</td><td>Object</td><td>short</td><td>union</td>
+</tr>
+<tr>
+<td>const</td><td>float</td><td>octet</td><td>string</td><td>void</td>
+</tr>
+<tr>
+<td>context</td><td>in</td><td>oneway</td><td>struct</td>
+</tr>
+</table>
+</center>
+
+<h3>Literals</h3>
+IDL literals similar to those in C and C++.
+Integers literals are decimal, octal (integers starting with "0"), and
+hexadecimal integers starting with "0x" or "0X").
+Character literals are of type <b>char</b> and are enclosed in single 
+quotes (i.e. 'x').
+Floating point literals are can be specified as just and integer/fraction
+combination or in scientific notation (i.e. 123.45E12).
+String literals are enclosed in double quotes (i.e. "Hi").
+
+<h3>Preprocessing</h3>
+IDL preprocessing, which is based on ANSI C++ preprocessing, provides macro 
+substitution, conditional compilation, and source file inclusion.  Lines that 
+begin with a # communicate with the preprocessor.  IDL allows inclusion of 
+other text files by using the <b>#include</b> directive, similar to C and C++.
+Any line may be continued on the next line of a source file by placing a 
+backslash character ("/") immediately before the newline.  
+
+<h3>Constants</h3>
+Constant values are declared by specifying a type, an identifier name, an 
+equal sign ("="), and an expression, all in a format similar to C++:
+<p>
+<blockquote>
+<b>const</b> <i>&lt;type&gt;</i> <i>&lt;name&gt;</i> <b>=</b> 
+<i>&lt;expression&gt;</i>
+</blockquote>
+<p>
+
+<h3>Types</h3>
+IDL types are <i>&lt;basic types&gt;</i> | <i>&lt;constructed types&gt;</i> | 
+<i>&lt;template types&gt;</i>.  These can be declared similar to type
+declarations in C.
+
+
+<p>
+<h4>Basic Types</h4>
+<center>
+<table border=2 cellpadding=5>
+<tr>
+<td>short</td><td>unsigned shord</td>
+</tr>
+<tr>
+<td>long</td><td>unsigned long</td>
+</tr>
+<tr>
+<td>float</td><td>double</td>
+</tr>
+<tr>
+<td>char</td><td>unsigned char</td>
+</tr>
+<tr>
+<td>boolean</td><td>octet</td>
+</tr>
+<tr>
+<td>string</td><td>any</td>
+</tr>
+</table>
+</center>
+
+
+<p>
+<h4>Constructed Types</h4>
+<b><i>&lt;Constructed types&gt;</i></b> are <i>&lt;structs&gt;</i>,
+<i>&lt;unions&gt;</i> or <i>&lt;enums&gt;</i>.
+<p>
+<i>&lt;Structs&gt;</i> are similar to C <b>struct</b>s and are declared by 
+specifying an <i>&lt;identifier&gt;</i> and a list of <i>&lt;type&gt;</i> 
+and <i>&lt;identifiers&gt;</i>:
+<p>
+<blockquote>
+<b>struct</b> <i>&lt;identifier&gt;</i> <b>{</b> 
+<i>&lt;types&gt;</i> <i>&lt;identifiers&gt;</i> <b>}</b>
+<br>
+<b>struct</b> <i>building</i> {
+<blockquote>
+<i>long windows</i>;<br>
+<i>short steps</i>;<br>
+<i>double doors</i>;
+</blockquote>
+}
+</blockquote>
+
+<p>
+<i>&lt;Unions&gt;</i> are a cross between C unions and switch statemets.
+
+<p>
+<i>&lt;Enums&gt;</i> are similar to C <b>enum</b>s and are declared by 
+specifying an <i>&lt;identifier&gt;</i> and a list of 
+<i>&lt;enumerators&gt;</i>:
+<p>
+<blockquote>
+<b>enum</b> <i>&lt;identifier&gt;</i> <b>{</b> 
+<i>&lt;enumerators&gt;</i> <b>}</b>
+</blockquote>
+<p>
+Where an <i>&lt;enumerator&gt;</i> is a list of <i>&lt;identifiers&gt;</i>.
+
+
+<p>
+<h4>Template Types</h4>
+<b><i>&lt;Template types&gt;</i></b> are <i>&lt;sequences&gt;</i> or 
+<i>&lt;strings&gt;</i>.
+
+<p>
+<i>&lt;Sequences&gt;</i> are lists of values of some type.  The list can be 
+either bounded or unbounded.  They are defined in the form:
+<p>
+<blockquote>
+<b>sequence &lt;</b> <i>&lt;type&gt;</i> <b>,</b> 
+<i>&lt;max size&gt;</i> <b>&gt;</b>
+</blockquote>
+
+<p>
+<i>&lt;Strings&gt;</i> are sequences of characters that may either be of
+fixed or unbouned size.  They are delcared:
+<p>
+<blockquote>
+<b>string &lt;</b> <i>&lt;max size&gt;</i> <b>&gt;</b>
+</blockquote>
+
+<p>
+<i>&lt;Sequences&gt;</i> and <i>&lt;Strings&gt;</i> are used in typedefs to
+declare an <i>&lt;identifier&gt;</i> to bo a string or sequence:
+<p>
+<blockquote>
+<b>typedef sequence &lt;</b> <i>&lt;type&gt;</i> <b>,</b> 
+<i>&lt;max size&gt;</i> <b>&gt;</b> <i>&lt;identifier&gt;</i>
+<br>
+<b>typedef sequence &lt;</b> <i>long, 10</i> <b>&gt;</b> <i>fingers</i>;
+// A sequence of at most 10 fingers.
+<p>
+<b>typedef string</b> <b>&lt;</b> <i>&lt;max size&gt;</i> <b>&gt;</b> 
+<i>&lt;identifier&gt;</i>
+<br>
+<b>typedef string</b> <i>my_string</i>; // A string of unbounded length.
+</blockquote>
+
+<p>
+IDL also defines arrays.  This is done in a manner similar to C.
+<p>
+<blockquote>
+<i>&lt;identifier&gt;</i><b>[</b> <i>&lt;positive size&gt;</i><b>]</b>
+</blockquote>
+
+
+<p>
+<h3>Attributes</h3>
+Attributes may only be declared as part of an interface.  Declaring an
+attribute can be thought of as declaring a private data member along with
+a pair of accessor methods.  Attributes are declared with this syntax:
+<p>
+<blockquote>
+[<b>readonly</b>] <b>attribute</b> <i>&lt;type&gt;</i> 
+<i>&lt;identifier&gt;</i>
+<br>
+<b>attribute</b> <i>long nose</i>; // A long nose attribute.
+<br>
+<b>readonly attribute</b> <i>short height, hair, sleeve</i>; // Attributes
+that are read only.
+</blockquote>
+
+
+<p>
+<h3>Operations</h3>
+IDL Operations are similar to class method declarations in C++.  They define
+the publicly accessible methods of a class and as such can only be delcared
+within an interface definition.  An operation is defined with the following
+syntax:
+<p>
+<blockquote>
+[<b>oneway</b>] <i>&lt;type&gt; &lt;identifier&gt; ( &lt;parameters&gt; ) 
+&lt;exceptions&gt; &lt;context&gt;</i>
+<br>
+<b>long</b> <i>my_nose_method</i> ();
+<br>
+<b>boolean</b> <i>am_i_lying</i> ( <b>in</b> <i>unsigned long my_story</i> );
+</blockquote>
+<p>
+The [<b>oneway</b>] operation attribute specifies a best-effort invocation 
+semantic for this operation (asynchronous invocation).  The operation must 
+not have any output parameters and must specify a <b>void</b> return type.
+<p>
+The parameter list is similar to that of a C++ method parameter list, with 
+the addition of a parameter attribute.  The parameter attribute specifies the 
+direction in which the parameter will be passed to the method.  The valid 
+parameter attributes are:
+<p>
+<center>
+<table border=2 cellpadding=5>
+<tr>
+<td><b>in</b></td><td>The parameter is passed from client to server</td>
+</tr>
+<tr>
+<td><b>out</b></td><td>The parameter is passed from server to client</td>
+</tr>
+<tr>
+<td><b>inout</b></td><td>The parameter is passed in both directions</td>
+</tr>
+</table>
+</center>
+<p>
+<b>In</b> parameters will not be modified, while <b>out</b> and <b>inout</b>
+parameters are undefined if an exception is raised as a result of the
+method invocation.  It should also be noted that when an unbounded 
+<b>string</b> or <b>sequence</b> is passed as an <b>inout</b> parameter, the 
+returned value cannot be longer than the input value.
+
+
+<p>
+<h3>Interface Definition</h3>
+An IDL interface definition is similar to the public section of a C++ class
+definition.  It consists of two parts: the interface header and the interface 
+body:
+<p>
+<center>
+<i>&lt;Interface Header&gt;</i> <b>{</b> 
+<i>&lt;Interface Body&gt;</i> <b>}</b>
+</center>
+<p>
+An <i>&lt;Interface Header&gt;</i> has the form:
+<p>
+<blockquote>
+<b>interface</b> <i>&lt;name&gt;</i> <b>:</b> <i>&lt;base_interface(s)&gt;</i>
+<br>
+<b>interface</b> <i>bugger</i> <b>:</b> <i>green</i>; // A bugger interface
+derived from the base interface green.
+</blockquote>
+<p>
+where <b>interface</b> is required, <i>&lt;name&gt;</i> is the interface 
+name, and the <b>:</b> is required only if there is a 
+<i>&lt;base_interface(s)&gt;</i> that this interface is derived from.  The 
+<i>&lt;base_interface(s)&gt;</i> may specify more than one base class, thus
+allowing for multiple inheritance.
+<p>
+An <i>&lt;Interface Body&gt;</i> may contain any number of constant, type, 
+exception, attribute and operation declarations.
+
+
+<p>
+<h3>Forward Declarations</h3>
+IDL allows the forward declaration of interfaces.  An interface that is 
+forwardly declared may be used only in other interface declarations.
+Structs may not be forwardly declared and a forwardly declared interface 
+may not be used in a struct.  In my testing, this last point holds true, but
+only in the compliation of C++ code.  That is to say, the IDL compiler
+accepts it, but the C++ complier does not.
+
+
+<p>
+<h3>Differences from C++</h3>
+The IDL grammar, whle attempting to conform to the C++ syntax, is somewhat 
+more restrictuve.  The current restrictions are as follows:
+<ul>
+<li>A function return type is mandatory.
+<li>A name must be supplied with each formal parameter to an operation 
+declaration.
+<li>A parameter list consisting of the single token <b>void</b> is <i>not</i>
+permitted as a synonym for an empty parameter list.
+<li>Tags are required for structures, discriminated unions, and enumerations.
+<li>Integer types cannot be defined as simply int or unsigned: they must be 
+delcared explicitly as <b>short</b> or <b>long</b>.
+<li><b>char</b> cannot be qualified by <b>signed</b> or <b>unsigned</b>
+keywords.
+</ul>
+
+
+
+		</tr>
+	</table>
+
+
+<!-- author section -->
+	<table width=600>
+		<tr><td>
+		<hr size=1 width=600>
+        	<center>
+        	<font size=2>
+	       Karsten Koch, 1997.
+	        </font>
+	        </center>
+		</td></tr>
+	</table>
+
+<!-- end section -->
+	</table>
+	</center>
+	</body>

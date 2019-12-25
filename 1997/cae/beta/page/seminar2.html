@@ -1,0 +1,289 @@
+<!-- init section -->
+
+	<head>
+		<title>Lehrveranstaltung zu Windows NT, MFC, COM, Active X: Seminar 2</title>
+	</head>
+	<body bgcolor="#ffffff" text="#000000" alink="#ff0000" vlink="#002080" link="#0f00ff">
+	<font face="VERDANA, ARIAL, HELVETICA">
+	<center>
+	<table>
+
+
+
+<!-- title section -->
+
+	<table border=0 cellspacing=0 cellpadding=0 width=600>
+	<font face="Arial, Helvetica" size=1>
+		<tr>
+			<td width=150><a href=/~bauinf><img src=../art/top-root.gif alt="root" width=150 height=25 border=0 vspace=0></a><br></td>
+			<td width=150><a href=/~bauinf/lehre/lehre.html><img src=../art/top-back.gif alt="previous" width=150 height=25 border=0 vspace=0></a><br></td>
+			<td width=150><a href=../index.html><img src=../art/top-index.gif alt="index" width=150 height=25 border=0 vspace=0></a><br></td>
+		</tr>
+	</table>
+
+
+<!-- page section -->
+
+	<table border=0 cellspacing=0 cellpadding=0 width=600>
+		<tr>
+			<td bgcolor=#ffffff text=#000000 width=600 valign=top align=left>
+			<font face="Verdana,Arial, Helvetica" size=2>
+			<br>
+			<hr size=1>
+			<br><h1><b>Seminar 2</i></b></h1>
+			<hr size=1>
+			<br><h2><b>Dokumente und Sichten</i></b></h2>
+			<blockquote>
+			In diesem Seminar wird das Document-View-Konzept (Dokument-Sicht) erl&auml;utert. Die Klassen CDocument, CView werden besprochen. F&uuml;r die Applikation aus Seminar 1 werden die Klassen Document und View erstellt.
+			</blockquote>
+			<br><h3><b>Das Document-View-Konzept</i></b></h4>
+			<blockquote>
+			Eine Applikation kann mehrere Dokumente verwalten. Diese werden aus den Dokumentenvorlagen erstellt. Dokumentenvorlagen werden auch Document Templates genannt. F&uuml;r die Visualisierung dieser Dokumente enth&auml;lt die Applikation sogenannte View Klassen. F&uuml;r ein Dokument k&ouml;nnen auch mehrere Visualisierungsklassen existieren.<br>
+			<p>
+			<img src=art/doc_view_konzept.gif><br>
+			</blockquote>
+			<br><h3><b>Erstellen der Klassen Document und View</i></b></h4>
+				<ol>
+				<li>Starten Sie die Visual C++ Entwicklungsumgebung und laden Sie das Projekt "D:\Seminar2\seminar.dsw" (auf Index-Seite herunterladen und entpacken).
+				<p>
+				<li>Die Klasse Document wird von CDocument abgeleitet. Diese Klasse enth&auml;lt bereits wichtige Funktionen zur Datenverwaltung und -haltung, beispielsweise zur Serialisierung. Die Klasse View wird von CView abgeleitet. Zu CView geh&ouml;ren verschiedene Funktionen zur Realisierung der Sichten auf Dokumente. Die folgende Graphik zeigt den Vererbungsbaum der Klassen Document und View .<br>
+				<p>
+				<img src=art/doc_view_baum.gif><br>
+				<p>
+				<li>&ouml;ffnen und vervollst&auml;ndigen Sie seminar.h. Die einzuf&uuml;genden Programmteile sind <font color=#ff0000>rot</font> gekennzeichnet.<br>
+				<p>
+				<table border=1><tr><td bgcolor=#000000>
+				<font color=#ffffff size=2>
+				seminar.h
+				</font><tr><td>
+					<pre>
+#ifndef __seminar__
+#define __seminar__
+
+<font color=#ff0000>
+/////////////////////////////////////////////////////////////////////////////
+// class Document
+
+class Document : public CDocument
+{
+  DECLARE_DYNCREATE(Document)
+};
+
+/////////////////////////////////////////////////////////////////////////////
+// class View
+
+class View : public CView
+{
+  DECLARE_DYNCREATE(View)
+
+  protected:
+  virtual void OnDraw(CDC * DC);
+};
+
+</font>
+/////////////////////////////////////////////////////////////////////////////
+// class MainFrame
+
+class MainFrame : public CMDIFrameWnd
+{
+  DECLARE_DYNAMIC(MainFrame)
+};
+
+/////////////////////////////////////////////////////////////////////////////
+// class Application
+
+class Application : public CWinApp
+{
+  DECLARE_MESSAGE_MAP()
+
+  public:
+  virtual BOOL InitInstance();
+};
+
+#endif
+					</pre>
+				</table>
+				<ul>
+				<br>
+				<li>Die Funktion OnDraw der Klasse View &uuml;bernimmt die Visualisierung.
+				</ul>
+				<p>
+				<li>Vervollst&auml;ndigen Sie auch seminar.cpp um die <font color=#ff0000>rot</font> gekennzeichneten Programmteile.<br>
+				<p>
+				<table border=1><tr><td bgcolor=#000000>
+				<font color=#ffffff size=2>
+				seminar.cpp
+				</font><tr><td>
+					<pre>
+#include &lt;afxwin.h&gt;
+#include "resource.h"
+#include "seminar.h"
+
+<font color=#ff0000>
+/////////////////////////////////////////////////////////////////////////////
+// class Document
+
+IMPLEMENT_DYNCREATE(Document,CDocument)
+
+/////////////////////////////////////////////////////////////////////////////
+// class View
+
+IMPLEMENT_DYNCREATE(View,CView)
+
+void View::OnDraw(CDC * DC)
+{
+
+}
+</font>
+
+/////////////////////////////////////////////////////////////////////////////
+// class MainFrame
+
+IMPLEMENT_DYNAMIC(MainFrame,CMDIFrameWnd)
+
+/////////////////////////////////////////////////////////////////////////////
+// class Application
+
+Application _Application;
+
+BOOL Application::InitInstance()
+{
+  Enable3dControls();
+
+<font color=#ff0000>
+  CMultiDocTemplate * DocTemplate;
+  DocTemplate = new CMultiDocTemplate(IDR_DOCUMENT,
+                                      RUNTIME_CLASS(Document),
+                                      RUNTIME_CLASS(CMDIChildWnd),
+                                      RUNTIME_CLASS(View));
+  AddDocTemplate(DocTemplate);
+</font>
+
+  MainFrame * Frame = new MainFrame;
+
+  if (!Frame->LoadFrame(IDR_MAIN_FRAME))
+    return FALSE;
+
+  m_pMainWnd = Frame;
+
+  m_pMainWnd->ShowWindow(m_nCmdShow);
+  m_pMainWnd->UpdateWindow();
+    
+  return TRUE;
+}			
+			</pre>
+			</table>
+			<ul>
+			<br>
+			<li>Der Zeiger "DocTemplate" zeigt auf eine Dokumentenvorlage, die durch das Instanziieren der Klasse CMultiDocTemplate entstanden ist.<br>
+			<li> Mit der Funktion "AddDocTemplate" wird diese Dokumentenvorlage der Applikation hinzugef&uuml;gt.<br>
+			</ul>
+			<p>
+			<li>Erzeugen Sie nun ein zweites Men&uuml; als Ressource. Dieses ist n&ouml;tig, um zwischen zwei Zust&auml;nden zu unterscheiden:<br>
+			<p>
+			<ul>
+			<li>Es ist noch kein Dokument vorhanden. Das Edit-Men&uuml; erscheint grau ("IDR_MAIN_FRAME").<br>
+			<li>Es wurde bereits ein Dokument erstellt. Die Funktionen des Edit-Men&uuml; k&ouml;nnen nun aufgerufen werden ("IDR_DOCUMENT").<br>
+			</ul><p>
+			Benutzen Sie die Funktionen "Kopieren" und "Einf&uuml;gen" aus dem Bearbeiten-Men&uuml;. Kopieren Sie das Men&uuml; "IDR_MAIN_FRAME", benennen Sie es "IDR_DOCUMENT" und &auml;ndern es, so daﬂ es folgender Abbildung entspricht:<br>
+			<p>
+			<img src=art/sem2_menu.gif><br>
+			<p>
+			<li>Kompilieren Sie nun seminar.cpp ([STRG]+[F7]). Starten Sie das Programm ([STRG]+[F7]) und versuchen Sie, ein Dokument zu erzeugen. Das sollte nat&uuml;rlich nicht m&ouml;glich sein, da noch nicht festgelegt wurde, was in diesem Fall geschehen soll.<br>
+			<p>
+			<li>Vervollst&auml;ndigen Sie deshalb nocheinmal seminar.cpp um den <font color=#ff0000>rot</font> gekennzeichneten Teil.<br>
+			<p>
+				<table border=1><tr><td bgcolor=#000000>
+				<font color=#ffffff size=2>
+				seminar.cpp
+				</font><tr><td>
+					<pre>
+#include &lt;afxwin.h&gt;
+#include "resource.h"
+#include "seminar.h"
+
+/////////////////////////////////////////////////////////////////////////////
+// class Document
+
+IMPLEMENT_DYNCREATE(Document,CDocument)
+
+/////////////////////////////////////////////////////////////////////////////
+// class View
+
+IMPLEMENT_DYNCREATE(View,CView)
+
+void View::OnDraw(CDC * DC)
+{
+
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// class MainFrame
+
+IMPLEMENT_DYNAMIC(MainFrame,CMDIFrameWnd)
+
+/////////////////////////////////////////////////////////////////////////////
+// class Application
+
+Application _Application;
+
+<font color=#ff0000>
+BEGIN_MESSAGE_MAP(Application,CWinApp)
+  ON_COMMAND(ID_FILE_NEW,CWinApp::OnFileNew)
+END_MESSAGE_MAP()
+</font>
+
+BOOL Application::InitInstance()
+{
+  Enable3dControls();
+
+  CMultiDocTemplate * DocTemplate;
+  DocTemplate = new CMultiDocTemplate(IDR_DOCUMENT,
+                                      RUNTIME_CLASS(Document),
+                                      RUNTIME_CLASS(CMDIChildWnd),
+                                      RUNTIME_CLASS(View));
+  AddDocTemplate(DocTemplate);
+
+  MainFrame * Frame = new MainFrame;
+
+  if (!Frame->LoadFrame(IDR_MAIN_FRAME))
+    return FALSE;
+
+  m_pMainWnd = Frame;
+
+  m_pMainWnd->ShowWindow(m_nCmdShow);
+  m_pMainWnd->UpdateWindow();
+    
+  return TRUE;
+}			
+			</pre>
+			</table>
+				<p>
+			<ul>
+			<li>Durch eine Message Map ist es der Applikation m&ouml;glich, auf Messages zu reagieren. Diese Messages werden vom Betriebssystem gesendet. Klick der Anwender zum Beispiel in einem Men&uuml; auf einen Eintrag, so sendet das Betriebssystem eine entsprechende Message.<br>
+			<li>In der implementierten Message Map wird vorerst nur festgelegt, daﬂ die Auswahl des Men&uuml;eintrages File-New den Aufruf der Funktion OnFileNew bewirkt.<br>
+			</ul>
+			<p>
+			<li>Kompilieren Sie das Programm nocheinmal und starten Sie es. Das Erstellen eines neuen Dokumentes sollte nun m&ouml;glich sein.<br>
+			<p>
+		</tr>
+	</table>
+
+
+<!-- author section -->
+	<!-- author: Karsten Koch 1997-->
+	<table width=600>
+		<tr><td>
+		<hr size=1 width=600>
+        	<center>
+        	<font size=2>
+        Lehrstuhl f&uuml;r Informatik im Bauwesen, BUW
+	        </font>
+	        </center>
+		</td></tr>
+	</table>
+
+<!-- end section -->
+	</table>
+	</center>
+	</body>

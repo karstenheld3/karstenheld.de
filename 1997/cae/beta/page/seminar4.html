@@ -1,0 +1,325 @@
+<!-- init section -->
+
+	<head>
+		<title>Lehrveranstaltung zu Windows NT, MFC, COM, Active X: Seminar 4</title>
+	</head>
+	<body bgcolor="#ffffff" text="#000000" alink="#ff0000" vlink="#002080" link="#0f00ff">
+	<font face="VERDANA, ARIAL, HELVETICA">
+	<center>
+	<table>
+
+
+
+<!-- title section -->
+
+	<table border=0 cellspacing=0 cellpadding=0 width=600>
+	<font face="Arial, Helvetica" size=1>
+		<tr>
+			<td width=150><a href=/~bauinf><img src=../art/top-root.gif alt="root" width=150 height=25 border=0 vspace=0></a><br></td>
+			<td width=150><a href=/~bauinf/lehre/lehre.html><img src=../art/top-back.gif alt="previous" width=150 height=25 border=0 vspace=0></a><br></td>
+			<td width=150><a href=../index.html><img src=../art/top-index.gif alt="index" width=150 height=25 border=0 vspace=0></a><br></td>
+		</tr>
+	</table>
+
+
+<!-- page section -->
+
+	<table border=0 cellspacing=0 cellpadding=0 width=600>
+		<tr>
+			<td bgcolor=#ffffff text=#000000 width=600 valign=top align=left>
+			<font face="Verdana,Arial, Helvetica" size=2>
+			<br>
+			<hr size=1>
+			<br><h1><b>Seminar 4</i></b></h1>
+			<hr size=1>
+			<br><h2><b>Visualisierung 1</i></b></h2>
+			<blockquote>
+			In diesem Seminar wird die Implementierung der Visualisierung durch graphische Primitiva am Beispiel des im 3. Seminar implementierten Polygonzuges gezeigt. Es wird die Funktion "OnDraw" der Klasse "View" so vervollst&auml;ndigt, daﬂ der eingegebene Polygonzug im Dokumenten-Fenster graphisch dargestellt wird.
+			</blockquote>
+			<br><h3><b>Funktionsweise der Visualisierung</i></b></h4>
+			<blockquote>
+			Die Visualisierung wird - wie bereits erw&auml;hnt - vollst&auml;ndig durch die Klasse "View" und ihre Funktion "OnDraw" realisiert. Der Aufruf dieser Funktion kommt jedesmal zustande, wenn in einem Programmteil die Funktion "UpdateAllViews" aufgerufen wird.
+			<br><p>
+			F&uuml;r die graphische Darstellung des Polygonzuges werden zun&auml;chst einmal die Ausmaﬂe des Polygonzuges (Variablen "minX", "minY", "maxX", "maxY") und die Gr&ouml;ﬂe des Fensters ("Rect") ermittelt. Aus diesen Daten werden die Gr&ouml;ﬂe des um den Polygonzug freigehaltenen Rahmens ("BorderX", "BorderY"), die Gr&ouml;ﬂe des Polygonzuges selbst ("SizeX", "SizeY") und der Maﬂstab ("ScaleX", "ScaleY") berechnet.
+			<p>
+			<center><img src=art/sem4_visualisierung1.gif><br></center>
+			<p>
+			Danach werden die Punkte des Polygonzuges ihrer Reihenfolge nach mit Linien verbunden. Diese Vorgehensweise soll im folgenden implementiert werden.
+			</blockquote>
+			<ol>
+				<li>Starten Sie die Visual C++ Entwicklungsumgebung und laden Sie das Projekt "D:\Seminar4\seminar.dsw" (auf Index-Seite herunterladen und entpacken).
+				<p>
+				<li>Um die Geometriedaten, d.h. die Liste der Punkte, der "View"-Klasse zug&auml;nglich zu machen, muﬂ die "Dokument"-Klasse eine Funktion anbieten, die einen Zeiger auf die Liste liefert. Deklarieren Sie die Funktion "GetGeometryList" in der Datei "seminar.h" (auszugsweise Darstellung).
+			<p>
+				<table border=1><tr><td bgcolor=#000000>
+				<font color=#ffffff size=2>
+				seminar.h
+				</font><tr><td>
+					<pre>
+...
+
+/////////////////////////////////////////////////////////////////////////////
+// class Document
+
+class Document : public CDocument
+{
+  DECLARE_DYNCREATE(Document)
+  DECLARE_MESSAGE_MAP()
+
+  private:
+  CObList _Geometry;
+
+  public:
+  void OnCreateDlg();
+  <font color=#ff0000>CObList * GetGeometryList();</font>
+};
+
+...
+				</pre>
+			</table>
+			<p>
+			<li>Implementieren Sie diese Funktion in der Datei "seminar.cpp" (auszugsweise Darstellung).
+			<p>
+				<table border=1><tr><td bgcolor=#000000>
+				<font color=#ffffff size=2>
+				seminar.cpp
+				</font><tr><td>
+					<pre>
+...
+
+<font color=#ff0000>CObList * Document::GetGeometryList()
+{
+  return (& _Geometry);
+}</font>
+
+/////////////////////////////////////////////////////////////////////////////
+// class View
+
+...
+				</pre>
+			</table>
+			<p>
+			<li>Implementieren Sie nun den 1. Teil der Funktion "OnDraw" der Klasse "View" (auszugsweise Darstellung).
+			<p>
+				<table border=1><tr><td bgcolor=#000000>
+				<font color=#ffffff size=2>
+				seminar.cpp
+				</font><tr><td>
+				<pre>
+...
+
+/////////////////////////////////////////////////////////////////////////////
+// class View
+
+IMPLEMENT_DYNCREATE(View,CView)
+
+void View::OnDraw(CDC * DC)
+{
+  <font color=#ff0000>CObList * Geometry = ((Document *) m_pDocument)->GetGeometryList();
+
+  double minX = 0;
+  double maxX = 0;
+  double minY = 0;
+  double maxY = 0;
+
+  POSITION Position;
+  Point2D * Point;
+
+  Position = Geometry->GetHeadPosition();
+  while (Position != NULL)
+  {
+    Point = (Point2D *) Geometry->GetNext(Position);
+    if (Point != NULL)
+    {
+       if (Point->_X < minX)
+         minX = Point->_X;
+       if (Point->_X > maxX)
+         maxX = Point->_X;
+       if (Point->_Y < minY)
+         minY = Point->_Y;
+       if (Point->_Y > maxY)
+         maxY = Point->_Y;
+    }
+  }</font>
+}
+
+...
+				</pre>
+			</table>
+			<p>
+			<ul>
+				<li>In der 1. Zeile des rot markierten Quelltextes wird ein Zeiger auf die Geometrieliste angelegt.
+				<li>"Position" beinhaltet immer die aktuelle Position in der verwendeten Liste. "GetHeadPosition" liefert den Kopf der Liste, "GetNext" den n&auml;chsten Eintrag als Position zur&uuml;ck.
+				<li>In der durchlaufenen While-Schleife werden die minimalen und maximalen X- und Y-Koordinaten ermittelt.
+			</ul>
+			<p>
+			<li>Implementieren Sie den 2. Teil der Funktion "OnDraw" (auszugsweise Darstellung).
+			<p>
+				<table border=1><tr><td bgcolor=#000000>
+				<font color=#ffffff size=2>
+				seminar.cpp
+				</font><tr><td>
+				<pre>
+...
+/////////////////////////////////////////////////////////////////////////////
+// class View
+
+IMPLEMENT_DYNCREATE(View,CView)
+
+void View::OnDraw(CDC * DC)
+{
+  CObList * Geometry = ((Document *) m_pDocument)->GetGeometryList();
+
+  double minX = 0;
+  double maxX = 0;
+  double minY = 0;
+  double maxY = 0;
+
+  POSITION Position;
+  Point2D * Point;
+
+  Position = Geometry->GetHeadPosition();
+  while (Position != NULL)
+  {
+    Point = (Point2D *) Geometry->GetNext(Position);
+    if (Point != NULL)
+    {
+       if (Point->_X < minX)
+         minX = Point->_X;
+       if (Point->_X > maxX)
+         maxX = Point->_X;
+       if (Point->_Y < minY)
+         minY = Point->_Y;
+       if (Point->_Y > maxY)
+         maxY = Point->_Y;
+    }
+  }
+
+  <font color=#ff0000>DC->SetBkMode(TRANSPARENT);
+
+  CRect Rect;
+  GetClientRect(& Rect);
+  int BorderX = (int) (Rect.Width() * 0.2);
+  int BorderY = (int) (Rect.Height() * 0.2);
+  int SizeX = (int) (Rect.Width() - (2 * BorderX));
+  int SizeY = (int) (Rect.Height() - (2 * BorderY));
+  double ScaleX = SizeX / (maxX - minX);
+  double ScaleY = SizeY / (maxY - minY);
+  int ZeroX = (int) (- minX * ScaleX) + BorderX;
+  int ZeroY = (int) (- minY * ScaleY) + BorderY;
+  
+  CPen NewPen(PS_SOLID,2,RGB(0,0,0));
+  CPen * OldPen = DC->SelectObject(& NewPen);
+
+  Position = Geometry->GetHeadPosition();
+  if (Position != NULL)
+  {
+    Point = (Point2D *) Geometry->GetNext(Position);
+    if (Point != NULL)
+      DC->MoveTo(((int) (Point->_X * ScaleX)) + ZeroX,
+                 Rect.Height() - (((int) (Point->_Y * ScaleY)) + ZeroY));
+  }
+
+  while (Position != NULL)
+  {
+    Point = (Point2D *) Geometry->GetNext(Position);
+    if (Point != NULL)
+      DC->LineTo(((int) (Point->_X * ScaleX)) + ZeroX,
+                 Rect.Height() - (((int) (Point->_Y * ScaleY)) + ZeroY));
+  }
+  
+  DC->SelectObject(OldPen);</font>
+}
+
+
+...
+				</pre>
+			</table>
+			<p>
+			<ul>
+				<li>In der ersten rot markierten Zeile wird der Darstellungsmodus auf "TRANSPARENT" gesetzt. Dies bewirkt, daﬂ die graphische Darstellung im Document-Fenster den bestehenden Hintergrund nicht l&ouml;scht, sondern auf diesem erfolgt.
+				<li>"DC" ist hierbei der sogenannte "Device Context". In ihm sind graphische Objekte sowie deren Attribute und Details zur Visualisierung (Bildschirmmodus etc.) enthalten.
+				<li>"CPen" ist einen MFC-Klasse, die f&uuml;r Zeichenaktionen als "Zeichenstift-Parameter" f&uuml;r den Device Context ben&ouml;tigt wird.
+				<li>Die beiden Funktionen "MoveTo" und "LineTo" der Instanz "DC" werden zur graphischen Darstellung des Polygonzuges verwendet. "MoveTo" verschiebt den Zeichenstift, "LineTo" zieht eine Line von der aktuellen zur n&auml;chsten Position (wird als Parameter &uuml;bergeben).
+				<li>Um sicherzustellen, das weitere Zeichenaktionen fehlerfrei verlaufen wurde vom vorherigen Zeichenstift in "OldPen" eine Sicherheitskopie angelegt. Nach Beendigung der graphischen Darstellung wird dieser Zeichenstift wieder aktiviert.
+			</ul>
+			<p>
+			<li>F&uuml;gen Sie als letztes in die Funktion "OnCreateDlg" der Klasse "Document" folgende Zeile ein (auszugsweise Darstellung):
+			<p>
+				<table border=1><tr><td bgcolor=#000000>
+				<font color=#ffffff size=2>
+				seminar.cpp
+				</font><tr><td>
+				<pre>
+...
+
+/////////////////////////////////////////////////////////////////////////////
+// class Document
+
+IMPLEMENT_DYNCREATE(Document,CDocument)
+
+BEGIN_MESSAGE_MAP(Document,CDocument)
+  ON_COMMAND(IDM_CREATE,OnCreateDlg)
+END_MESSAGE_MAP()
+
+void Document::OnCreateDlg()
+{
+  CreateDlg Dialog;
+  Point2D * Point;
+  int Result;
+
+  _Geometry.RemoveAll();
+  
+  do
+  {
+    Result = Dialog.DoModal();
+    if (Result == IDOK)
+    {
+      Point = new Point2D;
+      Point->_X = Dialog.GetX();
+      Point->_Y = Dialog.GetY();
+      _Geometry.AddTail(Point);
+    }
+    <font color=#ff0000>UpdateAllViews(NULL);</font>
+  }
+  while (Result == IDOK);
+}
+
+CObList * Document::GetGeometryList()
+{
+  return (& _Geometry);
+}
+
+...
+				</pre>
+			</table>
+			<p>
+			<ul>
+				<li>Der Aufruf der Funktion "UpdateAllViews" bewirkt, das alle Sichten auf dieses Document aktualisiert werden, d.h. in allen View-Klassen die Funktion "OnDraw" augerufen wird.
+			</ul>
+			<p>
+			<li>Kompilieren und Binden sie das Programm. F&uuml;hren sie einen Probestart durch, indem sie in der Applikation ein neues Dokument erzeugen und einen Querschnitt eingeben. Die folgende Abbildung zeigt die Applikation mit einem visualisierten Polygonzug.
+			<p>
+			<img src=art/sem4_screenshot1.gif><br>
+			<p>
+		</tr>
+	</table>
+
+
+<!-- author section -->
+	<!-- author: Karsten Koch 1997-->
+	<table width=600>
+		<tr><td>
+		<hr size=1 width=600>
+        	<center>
+        	<font size=2>
+        Lehrstuhl f&uuml;r Informatik im Bauwesen, BUW
+	        </font>
+	        </center>
+		</td></tr>
+	</table>
+
+<!-- end section -->
+	</table>
+	</center>
+	</body>

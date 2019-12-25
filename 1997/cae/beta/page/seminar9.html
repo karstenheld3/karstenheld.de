@@ -1,0 +1,284 @@
+<!-- init section -->
+
+	<head>
+		<title>Lehrveranstaltung zu Windows NT, MFC, COM, Active X: Seminar 9</title>
+	</head>
+	<body bgcolor="#ffffff" text="#000000" alink="#ff0000" vlink="#002080" link="#0f00ff">
+	<font face="VERDANA, ARIAL, HELVETICA">
+	<center>
+	<table>
+
+
+
+<!-- title section -->
+
+	<table border=0 cellspacing=0 cellpadding=0 width=600>
+	<font face="Arial, Helvetica" size=1>
+		<tr>
+			<td width=150><a href=/~bauinf><img src=../art/top-root.gif alt="root" width=150 height=25 border=0 vspace=0></a><br></td>
+			<td width=150><a href=/~bauinf/lehre/lehre.html><img src=../art/top-back.gif alt="previous" width=150 height=25 border=0 vspace=0></a><br></td>
+			<td width=150><a href=../index.html><img src=../art/top-index.gif alt="index" width=150 height=25 border=0 vspace=0></a><br></td>
+		</tr>
+	</table>
+
+
+<!-- page section -->
+
+	<table border=0 cellspacing=0 cellpadding=0 width=600>
+		<tr>
+			<td bgcolor=#ffffff text=#000000 width=600 valign=top align=left>
+			<font face="Verdana,Arial, Helvetica" size=2>
+			<br>
+			<hr size=1>
+			<br><h1><b>Seminar 9</i></b></h1>
+			<hr size=1>
+			<br><h2><b>Visualisierung 2</i></b></h2>
+			<blockquote>
+			In diesem Seminar wird ausschliesslich auf die Darstellung von Graphik und Text in einem frei skalierbaren Rahmenfenster eingegangen. Dafür wird die Funktion "View:OnDraw" um wesentliche Teile erweitert. Das Ergebnis dieses Seminars ist eine voll lauffähige Applikation, durch welche Querschnitte eingegeben, Querschnittswerte (mit Hilfe der Prozessor-Komponente) berechnet und die Ergebnisse visualisiert werden können.
+			</blockquote>
+			<br><h3><b>Visualisierung und Skalierung von Text und Graphik</i></b></h4>
+			<blockquote>
+			Wenn Graphik oder Text in einem frei skalierbaren Rahmenfenster dargestellt werden sollen, ergeben sich wesentliche Fragen:
+			<ul>	
+				<li>Wie klein darf das Fenster minimal sein (Ausmaß in X- und Y-Richtung) ?
+				<li>Welche Elemente werden skaliert (skalierte Schriften werden schnell unleserlich, nehmen aber bei kleinen Fenstern unskaliert viel Platz ein) ?
+				<li>Soll das Fenster unproportional skalierbar sein (ist der Sinn der Darstellung auch dann noch gegeben) ?
+				<li>Wie werden Abstände zwischen graphischen Objekten behandelt (in Pixeln, in Prozent der Ausdehnung)?
+			</ul>
+			<p>
+			Dies sind nur einige der Probleme, die zu bedenken sind. In unserem Fall soll das Fenster unproportional skalierbar sein. Lediglich eine Mindestbreite, die sich an den sichtbaren Rahmenfenstersymbolen orientiert,  ist standardmässig vorgegeben.
+			Das Fenster besitzt keine Laufleisten, sodass der gesamte Text nur bei ausreichender Skalierung sichtbar ist.
+			</blockquote>
+			<br><h3><b>Implementierung</i></b></h4>
+			<ol>
+				<li>Vervollst&auml;ndigen Sie "seminar.cpp" um den <font color=#ff0000>rot</font> markierten Text (auszugsweise Darstellung).
+				<p>
+				<table border=1><tr><td bgcolor=#000000>
+				<font color=#ffffff size=2>
+				seminar.cpp
+				</font><tr><td>
+				<pre>
+...
+
+/////////////////////////////////////////////////////////////////////////////
+// class View
+
+IMPLEMENT_DYNCREATE(View,CView)
+
+void View::OnDraw(CDC * DC)
+{
+  CObList * Geometry = ((Document *) m_pDocument)->GetGeometryList();
+
+  double minX = 0;
+  double maxX = 0;
+  double minY = 0;
+  double maxY = 0;
+
+  POSITION Position;
+  Point2D * Point;
+
+  Position = Geometry->GetHeadPosition();
+  while (Position != NULL)
+  {
+    Point = (Point2D *) Geometry->GetNext(Position);
+    if (Point != NULL)
+    {
+       if (Point->_X < minX)
+         minX = Point->_X;
+       if (Point->_X > maxX)
+         maxX = Point->_X;
+       if (Point->_Y < minY)
+         minY = Point->_Y;
+       if (Point->_Y > maxY)
+         maxY = Point->_Y;
+    }
+  }
+
+  DC->SetBkMode(TRANSPARENT);
+
+  CRect Rect;
+  GetClientRect(& Rect);
+  int BorderX = (int) (Rect.Width() * 0.2);
+  int BorderY = (int) (Rect.Height() * 0.2);
+  int SizeX = (int) (Rect.Width() - (2 * BorderX));
+  int SizeY = (int) (Rect.Height() - (2 * BorderY));
+
+  double * Results = ((Document *) m_pDocument)->GetResults();
+
+ <font color=#ff0000> if (Results != NULL)
+  {
+    CFont NewFont;
+    NewFont.CreateFont(-11,0,0,0,0,0,0,0,ANSI_CHARSET,OUT_DEFAULT_PRECIS,
+                       CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
+                       DEFAULT_PITCH | FF_SWISS,NULL);
+    CFont * OldFont = (CFont *) DC->SelectObject(& NewFont);
+
+    CSize TextSize(DC->GetTextExtent("MMMMMMMM",strlen("MMMMMMMM")));
+    SizeX -= TextSize.cx;
+    int TextX = BorderX + SizeX + 25;
+    int TextY = BorderY;
+
+    char Buffer[32];
+    int Index = 0;
+
+    sprintf(Buffer,"A = %.5f",Results[Index]);
+    DC->TextOut(TextX,TextY + (Index * (TextSize.cy + 8)),Buffer);
+    Index++;
+    sprintf(Buffer,"Xs = %.5f",Results[Index]);
+    DC->TextOut(TextX,TextY + (Index * (TextSize.cy + 8)),Buffer);
+    Index++;
+    sprintf(Buffer,"Ys = %.5f",Results[Index]);
+    DC->TextOut(TextX,TextY + (Index * (TextSize.cy + 8)),Buffer);
+    Index++;
+    sprintf(Buffer,"Sx = %.5f",Results[Index]);
+    DC->TextOut(TextX,TextY + (Index * (TextSize.cy + 8)),Buffer);
+    Index++;
+    sprintf(Buffer,"Sy = %.5f",Results[Index]);
+    DC->TextOut(TextX,TextY + (Index * (TextSize.cy + 8)),Buffer);
+    Index++;
+    sprintf(Buffer,"Ix = %.5f",Results[Index]);
+    DC->TextOut(TextX,TextY + (Index * (TextSize.cy + 8)),Buffer);
+    Index++;
+    sprintf(Buffer,"Iy = %.5f",Results[Index]);
+    DC->TextOut(TextX,TextY + (Index * (TextSize.cy + 8)),Buffer);
+    Index++;
+    sprintf(Buffer,"Ixy = %.5f",Results[Index]);
+    DC->TextOut(TextX,TextY + (Index * (TextSize.cy + 8)),Buffer);
+
+    DC->SelectObject(OldFont);
+  }</font>
+
+  double ScaleX = SizeX / (maxX - minX);
+  double ScaleY = SizeY / (maxY - minY);
+  int ZeroX = (int) (- minX * ScaleX) + BorderX;
+  int ZeroY = (int) (- minY * ScaleY) + BorderY;
+
+  CPen NewPen(PS_SOLID,2,RGB(0,0,0));
+  CPen * OldPen = DC->SelectObject(& NewPen);
+
+  Position = Geometry->GetHeadPosition();
+  if (Position != NULL)
+  {
+    Point = (Point2D *) Geometry->GetNext(Position);
+    if (Point != NULL)
+      DC->MoveTo(((int) (Point->_X * ScaleX)) + ZeroX,
+                 Rect.Height() - (((int) (Point->_Y * ScaleY)) + ZeroY));
+  }
+
+  while (Position != NULL)
+  {
+    Point = (Point2D *) Geometry->GetNext(Position);
+    if (Point != NULL)
+      DC->LineTo(((int) (Point->_X * ScaleX)) + ZeroX,
+                 Rect.Height() - (((int) (Point->_Y * ScaleY)) + ZeroY));
+  }
+
+  DC->SelectObject(OldPen);
+}
+
+...
+				</pre>
+				</table>
+				<p>
+				<ul>
+					<li>Die Funktion "CFont:CreateFont" legt eine durch zahlreiche Parameter definierte Schriftart an, mit der die Ergebnisse dargestellt werden sollen.
+					<li>Die Klasse "TextSize" (von CSize abgeleitet) enthält die Ausmaße des Probetextes "MMMMMMMM". Diese Maße werden zur Berechnung der Textpositionen benötigt.
+					<li>Zuerst wird die Position für den ersten Text errechnet ("TextX" und "TextY").
+					<li>In der Variable "Buffer" wird jedes Ergebnis abgelegt, bevor es auf dem Bildschirm ausgegeben wird. Die Funktion "sprintf" konvertiert die Fliesskommazahl in ein bestimmtes Text-Fomat und legt sie in "Buffer" ab. Mit "DC->TextOut" erfolgt dann die Darstellung von "Buffer". Als Textabstand vertikal wurden 8 Pixel, als Textabstand zur Graphik 25 Pixel gew&auml;hlt.
+					<li>Die Integer-Variable "Index" dient zur Errechnung der jeweiligen Textposition auf dem Bildschirm.
+					<li>Als letztes wird wieder die urspr&uuml;ngliche Schriftart eingestellt, die zuvor gesichert wurde.
+				</ul>
+				<p>
+				<li>Kompilieren Sie "seminar.cpp" und binden Sie das Projekt. F&uuml;hren Sie einen Probestart durch und geben Sie folgenden Polygonzug ein:
+				<p>
+				<ol>
+					<li>Punkt : (0;0)
+					<li>Punkt : (5;5)
+					<li>Punkt : (0;5)
+					<li>Punkt : (0,0)
+				</ol>
+				<p>
+				<blockquote>
+				Die Darstellung sollte der im folgenden abgebildeten gleichen:
+				<p>
+				<img src=art/sem9_screenshot1.gif>
+				<p>
+				</blockquote>
+				<li>Als zweites soll der Schwerpunkt eingezeichnet werden. Dies erfolg mit den Funktionen "MoveTo" und "LineTo" nach der Darstellung des Polygonzuges.<br>
+					Vervollständigen Sie "seminar.h" (auszugsweise Darstellung).
+				<p>
+				<table border=1><tr><td bgcolor=#000000>
+				<font color=#ffffff size=2>
+				seminar.cpp
+				</font><tr><td>
+				<pre>
+
+...
+
+/////////////////////////////////////////////////////////////////////////////
+// class View
+
+...
+
+  CPen NewPen(PS_SOLID,2,RGB(0,0,0));
+  CPen * OldPen = DC->SelectObject(& NewPen);
+
+  Position = Geometry->GetHeadPosition();
+  if (Position != NULL)
+  {
+    Point = (Point2D *) Geometry->GetNext(Position);
+    if (Point != NULL)
+      DC->MoveTo(((int) (Point->_X * ScaleX)) + ZeroX,
+                 Rect.Height() - (((int) (Point->_Y * ScaleY)) + ZeroY));
+  }
+
+  while (Position != NULL)
+  {
+    Point = (Point2D *) Geometry->GetNext(Position);
+    if (Point != NULL)
+      DC->LineTo(((int) (Point->_X * ScaleX)) + ZeroX,
+                 Rect.Height() - (((int) (Point->_Y * ScaleY)) + ZeroY));
+  }
+
+ <font color=#ff0000> if (Results != NULL)
+  {
+    DC->MoveTo(((int) (Results[1] * ScaleX)) + ZeroX,
+               Rect.Height() - (((int) (Results[2] * ScaleY)) + ZeroY));
+    DC->LineTo(((int) (Results[1] * ScaleX)) + ZeroX,
+               Rect.Height() - (((int) (Results[2] * ScaleY)) + ZeroY + 1));
+  }</font>
+
+  DC->SelectObject(OldPen);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// class MainFrame
+
+...
+				</pre>
+				</table>
+				<p>
+				<li>Kompilieren und binden sie das Projekt erneut. Führen Sie einen weiteren Probestart durch, um die Darstellung des Schwerpunktes zu überprüfen.
+				<p>
+			<ol>
+		</tr>
+	</table>
+
+
+<!-- author section -->
+	<!-- author: Karsten Koch 1997-->
+	<table width=600>
+		<tr><td>
+		<hr size=1 width=600>
+        	<center>
+        	<font size=2>
+        Lehrstuhl f&uuml;r Informatik im Bauwesen, BUW
+	        </font>
+	        </center>
+		</td></tr>
+	</table>
+
+<!-- end section -->
+	</table>
+	</center>
+	</body>
