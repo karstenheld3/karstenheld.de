@@ -113,10 +113,17 @@ $(document).ready(function() {
     });
   }
 
+    $('#btnShowVFProjects').on('click', function(e) {
+    var fullView = $('#full-view');
+    fullView.slideDown('slow', function() {
+      fullView.flexslider(3);
+    });
+  })
+
     $('#btnShowMOnSite').on('click', function(e) {
     var fullView = $('#full-view');
     fullView.slideDown('slow', function() {
-      fullView.flexslider(0);
+      fullView.flexslider(6);
     });
   })
 
@@ -124,35 +131,35 @@ $(document).ready(function() {
     $('#btnShowMEventsProjects').on('click', function(e) {
     var fullView = $('#full-view');
     fullView.slideDown('slow', function() {
-      fullView.flexslider(1);
+      fullView.flexslider(7);
     });
   })
   
     $('#btnShowCryptoXL').on('click', function(e) {
     var fullView = $('#full-view');
     fullView.slideDown('slow', function() {
-      fullView.flexslider(2);
+      fullView.flexslider(8);
     });
   })
   
     $('#btnShowCarlGmbH').on('click', function(e) {
     var fullView = $('#full-view');
     fullView.slideDown('slow', function() {
-      fullView.flexslider(3);
+      fullView.flexslider(9);
     });
   })
 
     $('#btnShowMEventsIntranet').on('click', function(e) {
     var fullView = $('#full-view');
     fullView.slideDown('slow', function() {
-      fullView.flexslider(4);
+      fullView.flexslider(10);
     });
   })
   
     $('#btnShowEtt').on('click', function(e) {
     var fullView = $('#full-view');
     fullView.slideDown('slow', function() {
-      fullView.flexslider(5);
+      fullView.flexslider(11);
     });
   })
 
@@ -160,70 +167,70 @@ $(document).ready(function() {
   $('#btnShowDt').on('click', function(e) {
     var fullView = $('#full-view');
     fullView.slideDown('slow', function() {
-      fullView.flexslider(6);
+      fullView.flexslider(12);
     });
   })
 
   $('#btnShowPm').on('click', function(e) {
     var fullView = $('#full-view');
     fullView.slideDown('slow', function() {
-      fullView.flexslider(7);
+      fullView.flexslider(13);
     });
   })
 
   $('#btnShowMn').on('click', function(e) {
     var fullView = $('#full-view');
     fullView.slideDown('slow', function() {
-      fullView.flexslider(8);
+      fullView.flexslider(14);
     });
   })
 
   $('#btnShowBencerWeb2012').on('click', function(e) {
     var fullView = $('#full-view');
     fullView.slideDown('slow', function() {
-      fullView.flexslider(10);
+      fullView.flexslider(16);
     });
   })
 
   $('#btnShowBencerWeb2011').on('click', function(e) {
     var fullView = $('#full-view');
     fullView.slideDown('slow', function() {
-      fullView.flexslider(11);
+      fullView.flexslider(17);
     });
   })
 
   $('#btnShowBencerWeb2010').on('click', function(e) {
     var fullView = $('#full-view');
     fullView.slideDown('slow', function() {
-      fullView.flexslider(12);
+      fullView.flexslider(18);
     });
   })
 
   $('#btnShowWhizzyToolsCd').on('click', function(e) {
     var fullView = $('#full-view');
     fullView.slideDown('slow', function() {
-      fullView.flexslider(16);
+      fullView.flexslider(22);
     });
   })
   
   $('#btnShowBencerFlyer').on('click', function(e) {
     var fullView = $('#full-view');
     fullView.slideDown('slow', function() {
-      fullView.flexslider(18);
+      fullView.flexslider(24);
     });
   })
 
   $('#btnShowSt').on('click', function(e) {
     var fullView = $('#full-view');
     fullView.slideDown('slow', function() {
-      fullView.flexslider(19)
+      fullView.flexslider(25)
     });
   })
 
   $('#btnShowSj').on('click', function(e) {
     var fullView = $('#full-view');
     fullView.slideDown('slow', function() {
-      fullView.flexslider(20)
+      fullView.flexslider(26)
     });
   })
 

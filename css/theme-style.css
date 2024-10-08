@@ -3640,6 +3640,18 @@ h3.title-divider {
     background-size: 100px 100px;
   }
 }
+.service-support {
+  background-image: url('../img/services/supportlogo.svg');
+  background-size: 100px 100px;
+}
+.service-m365 {
+  background-image: url('../img/services/m365logo.svg');
+  background-size: 100px 100px;
+}
+.service-powerplatform {
+  background-image: url('../img/services/powerplatformlogo.svg');
+  background-size: 100px 100px;
+}
 .service-backend {
   background-image: url('../img/services/service-backend.png');
   background-size: 100px 100px;
@@ -3660,6 +3672,10 @@ h3.title-divider {
 }
 .service-sharepoint {
   background-image: url('../img/services/sharepointlogo.svg');
+  background-size: 100px 100px;
+}
+.service-sharepoint2 {
+  background-image: url('../img/services/sharepointlogo2.svg');
   background-size: 100px 100px;
 }
 .service-mobile {
