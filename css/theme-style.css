@@ -2633,6 +2633,10 @@ h3.title-divider {
   letter-spacing: 1px;
   font-weight: normal;
 }
+/* Work sample link buttons: regular font, not capitalized */
+.slide .btn {
+  text-transform: none;
+}
 .btn:hover,
 .btn:focus,
 .btn:active,
