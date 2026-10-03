@@ -362,4 +362,23 @@ $(document).ready(function() {
       $(this).removeClass('unveil-loading').addClass('unveil-loaded');
     });
   });
+
+  //Hash-based deep linking to work samples
+  //Enables URLs like karstenheld.de#sharepoint-gpt-middleware to open that slide directly
+  var workHash = window.location.hash;
+  if (workHash) {
+    var targetSlide = $(workHash + '.slide');
+    if (targetSlide.length) {
+      var fullView = $('#full-view');
+      var slideIndex = $('#full-view .slide').index(targetSlide);
+      setTimeout(function() {
+        fullView.slideDown('slow');
+        fullView.flexslider(slideIndex);
+        $('html, body').animate({
+          scrollTop: $('#work').offset().top - ($('.navbar .container').height() + 5)
+        }, 500);
+        fullView.trigger("resize");
+      }, 500);
+    }
+  }
 });
